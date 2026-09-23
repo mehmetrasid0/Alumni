@@ -1,0 +1,13 @@
+services:
+  alumni:
+    build: .
+    container_name: alumni
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      - PORT=5000
+      - NODE_ENV=development
+    restart: unless-stopped

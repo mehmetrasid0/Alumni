@@ -81,12 +81,18 @@ Universities often lose contact with their graduates after they leave the instit
 | **MongoDB** | NoSQL document database |
 | **MongoDB Atlas** | Cloud-hosted database service |
 
+### DevOps & Containerization
+| Technology | Purpose |
+|---|---|
+| **Docker** | Containerization platform |
+| **Docker Compose** | Multi-container orchestration |
+| **Nodemon** | Auto-restart server during development (with legacy watch for Docker) |
+
 ### Development Tools
 | Tool | Purpose |
 |---|---|
 | **Git & GitHub** | Version control and collaboration |
 | **Postman** | API testing |
-| **Nodemon** | Auto-restart server during development |
 | **ESLint** | Code linting and formatting |
 
 ---
@@ -138,10 +144,13 @@ alumni-tracker/
 │   │   ├── alumniRoutes.js
 │   │   └── adminRoutes.js
 │   ├── utils/                 # Helper utilities
+│   ├── .env                   # Environment variables (not committed)
 │   ├── server.js              # Entry point
 │   └── package.json
 │
-├── .env.example               # Environment variable template
+├── Dockerfile                 # Docker image definition
+├── docker-compose.yml         # Container orchestration
+├── .dockerignore              # Files excluded from Docker build
 ├── .gitignore
 └── README.md
 ```
@@ -154,12 +163,10 @@ alumni-tracker/
 
 Make sure you have the following installed on your system:
 
-- **Node.js** (v18 or higher) — [Download](https://nodejs.org/)
-- **npm** (comes with Node.js)
-- **MongoDB** — [Download](https://www.mongodb.com/try/download/community) or use [MongoDB Atlas](https://www.mongodb.com/atlas)
+- **Docker Desktop** — [Download](https://www.docker.com/products/docker-desktop/)
 - **Git** — [Download](https://git-scm.com/)
 
-### Installation
+### Installation & Run with Docker Compose
 
 1. **Clone the repository**
    ```bash
@@ -167,19 +174,7 @@ Make sure you have the following installed on your system:
    cd Alumni
    ```
 
-2. **Set up the backend**
-   ```bash
-   cd server
-   npm install
-   ```
-
-3. **Set up the frontend**
-   ```bash
-   cd ../client
-   npm install
-   ```
-
-4. **Configure environment variables**
+2. **Configure environment variables**
 
    Create a `.env` file in the `server/` directory:
    ```env
@@ -189,23 +184,36 @@ Make sure you have the following installed on your system:
    NODE_ENV=development
    ```
 
-5. **Run the application**
-
-   Start the backend server:
+3. **Start the application with Docker Compose**
    ```bash
-   cd server
-   npm run dev
+   docker compose up -d --build
    ```
+   This will automatically build the Docker image, install all dependencies, and start the server inside a container named `alumni`.
 
-   Start the frontend (in a new terminal):
-   ```bash
-   cd client
-   npm run dev
-   ```
-
-6. **Open your browser**
-   - Frontend: `http://localhost:5173`
+4. **Open your browser**
    - Backend API: `http://localhost:5000`
+
+5. **View container logs**
+   ```bash
+   docker logs alumni
+   ```
+
+6. **Stop the application**
+   ```bash
+   docker compose down
+   ```
+
+> **Note:** The `server/` directory is mounted as a volume in the container. Any code changes you make locally will be automatically reflected inside the container thanks to **nodemon** with legacy watch mode — no rebuild needed!
+
+### Alternative: Run Without Docker
+
+If you prefer to run without Docker, make sure you have **Node.js** (v18+) installed:
+
+```bash
+cd server
+npm install
+npm run dev
+```
 
 ---
 
@@ -281,7 +289,9 @@ Make sure you have the following installed on your system:
 ## 🗺️ Roadmap
 
 - [x] Project setup and README
-- [ ] Backend: Initialize Express server and MongoDB connection
+- [x] Docker & Docker Compose configuration
+- [x] Backend: Initialize Express server with basic routes
+- [ ] Backend: MongoDB connection setup
 - [ ] Backend: User authentication (register/login with JWT)
 - [ ] Backend: CRUD operations for alumni records
 - [ ] Backend: Admin routes and middleware
