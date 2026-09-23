@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Alumni Tracker Hakkında — Proje bilgileri, geliştirici ve teknik detaylar.">
+  <title>Hakkında | Alumni Tracker</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* ==================== About Page Specific ==================== */
+    .about-hero {
+      background: linear-gradient(160deg, var(--navy-900) 0%, var(--navy-700) 60%, var(--navy-600) 100%);
+      padding: 140px 0 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-hero::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      right: -15%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(200, 169, 81, 0.06) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .about-hero .container {
+      position: relative;
+      z-index: 2;
+    }
+
+    .about-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      color: #FFFFFF;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    .about-hero h1 .highlight {
+      background: linear-gradient(135deg, var(--gold-400), var(--gold-300));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .about-hero p {
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .breadcrumb {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      font-size: 0.85rem;
+    }
+
+    .breadcrumb a {
+      color: var(--gold-400);
+    }
+
+    .breadcrumb span {
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    /* About Content */
+    .about-content {
+      padding: 80px 0;
+      background: var(--bg-primary);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .about-text h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--navy-700);
+      margin-bottom: 8px;
+    }
+
+    .about-text .accent-line {
+      width: 40px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold-500), var(--gold-300));
+      margin-bottom: 20px;
+      border-radius: 2px;
+    }
+
+    .about-text p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.85;
+      margin-bottom: 16px;
+    }
+
+    .about-text p strong {
+      color: var(--text-primary);
+    }
+
+    /* Feature List */
+    .feature-list {
+      margin-top: 24px;
+    }
+
+    .feature-list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .feature-list-item:last-child {
+      border-bottom: none;
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      background: var(--gold-100);
+    }
+
+    .feature-list-item h4 {
+      font-size: 0.92rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+      color: var(--text-primary);
+    }
+
+    .feature-list-item p {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 0;
+      line-height: 1.6;
+    }
+
+    /* Tech Stack Cards */
+    .tech-section {
+      padding: 80px 0;
+      background: linear-gradient(180deg, #FFFFFF 0%, var(--bg-primary) 100%);
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .tech-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .tech-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--gold-200);
+    }
+
+    .tech-card .tech-emoji {
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .tech-card h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .tech-card p {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Developer Card */
+    .developer-section {
+      padding: 80px 0;
+      background: var(--bg-primary);
+    }
+
+    .dev-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .dev-card-header {
+      background: linear-gradient(135deg, var(--navy-900), var(--navy-700));
+      padding: 40px 40px 48px;
+      text-align: center;
+      position: relative;
+    }
+
+    .dev-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-500), var(--gold-400));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--navy-900);
+      margin: 0 auto 16px;
+      border: 3px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .dev-card-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: #FFFFFF;
+      margin-bottom: 4px;
+    }
+
+    .dev-card-header .dev-title {
+      color: var(--gold-300);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .dev-card-body {
+      padding: 36px 40px;
+    }
+
+    .dev-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .dev-info-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+    }
+
+    .dev-info-item .info-icon {
+      font-size: 1.1rem;
+    }
+
+    .dev-info-item .info-content {
+      flex: 1;
+    }
+
+    .dev-info-item .info-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .dev-info-item .info-value {
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .dev-bio {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .dev-links {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .dev-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .dev-link-primary {
+      background: var(--navy-700);
+      color: #FFFFFF;
+    }
+
+    .dev-link-primary:hover {
+      background: var(--navy-600);
+      transform: translateY(-2px);
+    }
+
+    .dev-link-secondary {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .dev-link-secondary:hover {
+      border-color: var(--gold-400);
+      color: var(--gold-500);
+      transform: translateY(-2px);
+    }
+
+    /* Timeline */
+    .timeline-section {
+      padding: 80px 0;
+      background: linear-gradient(180deg, #FFFFFF 0%, var(--bg-primary) 100%);
+    }
+
+    .timeline {
+      max-width: 640px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 20px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--gold-500), var(--navy-700));
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 20px;
+      padding-bottom: 32px;
+      position: relative;
+    }
+
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-dot {
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      z-index: 2;
+    }
+
+    .dot-gold {
+      background: linear-gradient(135deg, var(--gold-500), var(--gold-400));
+      color: var(--navy-900);
+    }
+
+    .dot-navy {
+      background: linear-gradient(135deg, var(--navy-700), var(--navy-600));
+      color: #FFFFFF;
+    }
+
+    .dot-green {
+      background: linear-gradient(135deg, #2D8B75, #3DAF95);
+      color: #FFFFFF;
+    }
+
+    .timeline-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      flex: 1;
+      transition: var(--transition);
+    }
+
+    .timeline-content:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--gold-200);
+    }
+
+    .timeline-content .tl-phase {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 700;
+      color: var(--gold-500);
+      margin-bottom: 4px;
+    }
+
+    .timeline-content h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .timeline-content p {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+      .tech-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .dev-info-grid {
+        grid-template-columns: 1fr;
+      }
+      .dev-card-body {
+        padding: 24px;
+      }
+      .about-hero h1 {
+        font-size: 2.2rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .tech-grid {
+        grid-template-columns: 1fr;
+      }
+      .dev-links {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== Navbar ==================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="/" class="navbar-brand">
+        <div class="logo-icon">🎓</div>
+        <span>Alumni<span class="brand-accent">Tracker</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Ana Sayfa</a></li>
+        <li><a href="/#announcements">Duyurular</a></li>
+        <li><a href="/#scholarships">Burs İlanları</a></li>
+        <li><a href="/#alumni">Mezunlar</a></li>
+        <li><a href="/about" style="color: #FFFFFF;">Hakkında</a></li>
+        <li><a href="#" class="nav-cta">Giriş Yap</a></li>
+      </ul>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Menü">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== About Hero ==================== -->
+  <section class="about-hero">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/">Ana Sayfa</a>
+        <span>/</span>
+        <span style="color: rgba(255,255,255,0.7);">Hakkında</span>
+      </div>
+      <h1>Proje <span class="highlight">Hakkında</span></h1>
+      <p>Alumni Tracker projesinin amacı, teknik altyapısı ve geliştirici bilgileri.</p>
+    </div>
+  </section>
+
+  <!-- ==================== Proje Açıklaması ==================== -->
+  <section class="about-content">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-text">
+          <h2>Proje Nedir?</h2>
+          <div class="accent-line"></div>
+          <p>
+            <strong>Alumni Tracker</strong>, İstanbul Yeni Yüzyıl Üniversitesi Bilişim Sistemleri (YBS) bölümü 
+            <strong>Web Programlama</strong> dersi kapsamında geliştirilen tam kapsamlı bir mezun takip ve yönetim platformudur.
+          </p>
+          <p>
+            Platform, üniversitelerin mezunlarıyla bağlantılarını sürdürebilmelerini, kariyer gelişimlerini takip edebilmelerini 
+            ve etkin bir mezun ağı oluşturabilmelerini amaçlamaktadır. Mezunlar profillerini güncelleyebilir, burs fırsatlarını 
+            takip edebilir ve üniversite etkinliklerine katılabilirler.
+          </p>
+          <p>
+            Sistem, modern web teknolojileri ve <strong>Docker</strong> konteyner altyapısı kullanılarak geliştirilmektedir. 
+            Backend tarafında <strong>Node.js</strong> ve <strong>Express.js</strong> ile RESTful API, veritabanı olarak 
+            <strong>MongoDB</strong> kullanılmaktadır. Tüm uygulama <strong>Docker Compose</strong> ile tek komutla 
+            ayağa kaldırılabilmektedir.
+          </p>
+        </div>
+        <div>
+          <div class="feature-list">
+            <div class="feature-list-item">
+              <div class="feature-icon">👤</div>
+              <div>
+                <h4>Mezun Profil Yönetimi</h4>
+                <p>Mezunlar eğitim, kariyer ve iletişim bilgilerini güncelleyebilir.</p>
+              </div>
+            </div>
+            <div class="feature-list-item">
+              <div class="feature-icon">🔍</div>
+              <div>
+                <h4>Gelişmiş Arama & Filtreleme</h4>
+                <p>İsim, bölüm, mezuniyet yılı ve şirkete göre filtreleme.</p>
+              </div>
+            </div>
+            <div class="feature-list-item">
+              <div class="feature-icon">🎖️</div>
+              <div>
+                <h4>Burs İlanları</h4>
+                <p>Güncel burs fırsatları ve başvuru takip sistemi.</p>
+              </div>
+            </div>
+            <div class="feature-list-item">
+              <div class="feature-icon">📅</div>
+              <div>
+                <h4>Etkinlik Yönetimi</h4>
+                <p>Mezun buluşmaları, kariyer günleri ve mentorluk programları.</p>
+              </div>
+            </div>
+            <div class="feature-list-item">
+              <div class="feature-icon">📊</div>
+              <div>
+                <h4>Admin Dashboard</h4>
+                <p>İstatistikler, kullanıcı yönetimi ve raporlama araçları.</p>
+              </div>
+            </div>
+            <div class="feature-list-item">
+              <div class="feature-icon">🐳</div>
+              <div>
+                <h4>Docker ile Kolay Kurulum</h4>
+                <p>Tek komutla tüm sistemi ayağa kaldırma imkanı.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Tech Stack ==================== -->
+  <section class="tech-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>🛠️ Kullanılan Teknolojiler</h2>
+        <div class="accent-line"></div>
+        <p>Projede kullanılan teknolojiler ve araçlar</p>
+      </div>
+      <div class="tech-grid">
+        <div class="tech-card">
+          <span class="tech-emoji">🟢</span>
+          <h4>Node.js</h4>
+          <p>Sunucu tarafı JavaScript çalışma ortamı. Yüksek performanslı, olay tabanlı mimari.</p>
+        </div>
+        <div class="tech-card">
+          <span class="tech-emoji">⚡</span>
+          <h4>Express.js</h4>
+          <p>Hızlı ve minimal web framework. RESTful API geliştirmek için ideal.</p>
+        </div>
+        <div class="tech-card">
+          <span class="tech-emoji">🍃</span>
+          <h4>MongoDB</h4>
+          <p>Esnek NoSQL veritabanı. Mongoose ODM ile şema tabanlı veri modelleme.</p>
+        </div>
+        <div class="tech-card">
+          <span class="tech-emoji">⚛️</span>
+          <h4>React.js</h4>
+          <p>Bileşen tabanlı kullanıcı arayüzü kütüphanesi. Vite ile hızlı geliştirme.</p>
+        </div>
+        <div class="tech-card">
+          <span class="tech-emoji">🐳</span>
+          <h4>Docker</h4>
+          <p>Konteyner platformu. Docker Compose ile çoklu servis yönetimi.</p>
+        </div>
+        <div class="tech-card">
+          <span class="tech-emoji">🔐</span>
+          <h4>JWT & bcrypt</h4>
+          <p>Güvenli token tabanlı kimlik doğrulama ve şifre hashleme.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Geliştirici ==================== -->
+  <section class="developer-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>👨‍💻 Geliştirici</h2>
+        <div class="accent-line"></div>
+        <p>Projenin arkasındaki kişi</p>
+      </div>
+      <div class="dev-card">
+        <div class="dev-card-header">
+          <div class="dev-avatar">MR</div>
+          <h3>Mehmet Raşid Ünlüel</h3>
+          <div class="dev-title">Bilişim Sistemleri — 3. Sınıf Öğrencisi</div>
+        </div>
+        <div class="dev-card-body">
+          <div class="dev-info-grid">
+            <div class="dev-info-item">
+              <span class="info-icon">🏛️</span>
+              <div class="info-content">
+                <div class="info-label">Üniversite</div>
+                <div class="info-value">İstanbul Yeni Yüzyıl Üniversitesi</div>
+              </div>
+            </div>
+            <div class="dev-info-item">
+              <span class="info-icon">📚</span>
+              <div class="info-content">
+                <div class="info-label">Bölüm</div>
+                <div class="info-value">Bilişim Sistemleri (YBS)</div>
+              </div>
+            </div>
+            <div class="dev-info-item">
+              <span class="info-icon">🎫</span>
+              <div class="info-content">
+                <div class="info-label">Okul Numarası</div>
+                <div class="info-value">0515230018</div>
+              </div>
+            </div>
+            <div class="dev-info-item">
+              <span class="info-icon">📧</span>
+              <div class="info-content">
+                <div class="info-label">E-posta</div>
+                <div class="info-value">mehmetrasidunluel@gmail.com</div>
+              </div>
+            </div>
+            <div class="dev-info-item">
+              <span class="info-icon">📖</span>
+              <div class="info-content">
+                <div class="info-label">Ders</div>
+                <div class="info-value">Web Programlama</div>
+              </div>
+            </div>
+            <div class="dev-info-item">
+              <span class="info-icon">📅</span>
+              <div class="info-content">
+                <div class="info-label">Akademik Yıl</div>
+                <div class="info-value">2025 – 2026</div>
+              </div>
+            </div>
+          </div>
+          <div class="dev-bio">
+            Bu proje, Web Programlama dersi kapsamında üniversite mezunlarının takip edilmesi ve yönetilmesi amacıyla geliştirilmiştir. 
+            MERN Stack ve Docker teknolojileri kullanılarak modern bir full-stack web uygulaması olarak tasarlanmıştır.
+          </div>
+          <div class="dev-links">
+            <a href="https://github.com/mehmetrasid0" target="_blank" class="dev-link dev-link-primary">🐙 GitHub Profili</a>
+            <a href="https://github.com/mehmetrasid0/Alumni" target="_blank" class="dev-link dev-link-secondary">📂 Proje Reposu</a>
+            <a href="mailto:mehmetrasidunluel@gmail.com" class="dev-link dev-link-secondary">📧 E-posta Gönder</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Proje Yol Haritası ==================== -->
+  <section class="timeline-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>🗺️ Proje Yol Haritası</h2>
+        <div class="accent-line"></div>
+        <p>Projenin gelişim aşamaları</p>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot dot-gold">✅</div>
+          <div class="timeline-content">
+            <div class="tl-phase">Faz 1 — Tamamlandı</div>
+            <h4>Proje Kurulumu & Altyapı</h4>
+            <p>Repository oluşturma, README hazırlama, Dockerfile ve Docker Compose konfigürasyonu, Express server ile temel route'ların oluşturulması.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot dot-navy">🔄</div>
+          <div class="timeline-content">
+            <div class="tl-phase">Faz 2 — Devam Ediyor</div>
+            <h4>Veritabanı & Kimlik Doğrulama</h4>
+            <p>MongoDB bağlantısı, Mongoose şemaları, JWT tabanlı kullanıcı kayıt/giriş sistemi, bcrypt ile şifre hashleme.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot dot-navy">📋</div>
+          <div class="timeline-content">
+            <div class="tl-phase">Faz 3 — Planlandı</div>
+            <h4>API Geliştirme</h4>
+            <p>Mezun CRUD operasyonları, admin route'ları, arama ve pagination endpoint'leri.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot dot-navy">🎨</div>
+          <div class="timeline-content">
+            <div class="tl-phase">Faz 4 — Planlandı</div>
+            <h4>Frontend & Arayüz</h4>
+            <p>React + Vite ile responsive sayfalar, alumni directory, login/register, admin dashboard.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot dot-green">🚀</div>
+          <div class="timeline-content">
+            <div class="tl-phase">Faz 5 — Gelecek</div>
+            <h4>Entegrasyon & Deployment</h4>
+            <p>Frontend-backend entegrasyonu, Postman ile API testleri, production build ve cloud deployment.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Footer ==================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <h3>🎓 AlumniTracker</h3>
+          <p>İstanbul Yeni Yüzyıl Üniversitesi mezun takip ve yönetim platformu. Mezunlarımızla güçlü bağlar kurarak geleceği birlikte şekillendiriyoruz.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="Instagram">📷</a>
+            <a href="#" aria-label="YouTube">▶</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Hızlı Bağlantılar</h4>
+          <a href="/">Ana Sayfa</a>
+          <a href="/#announcements">Duyurular</a>
+          <a href="/#scholarships">Burs İlanları</a>
+          <a href="/#alumni">Mezun Dizini</a>
+          <a href="/about">Hakkında</a>
+        </div>
+        <div class="footer-col">
+          <h4>Kurumsal</h4>
+          <a href="#">Gizlilik Politikası</a>
+          <a href="#">Kullanım Şartları</a>
+          <a href="#">İletişim</a>
+        </div>
+        <div class="footer-col">
+          <h4>İletişim</h4>
+          <a href="#">📍 İstanbul, Türkiye</a>
+          <a href="mailto:mehmetrasidunluel@gmail.com">📧 mehmetrasidunluel@gmail.com</a>
+          <a href="https://github.com/mehmetrasid0" target="_blank">🐙 GitHub</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Alumni Tracker — İstanbul Yeni Yüzyıl Üniversitesi. Tüm hakları saklıdır.</span>
+        <span>Made with ❤️ by Mehmet Raşid Ünlüel</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== JavaScript ==================== -->
+  <script>
+    // Mobile menu toggle
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    mobileToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('active');
+      });
+    });
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 80) {
+        navbar.style.background = 'rgba(13, 27, 42, 0.98)';
+        navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.15)';
+      } else {
+        navbar.style.background = 'rgba(13, 27, 42, 0.92)';
+        navbar.style.boxShadow = 'none';
+      }
+    });
+
+    // Intersection Observer for animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.tech-card, .feature-list-item, .timeline-item, .dev-info-item').forEach(el => {
+      el.style.opacity = '0';
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

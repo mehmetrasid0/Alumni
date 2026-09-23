@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Alumni Tracker — İstanbul Yeni Yüzyıl Üniversitesi mezun takip ve yönetim platformu. Mezunlarımızla bağımızı güçlendiriyoruz.">
+  <title>Alumni Tracker | İstanbul Yeni Yüzyıl Üniversitesi</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- ==================== Navbar ==================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#" class="navbar-brand">
+        <div class="logo-icon">🎓</div>
+        <span>Alumni<span class="brand-accent">Tracker</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#announcements">Duyurular</a></li>
+        <li><a href="#scholarships">Burs İlanları</a></li>
+        <li><a href="#alumni">Mezunlar</a></li>
+        <li><a href="#events">Etkinlikler</a></li>
+        <li><a href="#posts">Paylaşımlar</a></li>
+        <li><a href="#" class="nav-cta">Giriş Yap</a></li>
+      </ul>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Menü">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== Hero ==================== -->
+  <section class="hero" id="hero">
+    <div class="hero-grid"></div>
+    <div class="container">
+      <div class="hero-badge">
+        ✨ İstanbul Yeni Yüzyıl Üniversitesi Mezun Platformu
+      </div>
+      <h1>
+        Mezunlarımızla<br>
+        <span class="highlight">Geleceği Birlikte</span> İnşa Ediyoruz
+      </h1>
+      <p class="hero-subtitle">
+        Kariyer yolculuğunuzu takip edin, burs fırsatlarını keşfedin, 
+        üniversite ağınızla bağlantıda kalın.
+      </p>
+      <div class="hero-search">
+        <input type="text" placeholder="Mezun ara... (isim, bölüm, şirket)" id="searchInput">
+        <button type="button" aria-label="Ara">🔍</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="number">2,847</div>
+          <div class="label">Toplam Mezun</div>
+        </div>
+        <div class="hero-stat">
+          <div class="number">156</div>
+          <div class="label">Şirket Ortağı</div>
+        </div>
+        <div class="hero-stat">
+          <div class="number">23</div>
+          <div class="label">Ülke</div>
+        </div>
+        <div class="hero-stat">
+          <div class="number">94%</div>
+          <div class="label">İstihdam Oranı</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Stats Bar ==================== -->
+  <section class="stats-bar">
+    <div class="container">
+      <div class="stat-item">
+        <div class="stat-icon">👨‍🏫</div>
+        <div class="stat-number">184</div>
+        <div class="stat-label">Akademisyen</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">⚙️</div>
+        <div class="stat-number">723</div>
+        <div class="stat-label">Mühendis</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">💼</div>
+        <div class="stat-number">412</div>
+        <div class="stat-label">Yönetici</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">🚀</div>
+        <div class="stat-number">89</div>
+        <div class="stat-label">Girişimci</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Duyurular ==================== -->
+  <section class="announcements" id="announcements">
+    <div class="container">
+      <div class="section-header">
+        <h2>📢 Duyurular</h2>
+        <div class="accent-line"></div>
+        <p>Üniversiteden en güncel haberler ve duyurular</p>
+      </div>
+      <div class="announcements-grid">
+        <div class="announcement-card">
+          <span class="announcement-tag tag-urgent">🔴 Önemli</span>
+          <h3>2026 Mezuniyet Töreni Tarihi Açıklandı</h3>
+          <p>2025-2026 akademik yılı mezuniyet töreni 28 Haziran 2026 tarihinde kampüs ana salonda gerçekleşecektir.</p>
+          <div class="announcement-meta">
+            <span class="date">📅 20 Eylül 2026</span>
+            <a href="#" class="read-more">Devamını Oku →</a>
+          </div>
+        </div>
+        <div class="announcement-card">
+          <span class="announcement-tag tag-general">📋 Genel</span>
+          <h3>Mezun Bilgi Sistemi Güncellendi</h3>
+          <p>Profil bilgilerinizi güncelleyerek iş fırsatlarından ve etkinliklerden haberdar olabilirsiniz.</p>
+          <div class="announcement-meta">
+            <span class="date">📅 18 Eylül 2026</span>
+            <a href="#" class="read-more">Devamını Oku →</a>
+          </div>
+        </div>
+        <div class="announcement-card">
+          <span class="announcement-tag tag-event">🎉 Etkinlik</span>
+          <h3>Kariyer Günleri — Teknoloji Sektörü</h3>
+          <p>Büyük teknoloji şirketlerinden temsilciler üniversitemize geliyor. Mezunlarımıza özel networking fırsatı.</p>
+          <div class="announcement-meta">
+            <span class="date">📅 15 Eylül 2026</span>
+            <a href="#" class="read-more">Devamını Oku →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Burs İlanları ==================== -->
+  <section class="scholarships" id="scholarships">
+    <div class="container">
+      <div class="section-header">
+        <h2>🎖️ Burs İlanları</h2>
+        <div class="accent-line"></div>
+        <p>Mezunlarımız ve öğrencilerimiz için güncel burs fırsatları</p>
+      </div>
+      <div class="scholarships-grid">
+        <div class="scholarship-card">
+          <div class="scholarship-icon icon-gold">🏅</div>
+          <div class="scholarship-info">
+            <h3>TÜBİTAK Yurt Dışı Araştırma Bursu</h3>
+            <p>Doktora ve yüksek lisans öğrencileri için yurt dışı araştırma desteği programı.</p>
+            <div class="scholarship-details">
+              <span>💰 Aylık 3.500€</span>
+              <span class="deadline-badge">⏰ Son: 15 Kasım 2026</span>
+            </div>
+          </div>
+        </div>
+        <div class="scholarship-card">
+          <div class="scholarship-icon icon-navy">📚</div>
+          <div class="scholarship-info">
+            <h3>İYYÜ Akademik Başarı Bursu</h3>
+            <p>GPA 3.50 üzeri öğrenciler için tam burs ve araştırma fonu desteği.</p>
+            <div class="scholarship-details">
+              <span>💰 Tam Burs + ₺5.000/ay</span>
+              <span class="deadline-badge">⏰ Son: 1 Aralık 2026</span>
+            </div>
+          </div>
+        </div>
+        <div class="scholarship-card">
+          <div class="scholarship-icon icon-gold">🌍</div>
+          <div class="scholarship-info">
+            <h3>Erasmus+ Değişim Programı</h3>
+            <p>Avrupa üniversitelerinde 1 veya 2 dönem öğrenim imkanı ve yaşam desteği.</p>
+            <div class="scholarship-details">
+              <span>💰 Aylık 800-1.100€</span>
+              <span class="deadline-badge">⏰ Son: 30 Ekim 2026</span>
+            </div>
+          </div>
+        </div>
+        <div class="scholarship-card">
+          <div class="scholarship-icon icon-navy">💻</div>
+          <div class="scholarship-info">
+            <h3>Google Developer Scholarship</h3>
+            <p>Yazılım mühendisliği ve bilgisayar bilimleri alanında Google destekli teknoloji bursu.</p>
+            <div class="scholarship-details">
+              <span>💰 $10,000</span>
+              <span class="deadline-badge">⏰ Son: 20 Kasım 2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Mezun Dizini ==================== -->
+  <section class="alumni-directory" id="alumni">
+    <div class="container">
+      <div class="section-header">
+        <h2>👥 Mezun Dizini</h2>
+        <div class="accent-line"></div>
+        <p>Mezunlarımızın kariyer yolculukları ve mevcut pozisyonları</p>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">Tümü</button>
+        <button class="filter-btn" data-filter="akademisyen">Akademisyen</button>
+        <button class="filter-btn" data-filter="muhendis">Mühendis</button>
+        <button class="filter-btn" data-filter="yonetici">Yönetici</button>
+        <button class="filter-btn" data-filter="doktor">Doktor</button>
+        <button class="filter-btn" data-filter="avukat">Avukat</button>
+        <button class="filter-btn" data-filter="girisimci">Girişimci</button>
+      </div>
+      <div class="alumni-grid" id="alumniGrid">
+
+        <div class="alumni-card" data-category="akademisyen">
+          <div class="alumni-avatar avatar-1">AY</div>
+          <h4>Prof. Dr. Ahmet Yılmaz</h4>
+          <span class="alumni-position pos-akademisyen">👨‍🏫 Akademisyen</span>
+          <div class="alumni-detail">🏛️ İstanbul Üniversitesi</div>
+          <div class="alumni-detail">📖 Bilgisayar Mühendisliği</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2008</span>
+        </div>
+
+        <div class="alumni-card" data-category="muhendis">
+          <div class="alumni-avatar avatar-2">EK</div>
+          <h4>Elif Kaya</h4>
+          <span class="alumni-position pos-muhendis">⚙️ Yazılım Mühendisi</span>
+          <div class="alumni-detail">🏢 Google</div>
+          <div class="alumni-detail">📖 Bilişim Sistemleri</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2019</span>
+        </div>
+
+        <div class="alumni-card" data-category="yonetici">
+          <div class="alumni-avatar avatar-3">MÖ</div>
+          <h4>Mehmet Özdemir</h4>
+          <span class="alumni-position pos-yonetici">💼 Genel Müdür</span>
+          <div class="alumni-detail">🏢 Türk Telekom</div>
+          <div class="alumni-detail">📖 İşletme</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2005</span>
+        </div>
+
+        <div class="alumni-card" data-category="doktor">
+          <div class="alumni-avatar avatar-5">ZA</div>
+          <h4>Dr. Zeynep Aksoy</h4>
+          <span class="alumni-position pos-doktor">🩺 Uzman Doktor</span>
+          <div class="alumni-detail">🏥 Acıbadem Hastanesi</div>
+          <div class="alumni-detail">📖 Tıp Fakültesi</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2014</span>
+        </div>
+
+        <div class="alumni-card" data-category="muhendis">
+          <div class="alumni-avatar avatar-6">BD</div>
+          <h4>Burak Demir</h4>
+          <span class="alumni-position pos-muhendis">⚙️ Backend Developer</span>
+          <div class="alumni-detail">🏢 Microsoft</div>
+          <div class="alumni-detail">📖 Bilgisayar Mühendisliği</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2021</span>
+        </div>
+
+        <div class="alumni-card" data-category="avukat">
+          <div class="alumni-avatar avatar-4">SÇ</div>
+          <h4>Av. Selin Çelik</h4>
+          <span class="alumni-position pos-avukat">⚖️ Avukat</span>
+          <div class="alumni-detail">🏢 Çelik Hukuk Bürosu</div>
+          <div class="alumni-detail">📖 Hukuk Fakültesi</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2016</span>
+        </div>
+
+        <div class="alumni-card" data-category="girisimci">
+          <div class="alumni-avatar avatar-7">CT</div>
+          <h4>Can Tekin</h4>
+          <span class="alumni-position pos-girisimci">🚀 Kurucu & CEO</span>
+          <div class="alumni-detail">🏢 TechPay Startup</div>
+          <div class="alumni-detail">📖 Bilişim Sistemleri</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2018</span>
+        </div>
+
+        <div class="alumni-card" data-category="akademisyen">
+          <div class="alumni-avatar avatar-8">FA</div>
+          <h4>Doç. Dr. Fatma Arslan</h4>
+          <span class="alumni-position pos-akademisyen">👨‍🏫 Akademisyen</span>
+          <div class="alumni-detail">🏛️ İYYÜ</div>
+          <div class="alumni-detail">📖 Endüstri Mühendisliği</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2011</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Etkinlikler ==================== -->
+  <section class="events" id="events">
+    <div class="container">
+      <div class="section-header">
+        <h2>📅 Yaklaşan Etkinlikler</h2>
+        <div class="accent-line"></div>
+        <p>Mezunlarımız ve öğrencilerimiz için düzenlenen etkinlikler</p>
+      </div>
+      <div class="events-list">
+        <div class="event-card">
+          <div class="event-date-box">
+            <div class="day">12</div>
+            <div class="month">Ekim</div>
+          </div>
+          <div class="event-info">
+            <h3>Mezunlar Buluşması 2026</h3>
+            <p>Tüm dönem mezunlarının katılabileceği geleneksel yıllık buluşma etkinliği.</p>
+            <div class="event-location">📍 İYYÜ Merkez Kampüs, Konferans Salonu</div>
+          </div>
+          <button class="event-register">Kayıt Ol</button>
+        </div>
+        <div class="event-card">
+          <div class="event-date-box">
+            <div class="day">25</div>
+            <div class="month">Ekim</div>
+          </div>
+          <div class="event-info">
+            <h3>Teknoloji Zirvesi — AI & Geleceğin Meslekleri</h3>
+            <p>Yapay zeka, veri bilimi ve dijital dönüşüm konularında uzman konuşmacılar.</p>
+            <div class="event-location">📍 Online (Zoom) + Kampüs Yayını</div>
+          </div>
+          <button class="event-register">Kayıt Ol</button>
+        </div>
+        <div class="event-card">
+          <div class="event-date-box">
+            <div class="day">08</div>
+            <div class="month">Kasım</div>
+          </div>
+          <div class="event-info">
+            <h3>Kariyer Mentorluk Programı Başlangıcı</h3>
+            <p>Deneyimli mezunlarımız ile yeni mezunlar ve öğrenciler arasında mentorluk eşleştirmesi.</p>
+            <div class="event-location">📍 İYYÜ Kariyer Merkezi</div>
+          </div>
+          <button class="event-register">Başvur</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Genel Paylaşımlar ==================== -->
+  <section class="posts" id="posts">
+    <div class="container">
+      <div class="section-header">
+        <h2>💬 Genel Paylaşımlar</h2>
+        <div class="accent-line"></div>
+        <p>Mezunlarımızın başarı hikayeleri ve paylaşımları</p>
+      </div>
+      <div class="posts-grid">
+        <div class="post-card">
+          <div class="post-image post-img-1">🏆</div>
+          <div class="post-body">
+            <div class="post-author">
+              <div class="post-author-avatar">EK</div>
+              <div>
+                <div class="post-author-name">Elif Kaya</div>
+                <div class="post-author-date">2 gün önce</div>
+              </div>
+            </div>
+            <h3>Google'da İlk Yılım: Neler Öğrendim?</h3>
+            <p>Mezuniyetin ardından Google'da yazılım mühendisi olarak ilk yılımda edindiğim deneyimleri paylaşmak istiyorum...</p>
+          </div>
+          <div class="post-footer">
+            <div class="post-reactions">
+              <span>❤️ 142</span>
+              <span>💬 28</span>
+            </div>
+            <a href="#" class="read-more">Oku →</a>
+          </div>
+        </div>
+        <div class="post-card">
+          <div class="post-image post-img-2">🌱</div>
+          <div class="post-body">
+            <div class="post-author">
+              <div class="post-author-avatar">CT</div>
+              <div>
+                <div class="post-author-name">Can Tekin</div>
+                <div class="post-author-date">5 gün önce</div>
+              </div>
+            </div>
+            <h3>Startup Kuruculuk Yolculuğum</h3>
+            <p>Üniversitede bir fikir olarak başlayan TechPay, bugün 50 kişilik bir ekibe ulaştı. İşte hikayemiz...</p>
+          </div>
+          <div class="post-footer">
+            <div class="post-reactions">
+              <span>❤️ 98</span>
+              <span>💬 45</span>
+            </div>
+            <a href="#" class="read-more">Oku →</a>
+          </div>
+        </div>
+        <div class="post-card">
+          <div class="post-image post-img-3">📖</div>
+          <div class="post-body">
+            <div class="post-author">
+              <div class="post-author-avatar">FA</div>
+              <div>
+                <div class="post-author-name">Doç. Dr. Fatma Arslan</div>
+                <div class="post-author-date">1 hafta önce</div>
+              </div>
+            </div>
+            <h3>TÜBİTAK Projesi ile Uluslararası Yayın</h3>
+            <p>TÜBİTAK destekli projemiz kapsamında Nature dergisinde yayımlanan makalemizin hikayesi...</p>
+          </div>
+          <div class="post-footer">
+            <div class="post-reactions">
+              <span>❤️ 76</span>
+              <span>💬 19</span>
+            </div>
+            <a href="#" class="read-more">Oku →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Newsletter ==================== -->
+  <section class="newsletter">
+    <div class="container">
+      <h2>📬 Bültenimize Abone Olun</h2>
+      <p>Burs fırsatları, etkinlikler ve duyurulardan anında haberdar olun.</p>
+      <form class="newsletter-form" id="newsletterForm">
+        <input type="email" placeholder="E-posta adresiniz" required>
+        <button type="submit">Abone Ol</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ==================== Footer ==================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <h3>🎓 AlumniTracker</h3>
+          <p>İstanbul Yeni Yüzyıl Üniversitesi mezun takip ve yönetim platformu. Mezunlarımızla güçlü bağlar kurarak geleceği birlikte şekillendiriyoruz.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="Instagram">📷</a>
+            <a href="#" aria-label="YouTube">▶</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Hızlı Bağlantılar</h4>
+          <a href="#announcements">Duyurular</a>
+          <a href="#scholarships">Burs İlanları</a>
+          <a href="#alumni">Mezun Dizini</a>
+          <a href="#events">Etkinlikler</a>
+          <a href="#posts">Paylaşımlar</a>
+        </div>
+        <div class="footer-col">
+          <h4>Kurumsal</h4>
+          <a href="#">Hakkımızda</a>
+          <a href="#">Gizlilik Politikası</a>
+          <a href="#">Kullanım Şartları</a>
+          <a href="#">İletişim</a>
+        </div>
+        <div class="footer-col">
+          <h4>İletişim</h4>
+          <a href="#">📍 İstanbul, Türkiye</a>
+          <a href="#">📧 alumni@iyyu.edu.tr</a>
+          <a href="#">📞 +90 (212) 000 00 00</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Alumni Tracker — İstanbul Yeni Yüzyıl Üniversitesi. Tüm hakları saklıdır.</span>
+        <span>Made with ❤️ by Mehmet Raşid</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== JavaScript ==================== -->
+  <script>
+    // Mobile menu toggle
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    mobileToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+
+    // Close mobile menu on link click
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('active');
+      });
+    });
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 80) {
+        navbar.style.background = 'rgba(13, 27, 42, 0.98)';
+        navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.15)';
+      } else {
+        navbar.style.background = 'rgba(13, 27, 42, 0.92)';
+        navbar.style.boxShadow = 'none';
+      }
+    });
+
+    // Alumni filter
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const alumniCards = document.querySelectorAll('.alumni-card');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.getAttribute('data-filter');
+
+        alumniCards.forEach(card => {
+          if (filter === 'all' || card.getAttribute('data-category') === filter) {
+            card.style.display = '';
+            card.style.animation = 'fadeInUp 0.4s ease';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      alumniCards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(query) ? '' : 'none';
+      });
+    });
+
+    // Animated counter
+    function animateCounters() {
+      const counters = document.querySelectorAll('.stat-number, .hero-stat .number');
+      counters.forEach(counter => {
+        const text = counter.textContent;
+        const hasPercent = text.includes('%');
+        const target = parseInt(text.replace(/[^0-9]/g, ''));
+        if (isNaN(target)) return;
+
+        let current = 0;
+        const step = Math.ceil(target / 60);
+        const timer = setInterval(() => {
+          current += step;
+          if (current >= target) {
+            current = target;
+            clearInterval(timer);
+          }
+          counter.textContent = current.toLocaleString('tr-TR') + (hasPercent ? '%' : '');
+        }, 20);
+      });
+    }
+
+    // Intersection Observer for animations
+    const observerOptions = { threshold: 0.2, rootMargin: '0px 0px -50px 0px' };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.announcement-card, .scholarship-card, .alumni-card, .event-card, .post-card').forEach(el => {
+      el.style.opacity = '0';
+      observer.observe(el);
+    });
+
+    // Start counter animation when stats bar is visible
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounters();
+          statsObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    const statsBar = document.querySelector('.stats-bar');
+    if (statsBar) statsObserver.observe(statsBar);
+
+    // Newsletter form
+    document.getElementById('newsletterForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = e.target.querySelector('input');
+      alert('✅ ' + input.value + ' adresi bültenimize eklendi!');
+      input.value = '';
+    });
+  </script>
+
+</body>
+</html>

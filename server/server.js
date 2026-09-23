@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const dotenv = require('dotenv');
 
 // Load environment variables
@@ -7,9 +8,17 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// GET / → "ok" döndür
+// Serve static files (CSS, images, etc.)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// GET / → Ana sayfa (index.html)
 app.get('/', (req, res) => {
-  res.send('ok');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// GET /about → Hakkında sayfası
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'about.html'));
 });
 
 // GET /hello/:name → "Hello,{name}!" döndür
