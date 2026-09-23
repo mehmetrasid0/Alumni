@@ -12,9 +12,16 @@ app.get('/', (req, res) => {
   res.send('ok');
 });
 
-// GET /hello → "Hello;World!" döndür
-app.get('/hello', (req, res) => {
-  res.send('Hello;World!');
+// GET /hello/:name → "Hello,{name}!" döndür
+app.get('/hello/:name', (req, res) => {
+  res.send(`Hello,${req.params.name}!`);
+});
+
+// GET /sum/:number1/:number2 → iki sayının toplamını döndür
+app.get('/sum/:number1/:number2', (req, res) => {
+  const num1 = Number(req.params.number1);
+  const num2 = Number(req.params.number2);
+  res.send(`${num1 + num2}`);
 });
 
 // Start server

@@ -1,49 +1,26 @@
 # 🎓 Alumni Tracker
 
-A full-stack web application for tracking and managing university alumni. Built as a course project for **Web Programming** at Istanbul Yeni Yüzyıl University — Information Systems (YBS), 3rd Year.
+A modern, containerized full-stack web application for tracking and managing university alumni. Built as a course project for **Web Programming** at Istanbul Yeni Yüzyıl University — Information Systems (YBS), 3rd Year.
 
 ---
 
-## 📋 Table of Contents
+## 🚀 Key Features & Modules
 
-- [About the Project](#about-the-project)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [API Endpoints](#api-endpoints)
-- [Database Schema](#database-schema)
-- [Screenshots](#screenshots)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-
----
-
-## 📖 About the Project
-
-**Alumni Tracker** is a web-based platform that enables universities to maintain and manage a comprehensive database of their graduates. The system allows administrators to track alumni information, employment status, and career progress after graduation. Alumni can also register, update their profiles, and connect with fellow graduates.
-
-### Problem Statement
-
-Universities often lose contact with their graduates after they leave the institution. This makes it difficult to:
-- Track employment outcomes and career paths
-- Maintain an updated alumni network
-- Gather feedback for curriculum improvement
-- Organize alumni events and reunions
-
-**Alumni Tracker** solves these problems by providing a centralized platform for alumni management.
-
----
-
-## ✨ Features
-
-### Core Features
-- **User Authentication** — Secure registration and login with JWT-based authentication
-- **Alumni Profiles** — Create and manage detailed alumni profiles (education, employment, skills)
-- **Search & Filter** — Search alumni by name, graduation year, department, or company
-- **Admin Dashboard** — Manage all alumni records, view statistics, and generate reports
-- **Profile Management** — Alumni can update their own profile and employment information
+- **👤 Alumni Profiles & Career Tracking**:
+  - Detailed professional profiles with current company, role, industry, and skills.
+  - Academic history (graduation year, department, degree, student ID).
+  - LinkedIn and portfolio integration.
+- **🔍 Advanced Search & Directory**:
+  - Filter alumni by graduation year, department, company, or location.
+  - Paginated results with real-time search.
+- **🔐 Authentication & Authorization**:
+  - JWT-based secure registration and login.
+  - Role-based access control (Admin / Alumni).
+- **📊 Admin Dashboard**:
+  - Manage all alumni records, view statistics, and generate reports.
+  - User role management and verification workflows.
+- **💼 Profile Management**:
+  - Alumni can update their own profile and employment information.
 
 ### Planned Features
 - [ ] Event management for alumni reunions
@@ -56,163 +33,121 @@ Universities often lose contact with their graduates after they leave the instit
 
 ## 🛠️ Tech Stack
 
-### Frontend
-| Technology | Purpose |
-|---|---|
-| **React.js** | UI library for building interactive user interfaces |
-| **Vite** | Fast build tool and development server |
-| **React Router** | Client-side routing and navigation |
-| **Axios** | HTTP client for API requests |
-| **CSS Modules** | Component-scoped styling |
+| Layer | Technology | Description |
+| :--- | :--- | :--- |
+| **Backend** | **Node.js** + **Express.js** | High-performance RESTful API with modular route architecture. |
+| **Database** | **MongoDB** (Atlas) | Flexible NoSQL document database for alumni and user data. |
+| **ODM** | **Mongoose** | Schema-based data modeling and validation for MongoDB. |
+| **Frontend** | **React.js** + **Vite** | Fast, modern SPA with component-based UI and hot module replacement. |
+| **Auth** | **JWT** + **bcrypt** | Secure token-based authentication with hashed passwords. |
+| **Containerization** | **Docker** & **Docker Compose** | Reproducible development environment with volume sync. |
+| **Dev Tools** | **Nodemon** (legacy watch) | Auto-restart server on file changes inside Docker containers. |
 
-### Backend
-| Technology | Purpose |
-|---|---|
-| **Node.js** | JavaScript runtime environment |
-| **Express.js** | Web framework for building REST APIs |
-| **Mongoose** | MongoDB object modeling (ODM) |
-| **JWT** | JSON Web Tokens for authentication |
-| **bcrypt** | Password hashing |
-| **dotenv** | Environment variable management |
+---
 
-### Database
-| Technology | Purpose |
-|---|---|
-| **MongoDB** | NoSQL document database |
-| **MongoDB Atlas** | Cloud-hosted database service |
+## 🏛️ System Architecture
 
-### DevOps & Containerization
-| Technology | Purpose |
-|---|---|
-| **Docker** | Containerization platform |
-| **Docker Compose** | Multi-container orchestration |
-| **Nodemon** | Auto-restart server during development (with legacy watch for Docker) |
-
-### Development Tools
-| Tool | Purpose |
-|---|---|
-| **Git & GitHub** | Version control and collaboration |
-| **Postman** | API testing |
-| **ESLint** | Code linting and formatting |
+```mermaid
+graph TD
+    User(["🌐 Web Client"]) -->|HTTP Requests| Frontend["Frontend: React + Vite :5173"]
+    Frontend -->|API Calls via Axios| Backend["Backend API: Express.js :5000"]
+    Backend -->|Queries via Mongoose ODM| DB[("MongoDB Atlas")]
+    Backend -->|JWT Auth| Auth["Authentication Middleware"]
+```
 
 ---
 
 ## 📁 Project Structure
 
-```
-alumni-tracker/
-├── client/                    # Frontend (React + Vite)
+```text
+Alumni/
+├── docker-compose.yml          # Multi-container orchestration
+├── Dockerfile                  # Docker image definition (Node 18 Alpine)
+├── .dockerignore               # Files excluded from Docker build
+├── .gitignore
+├── README.md
+│
+├── client/                     # Frontend (React + Vite)
 │   ├── public/
 │   ├── src/
-│   │   ├── assets/            # Images, icons, static files
-│   │   ├── components/        # Reusable UI components
+│   │   ├── assets/             # Images, icons, static files
+│   │   ├── components/         # Reusable UI components
 │   │   │   ├── Navbar.jsx
 │   │   │   ├── Footer.jsx
 │   │   │   ├── AlumniCard.jsx
 │   │   │   └── SearchBar.jsx
-│   │   ├── pages/             # Page components
+│   │   ├── pages/              # Page components
 │   │   │   ├── Home.jsx
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx
 │   │   │   ├── Dashboard.jsx
 │   │   │   ├── Profile.jsx
 │   │   │   └── AlumniList.jsx
-│   │   ├── context/           # React Context for state management
-│   │   ├── services/          # API service functions
-│   │   ├── utils/             # Helper functions
+│   │   ├── context/            # React Context for state management
+│   │   ├── services/           # API service functions (Axios)
+│   │   ├── utils/              # Helper functions
 │   │   ├── App.jsx
 │   │   ├── App.css
 │   │   └── main.jsx
 │   ├── package.json
 │   └── vite.config.js
 │
-├── server/                    # Backend (Node.js + Express)
-│   ├── config/
-│   │   └── db.js              # MongoDB connection configuration
-│   ├── controllers/           # Route handler logic
-│   │   ├── authController.js
-│   │   ├── alumniController.js
-│   │   └── adminController.js
-│   ├── middleware/
-│   │   ├── auth.js            # JWT authentication middleware
-│   │   └── errorHandler.js    # Global error handling
-│   ├── models/                # Mongoose schemas
-│   │   ├── User.js
-│   │   └── Alumni.js
-│   ├── routes/                # API route definitions
-│   │   ├── authRoutes.js
-│   │   ├── alumniRoutes.js
-│   │   └── adminRoutes.js
-│   ├── utils/                 # Helper utilities
-│   ├── .env                   # Environment variables (not committed)
-│   ├── server.js              # Entry point
-│   └── package.json
-│
-├── Dockerfile                 # Docker image definition
-├── docker-compose.yml         # Container orchestration
-├── .dockerignore              # Files excluded from Docker build
-├── .gitignore
-└── README.md
+└── server/                     # Backend (Node.js + Express)
+    ├── config/
+    │   └── db.js               # MongoDB connection configuration
+    ├── controllers/            # Route handler logic
+    │   ├── authController.js
+    │   ├── alumniController.js
+    │   └── adminController.js
+    ├── middleware/
+    │   ├── auth.js             # JWT authentication middleware
+    │   └── errorHandler.js     # Global error handling
+    ├── models/                 # Mongoose schemas
+    │   ├── User.js
+    │   └── Alumni.js
+    ├── routes/                 # API route definitions
+    │   ├── authRoutes.js
+    │   ├── alumniRoutes.js
+    │   └── adminRoutes.js
+    ├── utils/                  # Helper utilities
+    ├── .env                    # Environment variables (not committed)
+    ├── server.js               # Entry point
+    └── package.json
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🗄️ Database Schema (MongoDB)
 
-### Prerequisites
+```mermaid
+erDiagram
+    USERS ||--o{ ALUMNI_PROFILES : has
+    USERS {
+        ObjectId _id PK
+        string name "Full name"
+        string email "Unique email address"
+        string password "Hashed with bcrypt"
+        string role "alumni | admin"
+        date createdAt "Account creation date"
+    }
 
-Make sure you have the following installed on your system:
-
-- **Docker Desktop** — [Download](https://www.docker.com/products/docker-desktop/)
-- **Git** — [Download](https://git-scm.com/)
-
-### Installation & Run with Docker Compose
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/mehmetrasid0/Alumni.git
-   cd Alumni
-   ```
-
-2. **Configure environment variables**
-
-   Create a `.env` file in the `server/` directory:
-   ```env
-   PORT=5000
-   MONGODB_URI=mongodb+srv://your_connection_string
-   JWT_SECRET=your_secret_key
-   NODE_ENV=development
-   ```
-
-3. **Start the application with Docker Compose**
-   ```bash
-   docker compose up -d --build
-   ```
-   This will automatically build the Docker image, install all dependencies, and start the server inside a container named `alumni`.
-
-4. **Open your browser**
-   - Backend API: `http://localhost:5000`
-
-5. **View container logs**
-   ```bash
-   docker logs alumni
-   ```
-
-6. **Stop the application**
-   ```bash
-   docker compose down
-   ```
-
-> **Note:** The `server/` directory is mounted as a volume in the container. Any code changes you make locally will be automatically reflected inside the container thanks to **nodemon** with legacy watch mode — no rebuild needed!
-
-### Alternative: Run Without Docker
-
-If you prefer to run without Docker, make sure you have **Node.js** (v18+) installed:
-
-```bash
-cd server
-npm install
-npm run dev
+    ALUMNI_PROFILES {
+        ObjectId _id PK
+        ObjectId user FK "Reference to Users"
+        string studentId "University student number"
+        string department "Department or major"
+        number graduationYear "Year of graduation"
+        string degree "Bachelor | Master | PhD"
+        string currentCompany "Current employer"
+        string jobTitle "Current position"
+        string city "Current city"
+        string country "Current country"
+        string linkedIn "LinkedIn profile URL"
+        string phone "Contact number"
+        string bio "Short biography"
+        array skills "List of skills"
+        date updatedAt "Last profile update"
+    }
 ```
 
 ---
@@ -221,14 +156,14 @@ npm run dev
 
 ### Authentication
 | Method | Endpoint | Description |
-|---|---|---|
+| :--- | :--- | :--- |
 | `POST` | `/api/auth/register` | Register a new user |
 | `POST` | `/api/auth/login` | Login and receive JWT token |
 | `GET` | `/api/auth/me` | Get current logged-in user |
 
 ### Alumni
 | Method | Endpoint | Description |
-|---|---|---|
+| :--- | :--- | :--- |
 | `GET` | `/api/alumni` | Get all alumni (with pagination) |
 | `GET` | `/api/alumni/:id` | Get a single alumni by ID |
 | `POST` | `/api/alumni` | Create a new alumni record |
@@ -238,71 +173,93 @@ npm run dev
 
 ### Admin
 | Method | Endpoint | Description |
-|---|---|---|
+| :--- | :--- | :--- |
 | `GET` | `/api/admin/stats` | Get dashboard statistics |
 | `GET` | `/api/admin/users` | Get all registered users |
 | `PUT` | `/api/admin/users/:id/role` | Update user role |
 
----
-
-## 🗄️ Database Schema
-
-### User Model
-```javascript
-{
-  name:          String,       // Full name
-  email:         String,       // Unique email address
-  password:      String,       // Hashed password
-  role:          String,       // "alumni" | "admin"
-  createdAt:     Date          // Account creation date
-}
-```
-
-### Alumni Model
-```javascript
-{
-  user:           ObjectId,    // Reference to User
-  studentId:      String,      // University student number
-  department:     String,      // Department/major
-  graduationYear: Number,      // Year of graduation
-  degree:         String,      // "Bachelor" | "Master" | "PhD"
-  currentCompany: String,      // Current employer
-  jobTitle:       String,      // Current position
-  city:           String,      // Current city
-  country:        String,      // Current country
-  linkedIn:       String,      // LinkedIn profile URL
-  phone:          String,      // Contact number
-  bio:            String,      // Short biography
-  skills:         [String],    // List of skills
-  updatedAt:      Date         // Last profile update
-}
-```
+### Utility
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/` | Health check — returns `ok` |
+| `GET` | `/hello/:name` | Returns `Hello,{name}!` |
+| `GET` | `/sum/:num1/:num2` | Returns sum of two numbers |
 
 ---
 
-## 📸 Screenshots
+## ⚡ Getting Started
 
-> Screenshots will be added as the project progresses.
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (includes Docker Engine & Docker Compose)
+- [Git](https://git-scm.com/)
+
+### 1. Clone & Configure Environment
+```bash
+git clone https://github.com/mehmetrasid0/Alumni.git
+cd Alumni
+```
+
+Create a `.env` file in the `server/` directory:
+```env
+PORT=5000
+MONGODB_URI=mongodb+srv://your_connection_string
+JWT_SECRET=your_secret_key
+NODE_ENV=development
+```
+
+### 2. Run with Docker Compose
+Start the backend with a single command:
+```bash
+docker compose up -d --build
+```
+
+### 3. Service Endpoints
+- **Backend API**: [http://localhost:5000](http://localhost:5000)
+- **Health Check**: [http://localhost:5000/](http://localhost:5000/) → `ok`
+
+### 4. Useful Commands
+```bash
+docker logs alumni          # View container logs
+docker restart alumni       # Restart the container
+docker compose down         # Stop and remove containers
+```
+
+> **💡 Live Reload:** The `server/` directory is mounted as a volume. Code changes are automatically reflected inside the container thanks to **nodemon** with legacy watch mode — no rebuild needed!
+
+### Alternative: Run Without Docker
+```bash
+cd server
+npm install
+npm run dev
+```
 
 ---
 
 ## 🗺️ Roadmap
 
-- [x] Project setup and README
-- [x] Docker & Docker Compose configuration
-- [x] Backend: Initialize Express server with basic routes
-- [ ] Backend: MongoDB connection setup
-- [ ] Backend: User authentication (register/login with JWT)
-- [ ] Backend: CRUD operations for alumni records
-- [ ] Backend: Admin routes and middleware
-- [ ] Frontend: Project setup with Vite + React
-- [ ] Frontend: Login and Registration pages
-- [ ] Frontend: Alumni listing and search page
-- [ ] Frontend: Individual alumni profile page
-- [ ] Frontend: Admin dashboard
-- [ ] Integration: Connect frontend with backend API
-- [ ] Testing: API testing with Postman
-- [ ] Deployment: Deploy to cloud platform
+- [x] **Phase 1: Environment & Architecture Setup**
+  - Set up repository structure and README documentation.
+  - Configure `Dockerfile` and `docker-compose.yml` with Node.js.
+  - Initialize Express server with basic utility routes.
+- [ ] **Phase 2: Database & Authentication**
+  - Set up MongoDB connection with Mongoose ODM.
+  - Implement JWT-based auth (Register, Login, Role-based guards).
+  - Password hashing with bcrypt.
+- [ ] **Phase 3: Core API Development**
+  - CRUD operations for Alumni profiles.
+  - Admin routes and middleware.
+  - Search and pagination endpoints.
+- [ ] **Phase 4: Frontend & UI**
+  - Build responsive pages with React + Vite.
+  - Implement searchable alumni directory with filters.
+  - Login, Registration, and Profile pages.
+  - Admin dashboard with statistics.
+- [ ] **Phase 5: Integration & Testing**
+  - Connect frontend with backend API via Axios.
+  - API testing with Postman.
+- [ ] **Phase 6: Deployment & CI/CD**
+  - Production Docker builds.
+  - Deploy to cloud platform.
 
 ---
 
