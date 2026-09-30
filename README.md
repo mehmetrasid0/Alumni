@@ -154,36 +154,79 @@ erDiagram
 
 ## 📡 API Endpoints
 
-### Authentication
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Register a new user |
-| `POST` | `/api/auth/login` | Login and receive JWT token |
-| `GET` | `/api/auth/me` | Get current logged-in user |
+### 📘 Swagger API Dokümantasyonu
 
-### Alumni
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/alumni` | Get all alumni (with pagination) |
-| `GET` | `/api/alumni/:id` | Get a single alumni by ID |
-| `POST` | `/api/alumni` | Create a new alumni record |
-| `PUT` | `/api/alumni/:id` | Update an alumni record |
-| `DELETE` | `/api/alumni/:id` | Delete an alumni record |
-| `GET` | `/api/alumni/search?q=` | Search alumni by name/department |
+Tüm API endpoint'lerini interaktif olarak keşfetmek, test etmek ve detaylı şemalarını görmek için **Swagger UI** kullanılabilir:
 
-### Admin
-| Method | Endpoint | Description |
+| Kaynak | URL | Açıklama |
 | :--- | :--- | :--- |
-| `GET` | `/api/admin/stats` | Get dashboard statistics |
-| `GET` | `/api/admin/users` | Get all registered users |
-| `PUT` | `/api/admin/users/:id/role` | Update user role |
+| **Swagger UI** | [`/api/swagger`](http://localhost:5000/api/swagger) | İnteraktif API dokümantasyonu — Try it out ile doğrudan test edin |
+| **Swagger JSON** | [`/api/swagger.json`](http://localhost:5000/api/swagger.json) | OpenAPI 3.0 spesifikasyonu (JSON formatında) |
+
+> **💡 İpucu:** Swagger UI üzerinde her endpoint'in yanındaki **"Try it out"** butonuna tıklayarak doğrudan tarayıcıdan API istekleri gönderebilirsiniz.
+
+#### Swagger Üzerinden Test Adımları
+1. Tarayıcıda [`http://localhost:5000/api/swagger`](http://localhost:5000/api/swagger) adresini açın
+2. Test etmek istediğiniz endpoint'i genişletin
+3. **"Try it out"** butonuna tıklayın
+4. Gerekli parametreleri doldurun
+5. **"Execute"** butonuna tıklayın
+6. Response kısmında sonucu görün
+
+### Health Check
+| Method | Endpoint | Açıklama |
+| :--- | :--- | :--- |
+| `GET` | `/api/health` | Kapsamlı sistem sağlık durumu (CPU, bellek, OS, runtime bilgileri) |
+
+### Users (CRUD)
+| Method | Endpoint | Açıklama | Body Formatları |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/users` | Tüm kullanıcıları listele | — |
+| `GET` | `/api/users/:id` | Tek kullanıcı getir | — |
+| `POST` | `/api/users` | Yeni kullanıcı ekle | JSON, form-data, x-www-form-urlencoded |
+| `PUT` | `/api/users/:id` | Kullanıcıyı tamamen güncelle | JSON, form-data, x-www-form-urlencoded |
+| `PATCH` | `/api/users/:id` | Kullanıcıyı kısmi güncelle | JSON, form-data, x-www-form-urlencoded |
+| `DELETE` | `/api/users/:id` | Kullanıcı sil | — |
 
 ### Utility
-| Method | Endpoint | Description |
+| Method | Endpoint | Açıklama |
 | :--- | :--- | :--- |
-| `GET` | `/` | Health check — returns `ok` |
-| `GET` | `/hello/:name` | Returns `Hello,{name}!` |
-| `GET` | `/sum/:num1/:num2` | Returns sum of two numbers |
+| `GET` | `/hello/:name` | `Hello,{name}!` selamlama mesajı döndürür |
+| `GET` | `/sum/:num1/:num2` | İki sayının toplamını döndürür |
+
+### Pages
+| Method | Endpoint | Açıklama |
+| :--- | :--- | :--- |
+| `GET` | `/` | Ana sayfa (index.html) |
+| `GET` | `/about` | Hakkında sayfası (about.html) |
+| `GET` | `/alumni` | Mezunlar arayüzü (alumni.html) |
+| `GET` | `/api/swagger` | Swagger UI — İnteraktif API dokümantasyonu |
+
+### Örnek API İstekleri
+
+#### Tüm Kullanıcıları Listele
+```bash
+curl http://localhost:5000/api/users
+```
+
+#### Yeni Kullanıcı Ekle (JSON)
+```bash
+curl -X POST http://localhost:5000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Ali Vural","email":"ali@alumni.edu","graduationYear":2023,"department":"Yazılım Mühendisliği","company":"SAP","role":"Backend Developer"}'
+```
+
+#### Kullanıcı Kısmi Güncelle (PATCH)
+```bash
+curl -X PATCH http://localhost:5000/api/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{"company":"Tesla","role":"Senior Engineer"}'
+```
+
+#### Kullanıcı Sil
+```bash
+curl -X DELETE http://localhost:5000/api/users/1
+```
 
 ---
 
@@ -215,7 +258,10 @@ docker compose up -d --build
 
 ### 3. Service Endpoints
 - **Backend API**: [http://localhost:5000](http://localhost:5000)
-- **Health Check**: [http://localhost:5000/](http://localhost:5000/) → `ok`
+- **Swagger UI**: [http://localhost:5000/api/swagger](http://localhost:5000/api/swagger) — İnteraktif API dokümantasyonu
+- **Swagger JSON**: [http://localhost:5000/api/swagger.json](http://localhost:5000/api/swagger.json)
+- **Health Check**: [http://localhost:5000/api/health](http://localhost:5000/api/health)
+- **Mezunlar Arayüzü**: [http://localhost:5000/alumni](http://localhost:5000/alumni)
 
 ### 4. Useful Commands
 ```bash
