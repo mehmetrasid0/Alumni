@@ -148,3 +148,4 @@ class ApiUserController {
 
 // Export singleton instance
 module.exports = new ApiUserController();
+

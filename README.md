@@ -135,16 +135,20 @@ This project is developed in weekly milestones throughout the academic semester.
      * **Controller Layer (`server/controllers/`)**: Built two specialized controllers:
        * `UserController.js`: Web view and form lifecycle controller (`home`, `about`, `index`, `show`, `store`, `update`, `destroy`).
        * `ApiUserController.js`: RESTful JSON API controller (`getAll`, `getById`, `create`, `update`, `patch`, `delete`).
+     * **Routing Layer (`server/routes/`)**: Modularized Express routing:
+       * `userRoutes.js`: Web client routes mapped to `UserController`.
+       * `apiUserRoutes.js`: RESTful API routes mounted at `/api/users` mapped to `ApiUserController`.
      * **View Layer (`server/public/`)**: Documented client presentation assets (`index.html`, `about.html`, `alumni.html`), design system tokens (`css/style.css`), and Swagger UI.
+     * **Swagger Specification (`server/swagger.js`)**: Updated OpenAPI 3.0 specification to 100% English, fully covering all RESTful API endpoints and web user form handlers.
   2. **Directory, Folder & File Architecture Map**:
-     * Mapped every file in the repository to its architectural role (`[Model]`, `[View]`, `[Controller]`, `[DevOps]`, `[Config]`, `[Testing]`) and formulated an exhaustive Component Responsibility Matrix.
+     * Mapped every file in the repository to its architectural role (`[Model]`, `[View]`, `[Controller]`, `[Routing]`, `[DevOps]`, `[Config]`, `[Testing]`) and formulated an exhaustive Component Responsibility Matrix.
   3. **Mermaid Flow & Sequence Diagrams**:
      * High-level MVC interaction diagram illustrating decoupled layer communications.
      * 10-step sequence diagram tracing user submission in the View $\rightarrow$ `ApiUserController` $\rightarrow$ `User` Model $\rightarrow$ HTTP response $\rightarrow$ DOM update in the View.
   4. **Postman API Test Collection**:
      * Authored and exported [`postman/Alumni_Tracker_API.postman_collection.json`](./postman/Alumni_Tracker_API.postman_collection.json) containing 14 ready-to-execute automated requests covering CRUD, Health Telemetry, Utilities, and Web Pages.
   5. **Modular MVC Project Template**:
-     * Integrated dedicated `models/` and `controllers/` directories into the codebase, migrating route handlers from monolithic `server.js` while maintaining full application stability.
+     * Integrated dedicated `models/`, `controllers/`, and `routes/` directories into the codebase, migrating route handlers from monolithic `server.js` while maintaining full application stability.
 * **Evaluation Reference Links**:
   * 📖 **MVC Specification**: [🏗️ MVC Architecture](#-mvc-architecture-model---view---controller)
   * 📁 **Directory Map**: [📁 Project Directories, Folders & Files Structure](#-project-directories-folders--files-structure)
@@ -283,9 +287,14 @@ The **Controller** layer serves as the intermediary orchestrator between incomin
     * `patch(req, res)`: `PATCH /api/users/:id` $\rightarrow$ Selective field update (`200 OK` or `400/404/409`).
     * `delete(req, res)`: `DELETE /api/users/:id` $\rightarrow$ Removes user record (`200 OK` or `404 Not Found`).
 
-* **Application Dispatcher & System Routes (`server/server.js`)**:
-  * Configures middleware pipeline (`express.json()`, `urlencoded`, `multer`, `express.static`).
-  * Maps routes directly to `UserController` and `ApiUserController` methods.
+* **Modular Routing Layer (`server/routes/`)**:
+  * **`userRoutes.js` (`server/routes/userRoutes.js`)**: Encapsulates browser endpoints and form actions, routing directly to `UserController` methods (`/`, `/about`, `/alumni`, `/users/:id`, `/users`, `/users/:id/update`, `/users/:id/delete`).
+  * **`apiUserRoutes.js` (`server/routes/apiUserRoutes.js`)**: Encapsulates RESTful JSON endpoints mounted at `/api/users`, routing directly to `ApiUserController` methods (`/`, `/:id`).
+
+* **Application Dispatcher & System Endpoints (`server/server.js`)**:
+  * Initializes Express middleware pipeline (`express.json()`, `urlencoded`, `express.static`).
+  * Mounts `apiUserRoutes` (`/api/users`) and `userRoutes` (`/`).
+  * Serves interactive OpenAPI 3.0 documentation via Swagger UI (`/api/swagger`) and raw spec (`/api/swagger.json`).
   * System diagnostics & health check: `GET /api/health`.
   * Parameterized utilities: `GET /hello/:name`, `GET /sum/:number1/:number2`.
 
@@ -355,6 +364,10 @@ alumni-tracker/
         ├── package.json                        # [Manifest] Project metadata, NPM dependencies & run scripts
         ├── package-lock.json                   # [Manifest] Deterministic dependency lockfile
         │
+        ├── routes/                             # 🚦 [ROUTING LAYER]
+        │   ├── userRoutes.js                   # Web routes mapped to UserController (/, /about, /alumni, /users)
+        │   └── apiUserRoutes.js                # REST API routes mapped to ApiUserController (/api/users)
+        │
         ├── controllers/                        # 🎮 [CONTROLLER LAYER]
         │   ├── UserController.js               # Web Page & Form Controller (home, about, index, show, store, update, destroy)
         │   └── ApiUserController.js            # RESTful JSON API Controller (getAll, getById, create, update, patch, delete)
@@ -368,10 +381,9 @@ alumni-tracker/
         │                                       # • Response schemas: SuccessResponse, ErrorResponse
         │                                       # • Endpoint parameter docs & HTTP status code contracts
         │
-        ├── server.js                           # 🎮 [APPLICATION DISPATCHER & ROUTING]
+        ├── server.js                           # 🎮 [APPLICATION DISPATCHER & BOOTSTRAP]
         │                                       # • Express application initialization & middleware chain
-        │                                       # • Dispatches web page & form routes to UserController
-        │                                       # • Dispatches REST API endpoints to ApiUserController
+        │                                       # • Mounts routes/userRoutes and routes/apiUserRoutes
         │                                       # • System health diagnostics controller: GET /api/health
         │                                       # • Utility calculation controllers: GET /hello, GET /sum
         │                                       # • Server lifecycle listener on configured PORT
@@ -407,9 +419,11 @@ alumni-tracker/
 | **`Alumni/server/public/alumni.html`** | **View** | Interactive UI (HTML5 + JS) | Search input, filter selectors, alumni card grid rendering, modal form, and toast alerts. |
 | **`Alumni/server/public/css/style.css`** | **View** | Styling (CSS3) | Design tokens, color system, typography, animations, responsive layout rules, card styling. |
 | **`http://localhost:5000/api/swagger`** | **View** | API UI (Swagger) | Interactive OpenAPI 3.0 browser view for testing endpoints and inspecting model schemas. |
+| **`Alumni/server/routes/userRoutes.js`** | **Routing** | Web Router | Dispatches browser page requests and web form submissions to `UserController`. |
+| **`Alumni/server/routes/apiUserRoutes.js`** | **Routing** | REST API Router | Dispatches `/api/users` RESTful CRUD endpoints to `ApiUserController`. |
 | **`Alumni/server/controllers/UserController.js`** | **Controller** | Web Controller | Handles browser page delivery (`home`, `about`, `index`, `show`) and web form CRUD submissions (`store`, `update`, `destroy`). |
 | **`Alumni/server/controllers/ApiUserController.js`** | **Controller** | REST API Controller | Handles headless JSON REST endpoints with full CRUD operations (`getAll`, `getById`, `create`, `update`, `patch`, `delete`). |
-| **`Alumni/server/server.js`** *(Dispatcher)* | **Controller** | Router & Dispatcher | Initializes Express middleware pipeline, registers Swagger docs, and dispatches HTTP routes to controllers. |
+| **`Alumni/server/server.js`** *(Dispatcher)* | **Controller** | Router & Dispatcher | Initializes Express middleware pipeline, registers Swagger docs, and mounts route modules. |
 | **`Alumni/server/server.js`** *(Health & Util)* | **Controller** | Diagnostics & Utilities | Computes CPU core utilization, memory thresholds, OS metrics, uptime statistics, and utility calculation endpoints. |
 | **`Alumni/Dockerfile`** | **DevOps** | Containerization | Defines container build instructions for Node.js 18 Alpine runtime environment. |
 | **`Alumni/docker-compose.yml`** | **DevOps** | Orchestration | Coordinates container startup, port forwarding (`5000:5000`), and live volume mounting. |

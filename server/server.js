@@ -5,16 +5,15 @@ const multer = require('multer');
 const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
-const User = require('./models/User');
-const UserController = require('./controllers/UserController');
-const ApiUserController = require('./controllers/ApiUserController');
+// Import Routes
+const userRoutes = require('./routes/userRoutes');
+const apiUserRoutes = require('./routes/apiUserRoutes');
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const upload = multer(); // multipart/form-data support
 
 // Middleware
 app.use(express.json());
@@ -42,29 +41,24 @@ app.get('/api/swagger.json', (req, res) => {
 });
 
 // ============================================================================
-// Web View Controller Endpoints (UserController)
+// Application Routes (Mounted to Modular Routers)
 // ============================================================================
-app.get('/', (req, res) => UserController.home(req, res));
-app.get('/about', (req, res) => UserController.about(req, res));
-app.get('/alumni', (req, res) => UserController.index(req, res));
-app.get('/users/:id', (req, res) => UserController.show(req, res));
-app.post('/users', upload.none(), (req, res) => UserController.store(req, res));
-app.post('/users/:id/update', upload.none(), (req, res) => UserController.update(req, res));
-app.post('/users/:id/delete', (req, res) => UserController.destroy(req, res));
+app.use('/api/users', apiUserRoutes);
+app.use('/', userRoutes);
 
-// GET /hello/:name → "Hello,{name}!" döndür
+// GET /hello/:name → Returns greeting message
 app.get('/hello/:name', (req, res) => {
   res.send(`Hello,${req.params.name}!`);
 });
 
-// GET /sum/:number1/:number2 → iki sayının toplamını döndür
+// GET /sum/:number1/:number2 → Returns sum of two numbers
 app.get('/sum/:number1/:number2', (req, res) => {
   const num1 = Number(req.params.number1);
   const num2 = Number(req.params.number2);
   res.send(`${num1 + num2}`);
 });
 
-// GET /api/health → Kapsamlı sunucu sağlık durumu (JSON)
+// GET /api/health → Comprehensive server health status (JSON)
 app.get('/api/health', (req, res) => {
   const totalMem = os.totalmem();
   const freeMem = os.freemem();
@@ -91,21 +85,21 @@ app.get('/api/health', (req, res) => {
 
   const processMemory = process.memoryUsage();
 
-  // Durum belirleme: bellek %90+ → critical, %75+ → warning
+  // Status classification: memory > 90% → critical, > 75% → warning
   let overallStatus = 'healthy';
   const checks = [];
 
   if (parseFloat(memUsagePercent) > 90) {
     overallStatus = 'critical';
-    checks.push({ name: 'memory', status: 'critical', message: `Sistem belleği %${memUsagePercent} kullanımda` });
+    checks.push({ name: 'memory', status: 'critical', message: `System memory at ${memUsagePercent}% utilization` });
   } else if (parseFloat(memUsagePercent) > 75) {
     overallStatus = 'warning';
-    checks.push({ name: 'memory', status: 'warning', message: `Sistem belleği %${memUsagePercent} kullanımda` });
+    checks.push({ name: 'memory', status: 'warning', message: `System memory at ${memUsagePercent}% utilization` });
   } else {
-    checks.push({ name: 'memory', status: 'healthy', message: `Sistem belleği %${memUsagePercent} kullanımda` });
+    checks.push({ name: 'memory', status: 'healthy', message: `System memory at ${memUsagePercent}% utilization` });
   }
 
-  checks.push({ name: 'server', status: 'healthy', message: 'Express sunucusu çalışıyor' });
+  checks.push({ name: 'server', status: 'healthy', message: 'Express server running normally' });
 
   const formatBytes = (bytes) => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -125,7 +119,7 @@ app.get('/api/health', (req, res) => {
       port: PORT,
       uptime: {
         raw: `${uptimeSec.toFixed(0)}s`,
-        formatted: `${days}g ${hours}sa ${minutes}dk ${seconds}sn`
+        formatted: `${days}d ${hours}h ${minutes}m ${seconds}s`
       }
     },
     system: {
@@ -134,7 +128,7 @@ app.get('/api/health', (req, res) => {
       hostname: os.hostname(),
       osType: os.type(),
       osRelease: os.release(),
-      osUptime: `${Math.floor(os.uptime() / 3600)} saat`
+      osUptime: `${Math.floor(os.uptime() / 3600)} hours`
     },
     memory: {
       system: {
@@ -161,16 +155,6 @@ app.get('/api/health', (req, res) => {
     }
   });
 });
-
-// ============================================================================
-// REST API Controller Endpoints (ApiUserController)
-// ============================================================================
-app.get('/api/users', (req, res) => ApiUserController.getAll(req, res));
-app.get('/api/users/:id', (req, res) => ApiUserController.getById(req, res));
-app.post('/api/users', upload.none(), (req, res) => ApiUserController.create(req, res));
-app.put('/api/users/:id', upload.none(), (req, res) => ApiUserController.update(req, res));
-app.patch('/api/users/:id', upload.none(), (req, res) => ApiUserController.patch(req, res));
-app.delete('/api/users/:id', (req, res) => ApiUserController.delete(req, res));
 
 // Start server
 app.listen(PORT, () => {
