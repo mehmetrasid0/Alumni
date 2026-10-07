@@ -70,3 +70,4 @@ Write-Host "  Alumni Directory:    http://localhost:5000/users" -ForegroundColor
 Write-Host "  Swagger OpenAPI:     http://localhost:5000/api/swagger" -ForegroundColor Cyan
 Write-Host "  Health Diagnostics:  http://localhost:5000/api/health" -ForegroundColor Cyan
 Write-Host "============================================================================" -ForegroundColor Green
+

@@ -56,3 +56,4 @@ echo   Health Diagnostics:  http://localhost:5000/api/health
 echo ============================================================================
 echo.
 pause
+
