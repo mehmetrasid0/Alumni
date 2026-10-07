@@ -6,13 +6,15 @@ const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
 const User = require('./models/User');
+const UserController = require('./controllers/UserController');
+const ApiUserController = require('./controllers/ApiUserController');
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const upload = multer(); // form-data (multipart/form-data) desteği
+const upload = multer(); // multipart/form-data support
 
 // Middleware
 app.use(express.json());
@@ -39,22 +41,16 @@ app.get('/api/swagger.json', (req, res) => {
   res.send(swaggerSpec);
 });
 
-// GET /alumni → Mezunlar arayüzü
-app.get('/alumni', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'alumni.html'));
-});
-
-// Note: User data store and state management are encapsulated within the User Model (./models/User.js)
-
-// GET / → Ana sayfa (index.html)
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// GET /about → Hakkında sayfası
-app.get('/about', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'about.html'));
-});
+// ============================================================================
+// Web View Controller Endpoints (UserController)
+// ============================================================================
+app.get('/', (req, res) => UserController.home(req, res));
+app.get('/about', (req, res) => UserController.about(req, res));
+app.get('/alumni', (req, res) => UserController.index(req, res));
+app.get('/users/:id', (req, res) => UserController.show(req, res));
+app.post('/users', upload.none(), (req, res) => UserController.store(req, res));
+app.post('/users/:id/update', upload.none(), (req, res) => UserController.update(req, res));
+app.post('/users/:id/delete', (req, res) => UserController.destroy(req, res));
 
 // GET /hello/:name → "Hello,{name}!" döndür
 app.get('/hello/:name', (req, res) => {
@@ -167,103 +163,14 @@ app.get('/api/health', (req, res) => {
 });
 
 // ============================================================================
-// User CRUD Controller Endpoints (Delegating to User Model)
+// REST API Controller Endpoints (ApiUserController)
 // ============================================================================
-
-// GET /api/users → List all users (supports optional filtering)
-app.get('/api/users', (req, res) => {
-  const data = User.findAll(req.query);
-  res.json({
-    success: true,
-    count: data.length,
-    data
-  });
-});
-
-// GET /api/users/:id → Get single user by ID
-app.get('/api/users/:id', (req, res) => {
-  const user = User.findById(req.params.id);
-
-  if (!user) {
-    return res.status(404).json({
-      success: false,
-      error: `ID ${req.params.id} ile kullanıcı bulunamadı`
-    });
-  }
-
-  res.json({
-    success: true,
-    data: user
-  });
-});
-
-// DELETE /api/users/:id → Delete user
-app.delete('/api/users/:id', (req, res) => {
-  try {
-    const deleted = User.delete(req.params.id);
-    res.json({
-      success: true,
-      message: `${deleted.name} başarıyla silindi`,
-      data: deleted
-    });
-  } catch (err) {
-    res.status(err.statusCode || 404).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
-
-// POST /api/users → Create new user
-app.post('/api/users', upload.none(), (req, res) => {
-  try {
-    const newUser = User.create(req.body);
-    res.status(201).json({
-      success: true,
-      message: 'Kullanıcı başarıyla eklendi',
-      data: newUser
-    });
-  } catch (err) {
-    res.status(err.statusCode || 400).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
-
-// PUT /api/users/:id → Fully update user
-app.put('/api/users/:id', upload.none(), (req, res) => {
-  try {
-    const updated = User.update(req.params.id, req.body, false);
-    res.json({
-      success: true,
-      message: 'Kullanıcı tamamen güncellendi',
-      data: updated
-    });
-  } catch (err) {
-    res.status(err.statusCode || 400).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
-
-// PATCH /api/users/:id → Partially update user
-app.patch('/api/users/:id', upload.none(), (req, res) => {
-  try {
-    const updated = User.update(req.params.id, req.body, true);
-    res.json({
-      success: true,
-      message: 'Kullanıcı kısmi güncellendi',
-      data: updated
-    });
-  } catch (err) {
-    res.status(err.statusCode || 400).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
+app.get('/api/users', (req, res) => ApiUserController.getAll(req, res));
+app.get('/api/users/:id', (req, res) => ApiUserController.getById(req, res));
+app.post('/api/users', upload.none(), (req, res) => ApiUserController.create(req, res));
+app.put('/api/users/:id', upload.none(), (req, res) => ApiUserController.update(req, res));
+app.patch('/api/users/:id', upload.none(), (req, res) => ApiUserController.patch(req, res));
+app.delete('/api/users/:id', (req, res) => ApiUserController.delete(req, res));
 
 // Start server
 app.listen(PORT, () => {

@@ -130,19 +130,21 @@ This project is developed in weekly milestones throughout the academic semester.
 * **Objective**: Formalize the **Model-View-Controller (MVC)** architectural pattern, document directory/folder/file responsibilities, produce end-to-end request lifecycle diagrams, build a standardized Postman API test suite, and organize the repository layout.
 * **Focus**: Architectural Integrity, Layer Separation (MVC), Test Automation & Clean Project Template
 * **This Week's Accomplishments (Instructor Evaluation Checklist)**:
-  1. **Comprehensive MVC Architecture Documentation**:
-     * **Model Layer**: Documented `server/swagger.js` OpenAPI data models (`User`, `UserInput`, `UserPatch`) and `server/server.js` in-memory state management and business validation rules.
-     * **View Layer**: Documented `server/public/` presentation assets (`index.html`, `about.html`, `alumni.html`), design system tokens (`css/style.css`), and Swagger UI.
-     * **Controller Layer**: Documented `server/server.js` middleware pipeline, page view dispatchers, CRUD business logic handlers, and diagnostics controller.
+  1. **Comprehensive MVC Architecture Implementation & Documentation**:
+     * **Model Layer (`server/models/User.js` & `server/swagger.js`)**: Built standalone in-memory `User` Model class with full CRUD methods (`findAll`, `findById`, `findByEmail`, `create`, `update`, `delete`, `count`, `reset`) and business validation rules without requiring an external database connection.
+     * **Controller Layer (`server/controllers/`)**: Built two specialized controllers:
+       * `UserController.js`: Web view and form lifecycle controller (`home`, `about`, `index`, `show`, `store`, `update`, `destroy`).
+       * `ApiUserController.js`: RESTful JSON API controller (`getAll`, `getById`, `create`, `update`, `patch`, `delete`).
+     * **View Layer (`server/public/`)**: Documented client presentation assets (`index.html`, `about.html`, `alumni.html`), design system tokens (`css/style.css`), and Swagger UI.
   2. **Directory, Folder & File Architecture Map**:
      * Mapped every file in the repository to its architectural role (`[Model]`, `[View]`, `[Controller]`, `[DevOps]`, `[Config]`, `[Testing]`) and formulated an exhaustive Component Responsibility Matrix.
   3. **Mermaid Flow & Sequence Diagrams**:
      * High-level MVC interaction diagram illustrating decoupled layer communications.
-     * 10-step sequence diagram tracing user submission in the View $\rightarrow$ validation & mutation in the Controller/Model $\rightarrow$ HTTP response $\rightarrow$ DOM update in the View.
+     * 10-step sequence diagram tracing user submission in the View $\rightarrow$ `ApiUserController` $\rightarrow$ `User` Model $\rightarrow$ HTTP response $\rightarrow$ DOM update in the View.
   4. **Postman API Test Collection**:
      * Authored and exported [`postman/Alumni_Tracker_API.postman_collection.json`](./postman/Alumni_Tracker_API.postman_collection.json) containing 14 ready-to-execute automated requests covering CRUD, Health Telemetry, Utilities, and Web Pages.
-  5. **Modular MVC Scaling Blueprint**:
-     * Outlined the future decomposition plan for segregating monolithic controller code into dedicated `models/`, `views/`, `controllers/`, `routes/`, and `middleware/` folders during Phase 5 (MongoDB Atlas + JWT Auth).
+  5. **Modular MVC Project Template**:
+     * Integrated dedicated `models/` and `controllers/` directories into the codebase, migrating route handlers from monolithic `server.js` while maintaining full application stability.
 * **Evaluation Reference Links**:
   * 📖 **MVC Specification**: [🏗️ MVC Architecture](#-mvc-architecture-model---view---controller)
   * 📁 **Directory Map**: [📁 Project Directories, Folders & Files Structure](#-project-directories-folders--files-structure)
@@ -182,14 +184,14 @@ graph TD
 
     subgraph CONTROLLER_LAYER ["🎮 CONTROLLER LAYER (Application Logic)"]
         C_Middleware["Middleware Pipeline<br/>(express.json, urlencoded, multer)"]
-        C_ViewRoutes["View Controllers<br/>(Route to static HTML pages)"]
-        C_ApiRoutes["User API Controllers<br/>(CRUD: GET, POST, PUT, PATCH, DELETE)"]
+        C_WebCtrl["UserController<br/>(Web Pages & Form CRUD)"]
+        C_ApiCtrl["ApiUserController<br/>(REST API JSON CRUD)"]
         C_Health["Diagnostics Controller<br/>(GET /api/health)"]
         C_Util["Utility Controllers<br/>(GET /hello, GET /sum)"]
     end
 
     subgraph MODEL_LAYER ["🧠 MODEL LAYER (Data & Schema)"]
-        M_Memory["In-Memory Data Store<br/>(users array & nextId counter)"]
+        M_Memory["In-Memory Data Store<br/>(User Model & nextId counter)"]
         M_Validation["Business Rules & Validation<br/>(Required fields, Email uniqueness)"]
         M_Swagger["OpenAPI 3.0 Schemas<br/>(User, UserInput, UserPatch)"]
         M_TargetDB[("Future: MongoDB + Mongoose<br/>(User & Alumni Schemas)")]
@@ -197,18 +199,20 @@ graph TD
 
     User(["👤 End User"]) -->|Interacts with UI| VIEW_LAYER
     VIEW_LAYER -->|Dispatches HTTP Requests| C_Middleware
-    C_Middleware --> C_ViewRoutes
-    C_Middleware --> C_ApiRoutes
+    C_Middleware --> C_WebCtrl
+    C_Middleware --> C_ApiCtrl
     C_Middleware --> C_Health
     C_Middleware --> C_Util
 
-    C_ApiRoutes -->|Queries / Validates / Modifies| M_Memory
-    C_ApiRoutes -.->|Conforms to Schemas| M_Swagger
-    C_ApiRoutes -.->|Target Persistence| M_TargetDB
+    C_ApiCtrl -->|Queries / Validates / Modifies| M_Memory
+    C_WebCtrl -->|Queries / Persists| M_Memory
+    C_ApiCtrl -.->|Conforms to Schemas| M_Swagger
+    C_ApiCtrl -.->|Target Persistence| M_TargetDB
 
-    M_Memory -->|Returns State / Records| C_ApiRoutes
-    C_ApiRoutes -->|JSON Response (200, 201, 400, 404, 409)| VIEW_LAYER
-    C_ViewRoutes -->|Serves HTML Pages| VIEW_LAYER
+    M_Memory -->|Returns State / Records| C_ApiCtrl
+    M_Memory -->|Returns State / Records| C_WebCtrl
+    C_ApiCtrl -->|JSON Response (200, 201, 400, 404, 409)| VIEW_LAYER
+    C_WebCtrl -->|Serves HTML Pages & Form Redirects| VIEW_LAYER
     VIEW_LAYER -->|Renders Dynamic Cards & Feedback| User
 ```
 
@@ -258,30 +262,32 @@ The **View** is responsible for presenting data to the user, capturing user inte
 ---
 
 ### 🎮 3. Controller Layer (Routing & Request Orchestration)
-The **Controller** acts as the intermediate coordinator. It intercepts incoming HTTP requests, applies middleware processing, invokes validation on the Model, updates data, and returns appropriate HTTP status codes and response payloads.
+The **Controller** layer serves as the intermediary orchestrator between incoming requests, the **User Model**, and the **View**. In accordance with clean MVC separation, the application provides **two specialized controllers**:
 
-* **Current Implementation (`server/server.js`)**:
-  * **Middleware Pipeline**:
-    * `express.json()`: Parses incoming JSON request payloads.
-    * `express.urlencoded({ extended: true })`: Handles standard form-encoded data.
-    * `multer().none()`: Enables parsing of `multipart/form-data` without file storage.
-    * `express.static('public')`: Delivers view assets (HTML, CSS, static files).
-  * **View Routing Controllers**:
-    * `GET /` $\rightarrow$ Serves `index.html`
-    * `GET /about` $\rightarrow$ Serves `about.html`
-    * `GET /alumni` $\rightarrow$ Serves `alumni.html`
-  * **User CRUD API Controllers**:
-    * `GET /api/users`: Queries model for all users; returns HTTP 200 with record count and payload.
-    * `GET /api/users/:id`: Extracts `:id` parameter; returns HTTP 200 or HTTP 404 with error message.
-    * `POST /api/users`: Validates required fields, checks email uniqueness, creates new record, returns HTTP 201 Created.
-    * `PUT /api/users/:id`: Replaces existing record, enforces all required attributes, returns HTTP 200 or 400/404/409.
-    * `PATCH /api/users/:id`: Selectively modifies provided fields, validates email uniqueness if changed, returns HTTP 200.
-    * `DELETE /api/users/:id`: Removes record from model collection by ID; returns HTTP 200 with deleted user info or HTTP 404.
-  * **System Diagnostics & Health Controller**:
-    * `GET /api/health`: Collects Node.js runtime and OS telemetry (CPU core load, memory usage, uptime, OS type, process PID) and computes status levels (`healthy`, `warning`, `critical`).
-  * **Utility Controllers**:
-    * `GET /hello/:name`: URL parameter greeting generator.
-    * `GET /sum/:number1/:number2`: Parameterized math computation controller.
+* **1. `UserController` (`server/controllers/UserController.js`) — Web View & Page Lifecycle**:
+  * Manages browser-facing HTTP routes, static HTML delivery, and web-oriented CRUD operations:
+    * `home(req, res)`: Serves the landing page view (`GET /` $\rightarrow$ `index.html`).
+    * `about(req, res)`: Serves the institutional about page view (`GET /about` $\rightarrow$ `about.html`).
+    * `index(req, res)`: Serves the interactive alumni directory dashboard (`GET /alumni` $\rightarrow$ `alumni.html`).
+    * `show(req, res)`: Renders individual alumni profile page (`GET /users/:id`).
+    * `store(req, res)`: Handles web form submissions for creating new alumni records (`POST /users`).
+    * `update(req, res)`: Handles web form submissions for updating existing alumni records (`POST /users/:id/update`).
+    * `destroy(req, res)`: Handles web form actions for deleting alumni records (`POST /users/:id/delete`).
+
+* **2. `ApiUserController` (`server/controllers/ApiUserController.js`) — RESTful API Operations**:
+  * Manages all headless JSON REST API endpoints, parses request payloads, delegates business logic to the `User` model, and delivers standard HTTP status codes:
+    * `getAll(req, res)`: `GET /api/users` $\rightarrow$ Returns all alumni with optional query filtering (`200 OK`).
+    * `getById(req, res)`: `GET /api/users/:id` $\rightarrow$ Retrieves single user or `404 Not Found`.
+    * `create(req, res)`: `POST /api/users` $\rightarrow$ Validates input and persists new user (`201 Created` or `400/409`).
+    * `update(req, res)`: `PUT /api/users/:id` $\rightarrow$ Full entity replacement (`200 OK` or `400/404/409`).
+    * `patch(req, res)`: `PATCH /api/users/:id` $\rightarrow$ Selective field update (`200 OK` or `400/404/409`).
+    * `delete(req, res)`: `DELETE /api/users/:id` $\rightarrow$ Removes user record (`200 OK` or `404 Not Found`).
+
+* **Application Dispatcher & System Routes (`server/server.js`)**:
+  * Configures middleware pipeline (`express.json()`, `urlencoded`, `multer`, `express.static`).
+  * Maps routes directly to `UserController` and `ApiUserController` methods.
+  * System diagnostics & health check: `GET /api/health`.
+  * Parameterized utilities: `GET /hello/:name`, `GET /sum/:number1/:number2`.
 
 ---
 
@@ -294,21 +300,21 @@ sequenceDiagram
     autonumber
     actor User as 👤 Alumni / User
     participant View as 👁️ View (alumni.html)
-    participant Controller as 🎮 Controller (server.js)
-    participant Model as 🧠 Model (In-Memory / Schemas)
+    participant Controller as 🎮 Controller (ApiUserController)
+    participant Model as 🧠 Model (User.js)
 
     User->>View: 1. Opens "Add Alumni" modal & submits form
     View->>Controller: 2. POST /api/users (JSON payload via fetch)
-    Note over Controller: Validates name & email presence<br/>Checks email uniqueness
+    Note over Controller: Validates name & email presence<br/>Calls User.create()
     alt Validation Failed (Missing fields or duplicate email)
         Controller-->>View: 3a. Return HTTP 400 or HTTP 409 (Error JSON)
         View-->>User: 4a. Display error toast ("Already registered / Required fields missing")
     else Validation Succeeded
-        Controller->>Model: 3b. Create new user object with nextId++ & push to array
-        Model-->>Controller: 4b. Confirm saved entity
+        Controller->>Model: 3b. User.create(userData)
+        Model-->>Controller: 4b. Return created User entity
         Controller-->>View: 5. Return HTTP 201 Created (Success JSON)
         View->>Controller: 6. GET /api/users (Trigger automatic directory refresh)
-        Controller->>Model: 7. Query all alumni records
+        Controller->>Model: 7. User.findAll()
         Model-->>Controller: 8. Return users array
         Controller-->>View: 9. Return HTTP 200 OK (Updated alumni array)
         View-->>User: 10. Close modal, render updated cards & show success toast
@@ -349,6 +355,10 @@ alumni-tracker/
         ├── package.json                        # [Manifest] Project metadata, NPM dependencies & run scripts
         ├── package-lock.json                   # [Manifest] Deterministic dependency lockfile
         │
+        ├── controllers/                        # 🎮 [CONTROLLER LAYER]
+        │   ├── UserController.js               # Web Page & Form Controller (home, about, index, show, store, update, destroy)
+        │   └── ApiUserController.js            # RESTful JSON API Controller (getAll, getById, create, update, patch, delete)
+        │
         ├── models/                             # 🧠 [MODEL LAYER]
         │   └── User.js                         # In-memory User Model with complete CRUD methods & business validation
         │
@@ -358,11 +368,10 @@ alumni-tracker/
         │                                       # • Response schemas: SuccessResponse, ErrorResponse
         │                                       # • Endpoint parameter docs & HTTP status code contracts
         │
-        ├── server.js                           # 🎮 [CONTROLLER & ROUTING]
+        ├── server.js                           # 🎮 [APPLICATION DISPATCHER & ROUTING]
         │                                       # • Express application initialization & middleware chain
-        │                                       # • Delegates data operations to User Model (models/User.js)
-        │                                       # • Page routing controllers: GET /, GET /about, GET /alumni
-        │                                       # • User CRUD API controllers: GET, POST, PUT, PATCH, DELETE /api/users
+        │                                       # • Dispatches web page & form routes to UserController
+        │                                       # • Dispatches REST API endpoints to ApiUserController
         │                                       # • System health diagnostics controller: GET /api/health
         │                                       # • Utility calculation controllers: GET /hello, GET /sum
         │                                       # • Server lifecycle listener on configured PORT
@@ -398,9 +407,10 @@ alumni-tracker/
 | **`Alumni/server/public/alumni.html`** | **View** | Interactive UI (HTML5 + JS) | Search input, filter selectors, alumni card grid rendering, modal form, and toast alerts. |
 | **`Alumni/server/public/css/style.css`** | **View** | Styling (CSS3) | Design tokens, color system, typography, animations, responsive layout rules, card styling. |
 | **`http://localhost:5000/api/swagger`** | **View** | API UI (Swagger) | Interactive OpenAPI 3.0 browser view for testing endpoints and inspecting model schemas. |
-| **`Alumni/server/server.js`** *(Routes)* | **Controller** | Router & Handler | Dispatches HTTP requests to appropriate view loaders or REST API controller handlers. |
-| **`Alumni/server/server.js`** *(CRUD)* | **Controller** | Business Logic | Validates input formats, delegates CRUD operations to User Model, and manages HTTP responses. |
-| **`Alumni/server/server.js`** *(Health)* | **Controller** | Diagnostics | Computes CPU core utilization, memory thresholds, OS metrics, and uptime statistics. |
+| **`Alumni/server/controllers/UserController.js`** | **Controller** | Web Controller | Handles browser page delivery (`home`, `about`, `index`, `show`) and web form CRUD submissions (`store`, `update`, `destroy`). |
+| **`Alumni/server/controllers/ApiUserController.js`** | **Controller** | REST API Controller | Handles headless JSON REST endpoints with full CRUD operations (`getAll`, `getById`, `create`, `update`, `patch`, `delete`). |
+| **`Alumni/server/server.js`** *(Dispatcher)* | **Controller** | Router & Dispatcher | Initializes Express middleware pipeline, registers Swagger docs, and dispatches HTTP routes to controllers. |
+| **`Alumni/server/server.js`** *(Health & Util)* | **Controller** | Diagnostics & Utilities | Computes CPU core utilization, memory thresholds, OS metrics, uptime statistics, and utility calculation endpoints. |
 | **`Alumni/Dockerfile`** | **DevOps** | Containerization | Defines container build instructions for Node.js 18 Alpine runtime environment. |
 | **`Alumni/docker-compose.yml`** | **DevOps** | Orchestration | Coordinates container startup, port forwarding (`5000:5000`), and live volume mounting. |
 | **`Alumni/server/.env`** | **Config** | Environment | Stores runtime environment variables (`PORT`, `NODE_ENV`). |
@@ -410,7 +420,7 @@ alumni-tracker/
 
 ### 🚀 Target Modular MVC Architecture (Scaling Roadmap)
 
-As the project expands in Phase 5 through Phase 7 (database persistence and authentication), the monolithic controller in `server.js` cleanly decomposes into modular, dedicated MVC sub-packages:
+As the project expands in Phase 5 through Phase 7 (database persistence and authentication), the modular MVC controllers cleanly scale into specialized domain services and sub-packages:
 
 ```text
 Alumni/server/

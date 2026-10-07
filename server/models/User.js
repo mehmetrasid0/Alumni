@@ -14,78 +14,7 @@
 
 class UserModel {
   constructor() {
-    /**
-     * In-memory dataset of alumni users (seed data).
-     * @private
-     */
-    this._users = [
-      {
-        id: 1,
-        name: 'Ahmet Yilmaz',
-        email: 'ahmet@alumni.edu',
-        graduationYear: 2020,
-        department: 'Computer Engineering',
-        company: 'Google',
-        role: 'Software Engineer',
-        createdAt: '2026-09-22T10:00:00.000Z'
-      },
-      {
-        id: 2,
-        name: 'Elif Demir',
-        email: 'elif@alumni.edu',
-        graduationYear: 2019,
-        department: 'Electrical & Electronics',
-        company: 'Microsoft',
-        role: 'Product Manager',
-        createdAt: '2026-09-22T10:05:00.000Z'
-      },
-      {
-        id: 3,
-        name: 'Mehmet Kaya',
-        email: 'mehmet@alumni.edu',
-        graduationYear: 2021,
-        department: 'Industrial Engineering',
-        company: 'Amazon',
-        role: 'Data Analyst',
-        createdAt: '2026-09-22T10:10:00.000Z'
-      },
-      {
-        id: 4,
-        name: 'Zeynep Celik',
-        email: 'zeynep@alumni.edu',
-        graduationYear: 2018,
-        department: 'Computer Engineering',
-        company: 'Meta',
-        role: 'Frontend Developer',
-        createdAt: '2026-09-22T10:15:00.000Z'
-      },
-      {
-        id: 5,
-        name: 'Can Ozturk',
-        email: 'can@alumni.edu',
-        graduationYear: 2022,
-        department: 'Software Engineering',
-        company: 'Apple',
-        role: 'iOS Developer',
-        createdAt: '2026-09-22T10:20:00.000Z'
-      },
-      {
-        id: 6,
-        name: 'Ofe Emor Demiroz',
-        email: 'ofe@alumni.edu',
-        graduationYear: 2023,
-        department: 'Information Systems (YBS)',
-        company: 'Ay Yapim',
-        role: 'Cast Manager',
-        createdAt: '2026-09-22T10:25:00.000Z'
-      }
-    ];
-
-    /**
-     * Auto-incrementing identifier counter.
-     * @private
-     */
-    this._nextId = 7;
+    this.reset();
   }
 
   // ==========================================================================
@@ -335,9 +264,72 @@ class UserModel {
    * @returns {void}
    */
   reset() {
-    this.constructor();
+    this._users = [
+      {
+        id: 1,
+        name: 'Ahmet Yilmaz',
+        email: 'ahmet@alumni.edu',
+        graduationYear: 2020,
+        department: 'Computer Engineering',
+        company: 'Google',
+        role: 'Software Engineer',
+        createdAt: '2026-09-22T10:00:00.000Z'
+      },
+      {
+        id: 2,
+        name: 'Elif Demir',
+        email: 'elif@alumni.edu',
+        graduationYear: 2019,
+        department: 'Electrical & Electronics',
+        company: 'Microsoft',
+        role: 'Product Manager',
+        createdAt: '2026-09-22T10:05:00.000Z'
+      },
+      {
+        id: 3,
+        name: 'Mehmet Kaya',
+        email: 'mehmet@alumni.edu',
+        graduationYear: 2021,
+        department: 'Industrial Engineering',
+        company: 'Amazon',
+        role: 'Data Analyst',
+        createdAt: '2026-09-22T10:10:00.000Z'
+      },
+      {
+        id: 4,
+        name: 'Zeynep Celik',
+        email: 'zeynep@alumni.edu',
+        graduationYear: 2018,
+        department: 'Computer Engineering',
+        company: 'Meta',
+        role: 'Frontend Developer',
+        createdAt: '2026-09-22T10:15:00.000Z'
+      },
+      {
+        id: 5,
+        name: 'Can Ozturk',
+        email: 'can@alumni.edu',
+        graduationYear: 2022,
+        department: 'Software Engineering',
+        company: 'Apple',
+        role: 'iOS Developer',
+        createdAt: '2026-09-22T10:20:00.000Z'
+      },
+      {
+        id: 6,
+        name: 'Ofe Emor Demiroz',
+        email: 'ofe@alumni.edu',
+        graduationYear: 2023,
+        department: 'Information Systems (YBS)',
+        company: 'Ay Yapim',
+        role: 'Cast Manager',
+        createdAt: '2026-09-22T10:25:00.000Z'
+      }
+    ];
+    this._nextId = 7;
   }
 }
 
 // Export singleton instance representing the User Model
 module.exports = new UserModel();
+
