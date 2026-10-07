@@ -388,3 +388,4 @@ class AnnouncementModel {
 
 // Export singleton instance representing the Announcement Model
 module.exports = new AnnouncementModel();
+

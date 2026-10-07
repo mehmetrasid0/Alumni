@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon --legacy-watch server.js"
+    "dev": "nodemon --legacy-watch server.js",
+    "docker:up": "docker compose -f ../docker-compose.yml up -d",
+    "docker:down": "docker compose -f ../docker-compose.yml down",
+    "docker:logs": "docker compose -f ../docker-compose.yml logs -f"
   },
   "keywords": [],
   "author": "Mehmet Raşid Ünlüel",

@@ -151,3 +151,4 @@ class ApiAnnouncementController {
 
 // Export singleton instance
 module.exports = new ApiAnnouncementController();
+

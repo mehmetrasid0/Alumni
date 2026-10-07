@@ -434,3 +434,4 @@ class AnnouncementController {
 
 // Export singleton instance
 module.exports = new AnnouncementController();
+

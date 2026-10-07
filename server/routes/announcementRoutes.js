@@ -44,3 +44,4 @@ router.get('/announcements/:id/delete', (req, res) => AnnouncementController.des
 router.delete('/announcements/:id', (req, res) => AnnouncementController.destroy(req, res));
 
 module.exports = router;
+

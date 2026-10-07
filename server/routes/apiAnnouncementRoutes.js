@@ -34,3 +34,4 @@ router.patch('/:id', upload.none(), (req, res) => ApiAnnouncementController.patc
 router.delete('/:id', (req, res) => ApiAnnouncementController.delete(req, res));
 
 module.exports = router;
+

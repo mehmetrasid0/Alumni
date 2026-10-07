@@ -670,18 +670,22 @@ JWT_SECRET=your_secret_key
 NODE_ENV=development
 ```
 
-### 2. Run with Docker Compose
-Start the backend with a single command:
+### 2. Run with Docker Compose (Auto-Start)
+You can start Docker Desktop and spin up the container with one click:
+- **Windows Batch**: Double-click `docker-start.bat`
+- **PowerShell**: `./docker-start.ps1`
+- **Command Line**:
 ```bash
 docker compose up -d --build
 ```
 
 ### 3. Service Endpoints
-- **Backend API**: [http://localhost:5000](http://localhost:5000)
+- **Application Portal**: [http://localhost:5000](http://localhost:5000)
+- **Announcement Management**: [http://localhost:5000/announcements](http://localhost:5000/announcements)
+- **Alumni Web Directory**: [http://localhost:5000/users](http://localhost:5000/users) (or `/alumni`)
 - **Swagger UI**: [http://localhost:5000/api/swagger](http://localhost:5000/api/swagger) — Interactive API documentation
 - **Swagger JSON**: [http://localhost:5000/api/swagger.json](http://localhost:5000/api/swagger.json)
-- **Health Check**: [http://localhost:5000/api/health](http://localhost:5000/api/health)
-- **Alumni Web Directory**: [http://localhost:5000/alumni](http://localhost:5000/alumni)
+- **Health Check Telemetry**: [http://localhost:5000/api/health](http://localhost:5000/api/health)
 
 ### 4. Useful Commands
 ```bash
