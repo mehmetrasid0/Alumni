@@ -217,13 +217,18 @@ graph TD
 ### 🧠 1. Model Layer (Data & Schema Contracts)
 The **Model** represents core data structures, business logic constraints, and schema validations. It manages the state and rules governing alumni entities.
 
-* **Current Implementation (`server/server.js` & `server/swagger.js`)**:
-  * **In-Memory Store (`server/server.js`)**: Maintains runtime state via the `users` array and auto-incrementing `nextId` counter.
-  * **Data Integrity & Validation Rules**:
-    * Mandatory field verification: `name` and `email` are strictly required on `POST` and `PUT`.
-    * Unique constraint validation: duplicate email rejection (`409 Conflict`) across registration and update operations.
-    * Partial vs. Full modification enforcement (`PUT` requires complete entity payload; `PATCH` permits selective field mutation while guarding immutable identifiers like `id`).
-  * **Schema Definition (`server/swagger.js`)**:
+* **Current Implementation (`server/models/User.js` & `server/swagger.js`)**:
+  * **User Model Class (`server/models/User.js`)**:
+    * Encapsulates all data state and business validation without requiring an external database connection.
+    * Implements comprehensive **CRUD methods**:
+      * `findAll(filters)`: Retrieves the alumni collection with optional keyword search, department, and graduation year filtering.
+      * `findById(id)`: Fetches a single user record by numeric ID.
+      * `findByEmail(email)`: Queries user by email for duplicate checks and authentication.
+      * `create(userData)`: Validates required fields, enforces email uniqueness, auto-increments primary ID, and timestamps creation.
+      * `update(id, updateData, isPartial)`: Handles both full entity replacement (`PUT`) and selective field mutations (`PATCH`) while guarding immutable fields.
+      * `delete(id)`: Removes user record from the data store by ID.
+      * `count()`: Returns active total record count.
+  * **Schema Definition & Data Contracts (`server/swagger.js`)**:
     * `User`: Complete entity model (`id`, `name`, `email`, `graduationYear`, `department`, `company`, `role`).
     * `UserInput`: Validation schema for incoming registration payloads.
     * `UserPatch`: Validation schema for selective field modifications.
@@ -344,6 +349,9 @@ alumni-tracker/
         ├── package.json                        # [Manifest] Project metadata, NPM dependencies & run scripts
         ├── package-lock.json                   # [Manifest] Deterministic dependency lockfile
         │
+        ├── models/                             # 🧠 [MODEL LAYER]
+        │   └── User.js                         # In-memory User Model with complete CRUD methods & business validation
+        │
         ├── swagger.js                          # 🧠 [MODEL & SCHEMA CONTRACTS]
         │                                       # • OpenAPI 3.0 specification & Swagger UI configuration
         │                                       # • Entity schemas: User, UserInput, UserPatch
@@ -352,7 +360,7 @@ alumni-tracker/
         │
         ├── server.js                           # 🎮 [CONTROLLER & ROUTING]
         │                                       # • Express application initialization & middleware chain
-        │                                       # • Runtime in-memory data store (Model representation)
+        │                                       # • Delegates data operations to User Model (models/User.js)
         │                                       # • Page routing controllers: GET /, GET /about, GET /alumni
         │                                       # • User CRUD API controllers: GET, POST, PUT, PATCH, DELETE /api/users
         │                                       # • System health diagnostics controller: GET /api/health
@@ -383,16 +391,16 @@ alumni-tracker/
 
 | Path | MVC Layer | Component Type | Primary Responsibilities |
 | :--- | :--- | :--- | :--- |
+| **`Alumni/server/models/User.js`** | **Model** | Model Class (ES6) | In-memory User data store and complete CRUD operations (`findAll`, `findById`, `findByEmail`, `create`, `update`, `delete`). |
+| **`Alumni/server/swagger.js`** | **Model** | Schema Contracts | Defines formal OpenAPI data models (`User`, `UserInput`, `UserPatch`), constraints, and examples. |
 | **`Alumni/server/public/index.html`** | **View** | Presentation (HTML5) | Application landing page with hero banner, feature highlights, and navigation links. |
 | **`Alumni/server/public/about.html`** | **View** | Presentation (HTML5) | Department context (Istanbul Yeni Yüzyıl University YBS), project objectives, and author details. |
 | **`Alumni/server/public/alumni.html`** | **View** | Interactive UI (HTML5 + JS) | Search input, filter selectors, alumni card grid rendering, modal form, and toast alerts. |
 | **`Alumni/server/public/css/style.css`** | **View** | Styling (CSS3) | Design tokens, color system, typography, animations, responsive layout rules, card styling. |
 | **`http://localhost:5000/api/swagger`** | **View** | API UI (Swagger) | Interactive OpenAPI 3.0 browser view for testing endpoints and inspecting model schemas. |
 | **`Alumni/server/server.js`** *(Routes)* | **Controller** | Router & Handler | Dispatches HTTP requests to appropriate view loaders or REST API controller handlers. |
-| **`Alumni/server/server.js`** *(CRUD)* | **Controller** | Business Logic | Validates input formats, manages HTTP status codes (200, 201, 400, 404, 409), executes CRUD operations. |
+| **`Alumni/server/server.js`** *(CRUD)* | **Controller** | Business Logic | Validates input formats, delegates CRUD operations to User Model, and manages HTTP responses. |
 | **`Alumni/server/server.js`** *(Health)* | **Controller** | Diagnostics | Computes CPU core utilization, memory thresholds, OS metrics, and uptime statistics. |
-| **`Alumni/server/swagger.js`** | **Model** | Schema Contracts | Defines formal OpenAPI data models (`User`, `UserInput`, `UserPatch`), constraints, and examples. |
-| **`Alumni/server/server.js`** *(Store)* | **Model** | Runtime Data Store | Manages `users` array, field validation logic, ID autoincrement sequence, and email uniqueness checks. |
 | **`Alumni/Dockerfile`** | **DevOps** | Containerization | Defines container build instructions for Node.js 18 Alpine runtime environment. |
 | **`Alumni/docker-compose.yml`** | **DevOps** | Orchestration | Coordinates container startup, port forwarding (`5000:5000`), and live volume mounting. |
 | **`Alumni/server/.env`** | **Config** | Environment | Stores runtime environment variables (`PORT`, `NODE_ENV`). |

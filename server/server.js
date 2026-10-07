@@ -5,6 +5,7 @@ const multer = require('multer');
 const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
+const User = require('./models/User');
 
 // Load environment variables
 dotenv.config();
@@ -43,16 +44,7 @@ app.get('/alumni', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'alumni.html'));
 });
 
-// In-memory users dizisi (veritabanı yerine)
-let users = [
-  { id: 1, name: 'Ahmet Yılmaz', email: 'ahmet@alumni.edu', graduationYear: 2020, department: 'Bilgisayar Mühendisliği', company: 'Google', role: 'Software Engineer' },
-  { id: 2, name: 'Elif Demir', email: 'elif@alumni.edu', graduationYear: 2019, department: 'Elektrik-Elektronik', company: 'Microsoft', role: 'Product Manager' },
-  { id: 3, name: 'Mehmet Kaya', email: 'mehmet@alumni.edu', graduationYear: 2021, department: 'Endüstri Mühendisliği', company: 'Amazon', role: 'Data Analyst' },
-  { id: 4, name: 'Zeynep Çelik', email: 'zeynep@alumni.edu', graduationYear: 2018, department: 'Bilgisayar Mühendisliği', company: 'Meta', role: 'Frontend Developer' },
-  { id: 5, name: 'Can Öztürk', email: 'can@alumni.edu', graduationYear: 2022, department: 'Yazılım Mühendisliği', company: 'Apple', role: 'iOS Developer' },
-  { id: 6, name: 'Ofe Emor Demiroz', email: 'ofe@alumni.edu', graduationYear: 2023, department: 'Hisarüstü', company: 'Ay Yapım', role: 'Cast Manager' }
-];
-let nextId = 7;
+// Note: User data store and state management are encapsulated within the User Model (./models/User.js)
 
 // GET / → Ana sayfa (index.html)
 app.get('/', (req, res) => {
@@ -174,23 +166,28 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// GET /api/users → Tüm kullanıcıları listele
+// ============================================================================
+// User CRUD Controller Endpoints (Delegating to User Model)
+// ============================================================================
+
+// GET /api/users → List all users (supports optional filtering)
 app.get('/api/users', (req, res) => {
+  const data = User.findAll(req.query);
   res.json({
     success: true,
-    count: users.length,
-    data: users
+    count: data.length,
+    data
   });
 });
-// GET /api/users/:id → Tek kullanıcı getir
+
+// GET /api/users/:id → Get single user by ID
 app.get('/api/users/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const user = users.find(u => u.id === id);
+  const user = User.findById(req.params.id);
 
   if (!user) {
     return res.status(404).json({
       success: false,
-      error: `ID ${id} ile kullanıcı bulunamadı`
+      error: `ID ${req.params.id} ile kullanıcı bulunamadı`
     });
   }
 
@@ -200,151 +197,72 @@ app.get('/api/users/:id', (req, res) => {
   });
 });
 
-// DELETE /api/users/:id → Kullanıcı sil
+// DELETE /api/users/:id → Delete user
 app.delete('/api/users/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = users.findIndex(u => u.id === id);
-
-  if (index === -1) {
-    return res.status(404).json({
+  try {
+    const deleted = User.delete(req.params.id);
+    res.json({
+      success: true,
+      message: `${deleted.name} başarıyla silindi`,
+      data: deleted
+    });
+  } catch (err) {
+    res.status(err.statusCode || 404).json({
       success: false,
-      error: `ID ${id} ile kullanıcı bulunamadı`
+      error: err.message
     });
   }
-
-  const deleted = users.splice(index, 1)[0];
-
-  res.json({
-    success: true,
-    message: `${deleted.name} başarıyla silindi`,
-    data: deleted
-  });
 });
 
-// POST /api/users → Yeni kullanıcı ekle
+// POST /api/users → Create new user
 app.post('/api/users', upload.none(), (req, res) => {
-  const { name, email, graduationYear, department, company, role } = req.body;
-
-  // Zorunlu alan kontrolü
-  if (!name || !email) {
-    return res.status(400).json({
+  try {
+    const newUser = User.create(req.body);
+    res.status(201).json({
+      success: true,
+      message: 'Kullanıcı başarıyla eklendi',
+      data: newUser
+    });
+  } catch (err) {
+    res.status(err.statusCode || 400).json({
       success: false,
-      error: 'name ve email alanları zorunludur'
+      error: err.message
     });
   }
-
-  // Email tekrar kontrolü
-  const exists = users.find(u => u.email === email);
-  if (exists) {
-    return res.status(409).json({
-      success: false,
-      error: 'Bu email adresi zaten kayıtlı'
-    });
-  }
-
-  const newUser = {
-    id: nextId++,
-    name,
-    email,
-    graduationYear: graduationYear || null,
-    department: department || null,
-    company: company || null,
-    role: role || null
-  };
-
-  users.push(newUser);
-
-  res.status(201).json({
-    success: true,
-    message: 'Kullanıcı başarıyla eklendi',
-    data: newUser
-  });
 });
-// PUT /api/users/:id → Kullanıcıyı tamamen güncelle (tüm alanlar zorunlu)
+
+// PUT /api/users/:id → Fully update user
 app.put('/api/users/:id', upload.none(), (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = users.findIndex(u => u.id === id);
-
-  if (index === -1) {
-    return res.status(404).json({
+  try {
+    const updated = User.update(req.params.id, req.body, false);
+    res.json({
+      success: true,
+      message: 'Kullanıcı tamamen güncellendi',
+      data: updated
+    });
+  } catch (err) {
+    res.status(err.statusCode || 400).json({
       success: false,
-      error: `ID ${id} ile kullanıcı bulunamadı`
+      error: err.message
     });
   }
-
-  const { name, email, graduationYear, department, company, role } = req.body;
-
-  if (!name || !email) {
-    return res.status(400).json({
-      success: false,
-      error: 'PUT isteğinde name ve email alanları zorunludur'
-    });
-  }
-
-  // Email başka kullanıcıda var mı kontrol et
-  const emailExists = users.find(u => u.email === email && u.id !== id);
-  if (emailExists) {
-    return res.status(409).json({
-      success: false,
-      error: 'Bu email adresi başka bir kullanıcıya ait'
-    });
-  }
-
-  users[index] = {
-    id,
-    name,
-    email,
-    graduationYear: graduationYear || null,
-    department: department || null,
-    company: company || null,
-    role: role || null
-  };
-
-  res.json({
-    success: true,
-    message: 'Kullanıcı tamamen güncellendi',
-    data: users[index]
-  });
 });
 
-// PATCH /api/users/:id → Kullanıcıyı kısmi güncelle (sadece gönderilen alanlar)
+// PATCH /api/users/:id → Partially update user
 app.patch('/api/users/:id', upload.none(), (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = users.findIndex(u => u.id === id);
-
-  if (index === -1) {
-    return res.status(404).json({
+  try {
+    const updated = User.update(req.params.id, req.body, true);
+    res.json({
+      success: true,
+      message: 'Kullanıcı kısmi güncellendi',
+      data: updated
+    });
+  } catch (err) {
+    res.status(err.statusCode || 400).json({
       success: false,
-      error: `ID ${id} ile kullanıcı bulunamadı`
+      error: err.message
     });
   }
-
-  const updates = req.body;
-
-  // Email güncelleniyorsa başka kullanıcıda var mı kontrol et
-  if (updates.email) {
-    const emailExists = users.find(u => u.email === updates.email && u.id !== id);
-    if (emailExists) {
-      return res.status(409).json({
-        success: false,
-        error: 'Bu email adresi başka bir kullanıcıya ait'
-      });
-    }
-  }
-
-  // Sadece gönderilen alanları güncelle, id değiştirilemez
-  const allowedFields = ['name', 'email', 'graduationYear', 'department', 'company', 'role'];
-  allowedFields.forEach(field => {
-    if (updates[field] !== undefined) {
-      users[index][field] = updates[field];
-    }
-  });
-
-  res.json({
-    success: true,
-    message: 'Kullanıcı kısmi güncellendi',
-    data: users[index]
-  });
 });
 
 // Start server
