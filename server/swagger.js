@@ -397,6 +397,16 @@ API for Istanbul University Alumni Tracking and Management Platform (Management 
           }
         }
       },
+      '/users/create': {
+        get: {
+          tags: ['Web Users'],
+          summary: 'Render new alumnus creation form view',
+          description: 'Dispatches to UserController.create() to render the HTML registration form for adding a new alumnus.',
+          responses: {
+            '200': { description: 'Rendered HTML form view for creating an alumnus' }
+          }
+        }
+      },
       '/users/{id}': {
         get: {
           tags: ['Web Users'],
@@ -412,6 +422,24 @@ API for Istanbul University Alumni Tracking and Management Platform (Management 
           responses: {
             '200': { description: 'Rendered HTML profile page' },
             '404': { description: 'HTML error page when alumnus is not found' }
+          }
+        }
+      },
+      '/users/{id}/edit': {
+        get: {
+          tags: ['Web Users'],
+          summary: 'Render alumnus edit form view',
+          description: 'Dispatches to UserController.edit() to render a pre-populated HTML form for modifying the specified alumnus.',
+          parameters: [{
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric user identifier',
+            schema: { type: 'integer', example: 1 }
+          }],
+          responses: {
+            '200': { description: 'Rendered HTML edit form pre-filled with current alumni details' },
+            '404': { description: 'HTML error view if alumnus is not found' }
           }
         }
       },
@@ -474,7 +502,7 @@ API for Istanbul University Alumni Tracking and Management Platform (Management 
         post: {
           tags: ['Web Users'],
           summary: 'Web form action to delete an alumnus',
-          description: 'Dispatches to UserController.destroy() to delete the alumnus and redirect to /alumni directory.',
+          description: 'Dispatches to UserController.destroy() to delete the alumnus and redirect to /users directory.',
           parameters: [{
             name: 'id',
             in: 'path',
@@ -483,7 +511,23 @@ API for Istanbul University Alumni Tracking and Management Platform (Management 
             schema: { type: 'integer', example: 1 }
           }],
           responses: {
-            '302': { description: 'Redirects to /alumni directory upon deletion' },
+            '302': { description: 'Redirects to /users directory upon deletion' },
+            '404': { description: 'HTML error page if alumnus not found' }
+          }
+        },
+        get: {
+          tags: ['Web Users'],
+          summary: 'Direct link action to delete an alumnus',
+          description: 'Dispatches to UserController.destroy() to delete the alumnus and redirect to /users directory.',
+          parameters: [{
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric user identifier',
+            schema: { type: 'integer', example: 1 }
+          }],
+          responses: {
+            '302': { description: 'Redirects to /users directory upon deletion' },
             '404': { description: 'HTML error page if alumnus not found' }
           }
         }

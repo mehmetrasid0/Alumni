@@ -268,15 +268,17 @@ The **View** is responsible for presenting data to the user, capturing user inte
 ### 🎮 3. Controller Layer (Routing & Request Orchestration)
 The **Controller** layer serves as the intermediary orchestrator between incoming requests, the **User Model**, and the **View**. In accordance with clean MVC separation, the application provides **two specialized controllers**:
 
-* **1. `UserController` (`server/controllers/UserController.js`) — Web View & Page Lifecycle**:
-  * Manages browser-facing HTTP routes, static HTML delivery, and web-oriented CRUD operations:
+* **1. `UserController` (`server/controllers/UserController.js`) — Web View & Complete CRUD Operations**:
+  * Manages browser-facing HTTP routes, static HTML delivery, and web-oriented CRUD operations with View Layer:
     * `home(req, res)`: Serves the landing page view (`GET /` $\rightarrow$ `index.html`).
     * `about(req, res)`: Serves the institutional about page view (`GET /about` $\rightarrow$ `about.html`).
-    * `index(req, res)`: Serves the interactive alumni directory dashboard view layer (`GET /users`, `GET /alumni` $\rightarrow$ `alumni.html`).
-    * `show(req, res)`: Renders individual alumni profile page (`GET /users/:id`).
-    * `store(req, res)`: Handles web form submissions for creating new alumni records (`POST /users` $\rightarrow$ persists via Model & redirects to `/users`).
-    * `update(req, res)`: Handles web form submissions for updating existing alumni records (`POST /users/:id/update`).
-    * `destroy(req, res)`: Handles web form actions for deleting alumni records (`POST /users/:id/delete`).
+    * `index(req, res)`: [CRUD: Read All] Serves the interactive alumni directory dashboard view layer (`GET /users`, `GET /alumni` $\rightarrow$ `alumni.html`).
+    * `create(req, res)`: [CRUD: Create Form] Renders the HTML form view for registering a new alumnus (`GET /users/create`, `GET /users/new`).
+    * `store(req, res)`: [CRUD: Store] Handles web form submissions for creating new alumni records (`POST /users` $\rightarrow$ persists via Model & redirects to `/users`).
+    * `show(req, res)`: [CRUD: Read One] Renders individual alumni profile card view with Edit & Delete action buttons (`GET /users/:id`).
+    * `edit(req, res)`: [CRUD: Edit Form] Renders the pre-filled HTML form view to update an existing alumnus (`GET /users/:id/edit`).
+    * `update(req, res)`: [CRUD: Update] Handles web form updates (`POST /users/:id/update`, `POST /users/:id` $\rightarrow$ updates via Model & redirects to `/users/:id`).
+    * `destroy(req, res)`: [CRUD: Delete] Handles web deletion actions (`POST /users/:id/delete`, `GET /users/:id/delete` $\rightarrow$ deletes via Model & redirects to `/users`).
 
 * **2. `ApiUserController` (`server/controllers/ApiUserController.js`) — RESTful API Operations**:
   * Manages all headless JSON REST API endpoints, parses request payloads, delegates business logic to the `User` model, and delivers standard HTTP status codes:
@@ -290,9 +292,12 @@ The **Controller** layer serves as the intermediary orchestrator between incomin
 * **Modular Routing Layer (`server/routes/`)**:
   * **`userRoutes.js` (`server/routes/userRoutes.js`)**: Encapsulates browser endpoints and form actions with View Layer:
     * `GET /users` (and `/alumni`, `/user`): **Listing** alumni directory with View Layer.
+    * `GET /users/create` (and `/users/new`): **Create Form** view for new alumnus.
     * `POST /users` (and `/user`): **Creating** new alumnus with View Layer (persists and redirects to `/users`).
-    * `GET /users/:id`: Single alumnus HTML profile card view.
-    * `POST /users/:id/update` & `POST /users/:id/delete`: Form mutation actions.
+    * `GET /users/:id`: Single alumnus HTML profile card view with action buttons.
+    * `GET /users/:id/edit`: **Edit Form** view pre-populated with alumni details.
+    * `POST /users/:id/update`: Form update mutation (redirects to `/users/:id`).
+    * `POST /users/:id/delete` (and `GET /users/:id/delete`): Form delete action (redirects to `/users`).
     * `GET /` & `GET /about`: Presentation page routes (`index.html`, `about.html`).
   * **`apiUserRoutes.js` (`server/routes/apiUserRoutes.js`)**: Encapsulates RESTful JSON endpoints mounted at `/api/users`, routing directly to `ApiUserController` methods (`/`, `/:id`).
 
