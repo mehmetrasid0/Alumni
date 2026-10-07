@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "name": "Alumni Tracker API",
-    "description": "İstanbul Yeni Yüzyıl Üniversitesi — Alumni Tracker RESTful API Postman Test Koleksiyonu (W3-W4)",
+    "description": "Istanbul Yeni Yuzyil University — Alumni Tracker RESTful API Postman Test Collection (W3-W4)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -16,14 +16,14 @@
           "host": ["{{baseUrl}}"],
           "path": ["api", "health"]
         },
-        "description": "Sunucu donanım ve çalışma sağlığı telemetrisi (CPU, RAM, Uptime)"
+        "description": "Server hardware & runtime diagnostics telemetry (CPU, RAM, Uptime, OS)"
       }
     },
     {
       "name": "Users (CRUD)",
       "item": [
         {
-          "name": "1. Tüm Kullanıcıları Listele (GET)",
+          "name": "1. List All Users (GET)",
           "request": {
             "method": "GET",
             "header": [],
@@ -35,7 +35,7 @@
           }
         },
         {
-          "name": "2. Tek Kullanıcı Getir (GET by ID)",
+          "name": "2. Get Single User by ID (GET)",
           "request": {
             "method": "GET",
             "header": [],
@@ -47,7 +47,7 @@
           }
         },
         {
-          "name": "3. Yeni Kullanıcı Ekle (POST - JSON)",
+          "name": "3. Create New User (POST - JSON)",
           "request": {
             "method": "POST",
             "header": [
@@ -58,7 +58,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Ali Vural\",\n  \"email\": \"ali.vural@alumni.edu\",\n  \"graduationYear\": 2023,\n  \"department\": \"Yazılım Mühendisliği\",\n  \"company\": \"SAP\",\n  \"role\": \"Backend Developer\"\n}"
+              "raw": "{\n  \"name\": \"Ali Vural\",\n  \"email\": \"ali.vural@alumni.edu\",\n  \"graduationYear\": 2023,\n  \"department\": \"Software Engineering\",\n  \"company\": \"SAP\",\n  \"role\": \"Backend Developer\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/users",
@@ -68,7 +68,7 @@
           }
         },
         {
-          "name": "4. Kullanıcıyı Tamamen Güncelle (PUT)",
+          "name": "4. Fully Update User (PUT)",
           "request": {
             "method": "PUT",
             "header": [
@@ -79,7 +79,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Ahmet Yılmaz Güncel\",\n  \"email\": \"ahmet.guncel@alumni.edu\",\n  \"graduationYear\": 2020,\n  \"department\": \"Bilgisayar Mühendisliği\",\n  \"company\": \"Google Cloud\",\n  \"role\": \"Staff Software Engineer\"\n}"
+              "raw": "{\n  \"name\": \"Ahmet Yilmaz Updated\",\n  \"email\": \"ahmet.updated@alumni.edu\",\n  \"graduationYear\": 2020,\n  \"department\": \"Computer Engineering\",\n  \"company\": \"Google Cloud\",\n  \"role\": \"Staff Software Engineer\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/users/1",
@@ -89,7 +89,7 @@
           }
         },
         {
-          "name": "5. Kullanıcıyı Kısmi Güncelle (PATCH)",
+          "name": "5. Partially Update User (PATCH)",
           "request": {
             "method": "PATCH",
             "header": [
@@ -110,7 +110,7 @@
           }
         },
         {
-          "name": "6. Kullanıcıyı Sil (DELETE)",
+          "name": "6. Delete User (DELETE)",
           "request": {
             "method": "DELETE",
             "header": [],
@@ -127,7 +127,7 @@
       "name": "Utility",
       "item": [
         {
-          "name": "Hello Selamlama",
+          "name": "Hello Greeting",
           "request": {
             "method": "GET",
             "header": [],
@@ -139,7 +139,7 @@
           }
         },
         {
-          "name": "Sum Toplama",
+          "name": "Sum Calculation",
           "request": {
             "method": "GET",
             "header": [],
@@ -156,7 +156,7 @@
       "name": "Documentation & Pages",
       "item": [
         {
-          "name": "Swagger JSON Spesifikasyonu",
+          "name": "Swagger JSON Specification",
           "request": {
             "method": "GET",
             "header": [],
@@ -168,7 +168,7 @@
           }
         },
         {
-          "name": "Swagger UI Arayüzü",
+          "name": "Swagger UI Portal",
           "request": {
             "method": "GET",
             "header": [],
@@ -180,7 +180,7 @@
           }
         },
         {
-          "name": "Mezunlar Yönetim Arayüzü",
+          "name": "Alumni Directory Web UI",
           "request": {
             "method": "GET",
             "header": [],

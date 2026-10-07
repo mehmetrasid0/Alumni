@@ -12,9 +12,9 @@ A modern, containerized full-stack web application for tracking and managing uni
   - LinkedIn and portfolio integration.
 - **🔍 Advanced Search & Directory**:
   - Filter alumni by graduation year, department, company, or location.
-  - Paginated results with real-time search.
+  - Dynamic results with real-time client-side search.
 - **🔐 Authentication & Authorization**:
-  - JWT-based secure registration and login.
+  - JWT-based secure registration and login (Planned).
   - Role-based access control (Admin / Alumni).
 - **📊 Admin Dashboard**:
   - Manage all alumni records, view statistics, and generate reports.
@@ -36,112 +36,120 @@ A modern, containerized full-stack web application for tracking and managing uni
 | Layer | Technology | Description |
 | :--- | :--- | :--- |
 | **Backend** | **Node.js** + **Express.js** | High-performance RESTful API with modular route architecture. |
-| **Database** | **MongoDB** (Atlas) | Flexible NoSQL document database for alumni and user data. |
-| **ODM** | **Mongoose** | Schema-based data modeling and validation for MongoDB. |
-| **Frontend** | **React.js** + **Vite** | Fast, modern SPA with component-based UI and hot module replacement. |
-| **Auth** | **JWT** + **bcrypt** | Secure token-based authentication with hashed passwords. |
-| **Containerization** | **Docker** & **Docker Compose** | Reproducible development environment with volume sync. |
+| **Database** | **MongoDB** (Atlas) | Flexible NoSQL document database for alumni and user data (Planned). |
+| **ODM** | **Mongoose** | Schema-based data modeling and validation for MongoDB (Planned). |
+| **Frontend** | **HTML5** + **CSS3** + **Vanilla JS (ES6+)** | Responsive, accessible UI with real-time filtering (React + Vite planned for Phase 7). |
+| **Documentation** | **Swagger UI** + **OpenAPI 3.0** | Interactive API documentation and in-browser testing portal. |
+| **Containerization** | **Docker** & **Docker Compose** | Reproducible development environment with volume synchronization. |
 | **Dev Tools** | **Nodemon** (legacy watch) | Auto-restart server on file changes inside Docker containers. |
+| **Testing** | **Postman Collection** | Preconfigured automated test suite for all REST API endpoints. |
 
 ---
 
-## 📌 Hızlı Genel Bakış (Hoca Değerlendirme & Hızlı Erişim)
+## 📌 Quick Overview & Instructor Evaluation Guide
 
-| Kontrol Alanı | Doğrudan Bağlantı / Dosya | Açıklama |
+| Verification Item | Direct Link / Resource | Description |
 | :--- | :--- | :--- |
-| ⭐ **Bu Hafta (W4)** | [Hafta 4 — MVC Mimarisi & Postman](#-hafta-4-w4--07-ekim-2026-bu-hafta--current-week-) | MVC katman analizi, dosya/klasör haritası ve test paketi |
-| 👁️ **Canlı Arayüz** | [`http://localhost:5000/alumni`](http://localhost:5000/alumni) | İnteraktif mezun arama, filtreleme ve ekleme paneli |
-| 📘 **Swagger UI** | [`http://localhost:5000/api/swagger`](http://localhost:5000/api/swagger) | OpenAPI 3.0 interaktif API dokümantasyonu |
-| 🩺 **Health Check** | [`http://localhost:5000/api/health`](http://localhost:5000/api/health) | CPU, bellek, işletim sistemi ve çalışma süresi telemetrisi |
-| 📮 **Postman Test Paketi** | [`postman/Alumni_Tracker_API.postman_collection.json`](./postman/Alumni_Tracker_API.postman_collection.json) | Tek tıkla içe aktarılabilir 14 adet API test isteği |
-| 🏗️ **MVC Mimarisi** | [MVC Mimarisi ve Katman Analizi](#-mvc-architecture-model---view---controller) | Model, View, Controller detaylı teknik dokümanı |
-| 📁 **Dosya Haritası** | [Proje Dizin, Klasör ve Dosya Haritası](#-project-directories-folders--files-structure) | Tüm dosya ve klasörlerin MVC sorumluluk tablosu |
+| ⭐ **This Week (W4)** | [Week 4 — MVC Architecture & Postman](#-week-4-w4--october-07-2026-this-week--current-week-) | Comprehensive MVC breakdown, directory map, and automated test suite |
+| 👁️ **Live UI (View)** | [`http://localhost:5000/alumni`](http://localhost:5000/alumni) | Interactive alumni search, multi-filter directory, and creation modal |
+| 📘 **Swagger UI (Docs/Model)** | [`http://localhost:5000/api/swagger`](http://localhost:5000/api/swagger) | Interactive OpenAPI 3.0 API documentation & live testing portal |
+| 🩺 **Health Check (Controller)**| [`http://localhost:5000/api/health`](http://localhost:5000/api/health) | Real-time CPU load, memory utilization, OS details, and server uptime |
+| 📮 **Postman Test Suite** | [`postman/Alumni_Tracker_API.postman_collection.json`](./postman/Alumni_Tracker_API.postman_collection.json) | One-click importable Postman collection containing 14 automated API requests |
+| 🏗️ **MVC Architecture** | [MVC Architecture Specification](#-mvc-architecture-model---view---controller) | Detailed technical breakdown of Model, View, and Controller layers |
+| 📁 **File & Directory Map** | [Project Directory, Folder & File Structure](#-project-directories-folders--files-structure) | Full mapping of project files to their respective MVC roles |
 
 ---
 
-## 📅 Haftalık Geliştirme Süreci (Weekly Progress Tracker: W1 — W4)
+## 📅 Weekly Development Progress Tracker (W1 — W4)
 
-Bu proje, dönem boyunca haftalık aşamalarla geliştirilmektedir. Git commit geçmişi baz alınarak her haftanın hedefleri, yapılan geliştirmeler, ilgili dosyalar ve hoca kontrol notları aşağıda özetlenmiştir:
+This project is developed in weekly milestones throughout the academic semester. The breakdown below details goals, completed work, affected files, and commit references based on the Git commit history:
 
-| Hafta | Tarih Aralığı | Odak & Kazanımlar | İlgili Commitler | Durum |
+| Week | Date Range | Focus & Deliverables | Git Commits | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **W1** | 22 – 23 Eylül 2026 | Proje Başlangıcı, Docker Ortamı & Express Temelleri | `d76cbcb`, `54eeece`, `6b9af53` | ✅ Tamamlandı |
-| **W2** | 23 – 29 Eylül 2026 | View Katmanı Temelleri, Kurumsal UI (Home & About), Tasarım Sistemi | `e612c51` | ✅ Tamamlandı |
-| **W3** | 30 Eylül 2026 | RESTful API (Users CRUD), Health Diagnostics, Swagger UI, Mezun Paneli | `cd6b3ef` | ✅ Tamamlandı |
-| **W4** | **07 Ekim 2026** | **MVC Mimarisi, Dizin/Klasör Haritası, Postman Testleri & Mimari Taslak** | *(Bugünkü Commit)* | 🚀 **Bu Hafta (Aktif)** |
+| **W1** | Sep 22 – 23, 2026 | Project Kickoff, Docker Containerization & Express Foundation | `d76cbcb`, `54eeece`, `6b9af53` | ✅ Completed |
+| **W2** | Sep 23 – 29, 2026 | View Layer Foundation, Institutional UI (Home & About), Design System | `e612c51` | ✅ Completed |
+| **W3** | Sep 30, 2026 | RESTful API (Users CRUD), Health Telemetry, Swagger UI, Alumni UI | `cd6b3ef` | ✅ Completed |
+| **W4** | **Oct 07, 2026** | **MVC Architecture Formalization, File Map, Postman Test Suite & Blueprint** | `88f15e5` | 🚀 **This Week (Active)** |
 
 ---
 
-### 📦 Hafta 1 (W1) — 22–23 Eylül 2026: Proje Başlangıcı & Altyapı
-* **Amaç**: Web Programlama dersi için mezun takip platformunun temel altyapısını kurmak, container mimarisini oluşturmak ve başlangıç dokümantasyonunu hazırlamak.
-* **Commitler**:
+### 📦 Week 1 (W1) — September 22–23, 2026: Project Kickoff & Infrastructure
+* **Objective**: Establish the core infrastructure for the Alumni Tracker platform, configure containerization via Docker, and draft initial project documentation.
+* **Commits**:
   * [`d76cbcb`](https://github.com/mehmetrasid0/Alumni/commit/d76cbcb) — *Initial commit: Add README and project documentation*
   * [`54eeece`](https://github.com/mehmetrasid0/Alumni/commit/54eeece) — *feat: add Docker Compose setup and Express server with basic routes*
   * [`6b9af53`](https://github.com/mehmetrasid0/Alumni/commit/6b9af53) — *docs: redesign README with mermaid diagrams, ER schema, and phased roadmap*
-* **Yapılan Geliştirmeler**:
-  1. Git deposu ve `.gitignore` kural dosyası yapılandırıldı.
-  2. `Dockerfile` (Node.js 18 Alpine tabanlı) ve `docker-compose.yml` yazılarak containerize geliştirme ortamı oluşturuldu.
-  3. `server/server.js` dosyasında Express.js sunucusu ayağa kaldırıldı, temel yardımcı endpoint'ler eklendi (`GET /hello/:name`, `GET /sum/:number1/:number2`).
-  4. MongoDB Atlas için taslak ER veri tabanı şeması ve aşamalı yol haritası (Roadmap) belirlendi.
-* **İlgili Dosyalar**: `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `server/server.js`, `README.md`.
+* **Accomplishments**:
+  1. Initialized Git repository with clean `.gitignore` rule configurations.
+  2. Configured containerization using `Dockerfile` (Node.js 18 Alpine) and `docker-compose.yml` with live volume reload.
+  3. Initialized Express.js HTTP backend server with foundational utility routes (`GET /hello/:name`, `GET /sum/:number1/:number2`).
+  4. Designed preliminary Entity-Relationship (ER) schema for MongoDB Atlas and established a multi-phased development roadmap.
+* **Related Files**: `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `server/server.js`, `README.md`.
 
 ---
 
-### 🎨 Hafta 2 (W2) — 23–29 Eylül 2026: View Katmanı & Kurumsal Web Arayüzü
-* **Amaç**: Kullanıcıyı karşılayan ana sayfa ve kurumsal hakkında sayfalarını modern, duyarlı (responsive) bir arayüzle geliştirmek.
-* **Commitler**:
+### 🎨 Week 2 (W2) — September 23–29, 2026: View Layer & Institutional Web UI
+* **Objective**: Build responsive, professional frontend views for the application landing page and institutional about page.
+* **Commits**:
   * [`e612c51`](https://github.com/mehmetrasid0/Alumni/commit/e612c51) — *feat: add homepage UI and about page with developer info*
-* **Yapılan Geliştirmeler**:
-  1. **Ana Sayfa (`server/public/index.html`)**: Karşılama hero alanı, canlı platform istatistik sayaçları, özellik kartları ve aksiyon butonları tasarlandı.
-  2. **Hakkında Sayfası (`server/public/about.html`)**: İstanbul Yeni Yüzyıl Üniversitesi Yönetim Bilişim Sistemleri (YBS) 3. sınıf ders projesi bilgileri, vizyon, misyon ve geliştirici biyografisi oluşturuldu.
-  3. **Global Tasarım Sistemi (`server/public/css/style.css`)**: Üniversite kurumsal kimliğini yansıtan Lacivert (`--navy-900`) ve Altın (`--gold-400`) renk paleti, tipografi, flex/grid düzenleri ve mobil hamburger menü kodlandı.
-  4. Express static middleware (`express.static('public')`) ile statik dosyaların sunumu sağlandı.
-* **İlgili Dosyalar**: `server/public/index.html`, `server/public/about.html`, `server/public/css/style.css`, `server/server.js`.
+* **Accomplishments**:
+  1. **Landing Page (`server/public/index.html`)**: Designed greeting hero banner, real-time platform statistics counters, feature highlight cards, and call-to-action buttons.
+  2. **About Page (`server/public/about.html`)**: Authored academic project overview for Istanbul Yeni Yüzyıl University (Information Systems / YBS, 3rd Year), vision, mission, and developer biography.
+  3. **Global Design System (`server/public/css/style.css`)**: Built unified CSS design tokens utilizing an institutional Navy (`--navy-900`) and Gold (`--gold-400`) palette, typography scale, responsive CSS Grid/Flexbox layouts, and mobile drawer navigation.
+  4. Configured static asset delivery using Express static middleware (`express.static('public')`).
+* **Related Files**: `server/public/index.html`, `server/public/about.html`, `server/public/css/style.css`, `server/server.js`.
 
 ---
 
-### ⚡ Hafta 3 (W3) — 30 Eylül 2026: RESTful API, Health Telemetri, Swagger & Mezunlar Paneli
-* **Amaç**: Mezun yönetimini sağlayan tam teşekküllü RESTful CRUD API'sini yazmak, Swagger dokümantasyonunu kurmak ve interaktif mezun yönetim arayüzünü geliştirmek.
-* **Commitler**:
+### ⚡ Week 3 (W3) — September 30, 2026: RESTful API, Health Telemetry, Swagger & Alumni Dashboard
+* **Objective**: Implement a full-featured RESTful CRUD API for alumni management, integrate Swagger documentation, and construct an interactive client-side alumni directory.
+* **Commits**:
   * [`cd6b3ef`](https://github.com/mehmetrasid0/Alumni/commit/cd6b3ef) — *feat: Swagger API docs, health endpoint, users CRUD, alumni UI*
-* **Yapılan Geliştirmeler**:
+* **Accomplishments**:
   1. **Users RESTful CRUD API**:
-     * `GET /api/users` (Tüm mezunları listeleme)
-     * `GET /api/users/:id` (Tekil mezun sorgulama)
-     * `POST /api/users` (Yeni mezun ekleme, email benzersizlik kontrolü)
-     * `PUT /api/users/:id` (Kayıt tam güncelleme)
-     * `PATCH /api/users/:id` (Kayıt kısmi güncelleme)
-     * `DELETE /api/users/:id` (Kayıt silme)
-  2. **Multer & Form-Data Desteği**: JSON haricinde `multipart/form-data` ve `x-www-form-urlencoded` formatlarında veri alabilme özelliği eklendi.
-  3. **Kapsamlı Sistem Telemetrisi (`GET /api/health`)**: CPU çekirdek yükü, sistem & işlem RAM kullanımı, işletim sistemi tipi ve uptime metrikleri hesaplanarak `healthy`, `warning`, `critical` durumlarıyla raporlandı.
-  4. **Swagger UI (`/api/swagger`)**: OpenAPI 3.0 standardında interaktif API dokümantasyonu kuruldu (`swagger.js`).
-  5. **Dinamik Mezunlar Paneli (`server/public/alumni.html`)**:
-     * Canlı metin araması (isim, şirket, rol, email).
-     * Bölüm ve mezuniyet yılına göre reaktif filtreleme.
-     * Dinamik kart oluşturma motoru ve avatar initials üretici.
-     * Yeni mezun ekleme modal penceresi ve asenkron `fetch()` entegrasyonu.
-     * Bildirim (toast notification) geri bildirimleri.
-* **İlgili Dosyalar**: `server/server.js`, `server/swagger.js`, `server/public/alumni.html`, `server/public/css/style.css`, `server/package.json`.
+     * `GET /api/users` (List all alumni records)
+     * `GET /api/users/:id` (Fetch single user by ID)
+     * `POST /api/users` (Add new alumni record with email uniqueness validation)
+     * `PUT /api/users/:id` (Full record update with mandatory field enforcement)
+     * `PATCH /api/users/:id` (Partial field update preserving entity identity)
+     * `DELETE /api/users/:id` (Remove record from data store)
+  2. **Multipart & Form Parsing**: Integrated `multer` middleware alongside standard body parsers to support `application/json`, `multipart/form-data`, and `application/x-www-form-urlencoded`.
+  3. **System Telemetry & Health Check (`GET /api/health`)**: Built comprehensive hardware telemetry endpoint reporting per-core CPU load, system and process RAM usage, operating system details, and uptime with health status classification (`healthy`, `warning`, `critical`).
+  4. **Swagger UI Portal (`/api/swagger`)**: Integrated OpenAPI 3.0 specification (`swagger.js`) providing browser-based interactive API testing with "Try it out" capability.
+  5. **Interactive Alumni Dashboard (`server/public/alumni.html`)**:
+     * Real-time client-side search across names, companies, roles, and emails.
+     * Reactive dropdown filtering by academic department and graduation year.
+     * Dynamic DOM card rendering engine with automated avatar initials generation.
+     * Asynchronous modal dialog for adding new alumni records using `fetch()`.
+     * Instant toast notification feedback system.
+* **Related Files**: `server/server.js`, `server/swagger.js`, `server/public/alumni.html`, `server/public/css/style.css`, `server/package.json`.
 
 ---
 
-### 🚀 Hafta 4 (W4) — 07 Ekim 2026 (BU HAFTA / CURRENT WEEK ⭐)
-* **Amaç**: Projenin **MVC (Model-View-Controller)** mimarisini resmileştirmek, katmanlarını ayrıştırmak, tüm dosya/klasör haritasını çıkarmak, Postman test koleksiyonuyla doğrulamak ve projeyi düzenli bir mimari taslağa kavuşturmak.
-* **Odak**: Mimari Bütünlük, Katman Ayrımı (MVC), Test Otomasyonu & Proje Şablonu
-* **Bu Hafta Yapılan Geliştirmeler (Hoca Değerlendirme Listesi)**:
-  1. **MVC Mimarisi Analizi & Dokümantasyonu**:
-     * **Model Katmanı**: `server/swagger.js` veri şemaları (User, UserInput, UserPatch) ve `server/server.js` runtime veri yönetimi/doğrulama kuralları detaylandırıldı.
-     * **View Katmanı**: `server/public/` altındaki HTML5/CSS3 sayfaları (`index.html`, `about.html`, `alumni.html`) ile Swagger UI'ın sunum sorumlulukları belirlendi.
-     * **Controller Katmanı**: `server/server.js` içerisindeki middleware zinciri, sayfa yönlendiricileri, CRUD handler'ları ve diagnostics controller'ı incelendi.
-  2. **Dizin, Klasör ve Dosya Haritası**:
-     * Projedeki tüm dizin ve dosyaların MVC rolleri (`[Model]`, `[View]`, `[Controller]`, `[DevOps]`, `[Config]`, `[Testing]`) çıkarıldı ve ayrıntılı bir Sorumluluk Matrisi tablosu oluşturuldu.
-  3. **Mermaid Mimari & Sekans Diyagramları**:
-     * MVC katman etkileşim şeması ile kullanıcı aksiyonundan başlayıp DB/Model güncellemesine ve arayüze dönen 10 adımlı veri akış sekans diyagramı eklendi.
-  4. **Postman API Test Koleksiyonu**:
-     * CRUD operasyonları, Health check, Utility ve Web page endpoint'lerini kapsayan `postman/Alumni_Tracker_API.postman_collection.json` dosyası oluşturuldu. Hoca veya geliştirici tek tıkla Postman'e import edip tüm API'yi doğrulayabilir.
-  5. **Modüler MVC Geçiş Şablonu (Roadmap)**:
-     * Gelecek haftalarda MongoDB Atlas ve JWT Authentication eklendiğinde projenin nasıl ayrık `models/`, `views/`, `controllers/`, `routes/`, `middleware/` klasörlerine evrileceği şablonlaştırıldı.
-* **İlgili Dosyalar**: `README.md`, `Alumni/README.md`, `Alumni/postman/Alumni_Tracker_API.postman_collection.json`, `postman/collections/Alumni_Tracker_API.postman_collection.json`.
+### 🚀 Week 4 (W4) — October 07, 2026 (THIS WEEK / CURRENT WEEK ⭐)
+* **Objective**: Formalize the **Model-View-Controller (MVC)** architectural pattern, document directory/folder/file responsibilities, produce end-to-end request lifecycle diagrams, build a standardized Postman API test suite, and organize the repository layout.
+* **Focus**: Architectural Integrity, Layer Separation (MVC), Test Automation & Clean Project Template
+* **This Week's Accomplishments (Instructor Evaluation Checklist)**:
+  1. **Comprehensive MVC Architecture Documentation**:
+     * **Model Layer**: Documented `server/swagger.js` OpenAPI data models (`User`, `UserInput`, `UserPatch`) and `server/server.js` in-memory state management and business validation rules.
+     * **View Layer**: Documented `server/public/` presentation assets (`index.html`, `about.html`, `alumni.html`), design system tokens (`css/style.css`), and Swagger UI.
+     * **Controller Layer**: Documented `server/server.js` middleware pipeline, page view dispatchers, CRUD business logic handlers, and diagnostics controller.
+  2. **Directory, Folder & File Architecture Map**:
+     * Mapped every file in the repository to its architectural role (`[Model]`, `[View]`, `[Controller]`, `[DevOps]`, `[Config]`, `[Testing]`) and formulated an exhaustive Component Responsibility Matrix.
+  3. **Mermaid Flow & Sequence Diagrams**:
+     * High-level MVC interaction diagram illustrating decoupled layer communications.
+     * 10-step sequence diagram tracing user submission in the View $\rightarrow$ validation & mutation in the Controller/Model $\rightarrow$ HTTP response $\rightarrow$ DOM update in the View.
+  4. **Postman API Test Collection**:
+     * Authored and exported [`postman/Alumni_Tracker_API.postman_collection.json`](./postman/Alumni_Tracker_API.postman_collection.json) containing 14 ready-to-execute automated requests covering CRUD, Health Telemetry, Utilities, and Web Pages.
+  5. **Modular MVC Scaling Blueprint**:
+     * Outlined the future decomposition plan for segregating monolithic controller code into dedicated `models/`, `views/`, `controllers/`, `routes/`, and `middleware/` folders during Phase 5 (MongoDB Atlas + JWT Auth).
+* **Evaluation Reference Links**:
+  * 📖 **MVC Specification**: [🏗️ MVC Architecture](#-mvc-architecture-model---view---controller)
+  * 📁 **Directory Map**: [📁 Project Directories, Folders & Files Structure](#-project-directories-folders--files-structure)
+  * 🌐 **Live Web UI**: [`http://localhost:5000/alumni`](http://localhost:5000/alumni)
+  * 📘 **Swagger UI**: [`http://localhost:5000/api/swagger`](http://localhost:5000/api/swagger)
+  * 🩺 **Health Telemetry**: [`http://localhost:5000/api/health`](http://localhost:5000/api/health)
+  * 📮 **Postman Test Suite**: [`postman/Alumni_Tracker_API.postman_collection.json`](./postman/Alumni_Tracker_API.postman_collection.json)
 
 ---
 
@@ -207,21 +215,21 @@ graph TD
 ---
 
 ### 🧠 1. Model Layer (Data & Schema Contracts)
-The **Model** represents the core data structures, business logic constraints, and schema validations. It manages the state and rules governing alumni entities.
+The **Model** represents core data structures, business logic constraints, and schema validations. It manages the state and rules governing alumni entities.
 
 * **Current Implementation (`server/server.js` & `server/swagger.js`)**:
-  * **In-Memory Store (`server/server.js` lines 47-55)**: Maintains runtime state via the `users` array and auto-incrementing `nextId` counter.
+  * **In-Memory Store (`server/server.js`)**: Maintains runtime state via the `users` array and auto-incrementing `nextId` counter.
   * **Data Integrity & Validation Rules**:
-    * Mandatory field verification: `name` and `email` are enforced on `POST` and `PUT`.
+    * Mandatory field verification: `name` and `email` are strictly required on `POST` and `PUT`.
     * Unique constraint validation: duplicate email rejection (`409 Conflict`) across registration and update operations.
-    * Partial vs. Full modification enforcement (`PUT` requires full payload; `PATCH` permits selective field mutation while guarding immutable identifiers like `id`).
+    * Partial vs. Full modification enforcement (`PUT` requires complete entity payload; `PATCH` permits selective field mutation while guarding immutable identifiers like `id`).
   * **Schema Definition (`server/swagger.js`)**:
-    * `User`: Complete data structure (`id`, `name`, `email`, `graduationYear`, `department`, `company`, `role`).
-    * `UserInput`: Schema definition for incoming registration payloads.
-    * `UserPatch`: Schema definition for selective field modifications.
-    * `HealthCheckResponse`: Contract for system diagnostics telemetry.
+    * `User`: Complete entity model (`id`, `name`, `email`, `graduationYear`, `department`, `company`, `role`).
+    * `UserInput`: Validation schema for incoming registration payloads.
+    * `UserPatch`: Validation schema for selective field modifications.
+    * `HealthCheckResponse`: Specification contract for system diagnostics telemetry.
 * **Target Persistence Layer**:
-  * Mongoose ODM models (`models/User.js`, `models/Alumni.js`) mapped to MongoDB Atlas collections.
+  * Mongoose ODM models (`models/User.js`, `models/Alumni.js`) mapped to MongoDB Atlas cloud collections.
 
 ---
 
@@ -229,13 +237,13 @@ The **Model** represents the core data structures, business logic constraints, a
 The **View** is responsible for presenting data to the user, capturing user interactions, and rendering visual feedback.
 
 * **Current Implementation (`server/public/`)**:
-  * **`index.html` (Landing View)**: Brand hero section, quick navigation, key university information, and statistics overview.
-  * **`about.html` (Informational View)**: Project motivation, university curriculum details (Istanbul Yeni Yüzyıl University YBS), and development background.
+  * **`index.html` (Landing View)**: Brand hero section, quick navigation, key university information, and platform statistics overview.
+  * **`about.html` (Informational View)**: Project motivation, academic department curriculum context (Istanbul Yeni Yüzyıl University YBS), and development background.
   * **`alumni.html` (Dynamic Alumni Directory View)**:
     * **Reactive Search & Filtering**: Real-time client-side search across names, emails, companies, and roles, alongside department and graduation year select filters.
     * **Card Generator Engine**: Dynamic DOM generation converting user objects into styled card components with initials avatars and metadata tags.
     * **Modal Dialog & Form Handling**: Intercepts user inputs, formats JSON payloads, and communicates asynchronously with backend endpoints via `fetch()`.
-    * **Toast Notification System**: Real-time feedback alerts for successful creation or HTTP errors.
+    * **Toast Notification System**: Real-time feedback alerts for successful operations or HTTP errors.
   * **`css/style.css` (Visual Design System)**:
     * CSS Custom Properties (design tokens for colors: `--navy-900`, `--gold-400`, typography, elevation shadows, transitions).
     * Responsive CSS Grid and Flexbox layouts supporting desktop, tablet, and mobile breakpoints.
@@ -245,14 +253,14 @@ The **View** is responsible for presenting data to the user, capturing user inte
 ---
 
 ### 🎮 3. Controller Layer (Routing & Request Orchestration)
-The **Controller** acts as the intermediate brain. It intercepts incoming HTTP requests, applies middleware processing, invokes validation on the Model, updates data, and returns the appropriate HTTP status code and response payload.
+The **Controller** acts as the intermediate coordinator. It intercepts incoming HTTP requests, applies middleware processing, invokes validation on the Model, updates data, and returns appropriate HTTP status codes and response payloads.
 
 * **Current Implementation (`server/server.js`)**:
   * **Middleware Pipeline**:
     * `express.json()`: Parses incoming JSON request payloads.
     * `express.urlencoded({ extended: true })`: Handles standard form-encoded data.
     * `multer().none()`: Enables parsing of `multipart/form-data` without file storage.
-    * `express.static('public')`: Serves view assets (HTML, CSS, static files).
+    * `express.static('public')`: Delivers view assets (HTML, CSS, static files).
   * **View Routing Controllers**:
     * `GET /` $\rightarrow$ Serves `index.html`
     * `GET /about` $\rightarrow$ Serves `about.html`
@@ -284,12 +292,12 @@ sequenceDiagram
     participant Controller as 🎮 Controller (server.js)
     participant Model as 🧠 Model (In-Memory / Schemas)
 
-    User->>View: 1. Opens "Yeni Mezun Ekle" modal & submits form
+    User->>View: 1. Opens "Add Alumni" modal & submits form
     View->>Controller: 2. POST /api/users (JSON payload via fetch)
     Note over Controller: Validates name & email presence<br/>Checks email uniqueness
     alt Validation Failed (Missing fields or duplicate email)
         Controller-->>View: 3a. Return HTTP 400 or HTTP 409 (Error JSON)
-        View-->>User: 4a. Display error toast ("Zaten kayıtlı / Alanlar zorunlu")
+        View-->>User: 4a. Display error toast ("Already registered / Required fields missing")
     else Validation Succeeded
         Controller->>Model: 3b. Create new user object with nextId++ & push to array
         Model-->>Controller: 4b. Confirm saved entity
@@ -394,7 +402,7 @@ alumni-tracker/
 
 ### 🚀 Target Modular MVC Architecture (Scaling Roadmap)
 
-As the project expands in Phase 2 through Phase 4 (database persistence and authentication), the monolithic controller in `server.js` cleanly decomposes into modular, dedicated MVC sub-packages:
+As the project expands in Phase 5 through Phase 7 (database persistence and authentication), the monolithic controller in `server.js` cleanly decomposes into modular, dedicated MVC sub-packages:
 
 ```text
 Alumni/server/
@@ -421,7 +429,7 @@ Alumni/server/
 
 ---
 
-## 🗄️ Database Schema (MongoDB)
+## 🗄️ Database Schema (MongoDB Atlas - Target Model)
 
 ```mermaid
 erDiagram
@@ -458,76 +466,76 @@ erDiagram
 
 ## 📡 API Endpoints
 
-### 📘 Swagger API Dokümantasyonu
+### 📘 Swagger API Documentation
 
-Tüm API endpoint'lerini interaktif olarak keşfetmek, test etmek ve detaylı şemalarını görmek için **Swagger UI** kullanılabilir:
+To interactively explore, test, and view schemas for all API endpoints, use **Swagger UI**:
 
-| Kaynak | URL | Açıklama |
+| Resource | URL | Description |
 | :--- | :--- | :--- |
-| **Swagger UI** | [`/api/swagger`](http://localhost:5000/api/swagger) | İnteraktif API dokümantasyonu — Try it out ile doğrudan test edin |
-| **Swagger JSON** | [`/api/swagger.json`](http://localhost:5000/api/swagger.json) | OpenAPI 3.0 spesifikasyonu (JSON formatında) |
+| **Swagger UI** | [`/api/swagger`](http://localhost:5000/api/swagger) | Interactive API documentation — Test directly with "Try it out" |
+| **Swagger JSON** | [`/api/swagger.json`](http://localhost:5000/api/swagger.json) | OpenAPI 3.0 specification in raw JSON format |
 
-> **💡 İpucu:** Swagger UI üzerinde her endpoint'in yanındaki **"Try it out"** butonuna tıklayarak doğrudan tarayıcıdan API istekleri gönderebilirsiniz.
+> **💡 Tip:** Click the **"Try it out"** button next to any endpoint in Swagger UI to dispatch live API requests straight from your browser.
 
-#### Swagger Üzerinden Test Adımları
-1. Tarayıcıda [`http://localhost:5000/api/swagger`](http://localhost:5000/api/swagger) adresini açın
-2. Test etmek istediğiniz endpoint'i genişletin
-3. **"Try it out"** butonuna tıklayın
-4. Gerekli parametreleri doldurun
-5. **"Execute"** butonuna tıklayın
-6. Response kısmında sonucu görün
+#### Testing Steps via Swagger UI
+1. Open [`http://localhost:5000/api/swagger`](http://localhost:5000/api/swagger) in your browser.
+2. Expand the endpoint you want to test.
+3. Click the **"Try it out"** button.
+4. Fill in any required request body or path parameters.
+5. Click the **"Execute"** button.
+6. Inspect the live response code, headers, and body.
 
 ### Health Check
-| Method | Endpoint | Açıklama |
+| Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/health` | Kapsamlı sistem sağlık durumu (CPU, bellek, OS, runtime bilgileri) |
+| `GET` | `/api/health` | Comprehensive server diagnostics telemetry (CPU, memory, OS, runtime info) |
 
 ### Users (CRUD)
-| Method | Endpoint | Açıklama | Body Formatları |
+| Method | Endpoint | Description | Accepted Formats |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/users` | Tüm kullanıcıları listele | — |
-| `GET` | `/api/users/:id` | Tek kullanıcı getir | — |
-| `POST` | `/api/users` | Yeni kullanıcı ekle | JSON, form-data, x-www-form-urlencoded |
-| `PUT` | `/api/users/:id` | Kullanıcıyı tamamen güncelle | JSON, form-data, x-www-form-urlencoded |
-| `PATCH` | `/api/users/:id` | Kullanıcıyı kısmi güncelle | JSON, form-data, x-www-form-urlencoded |
-| `DELETE` | `/api/users/:id` | Kullanıcı sil | — |
+| `GET` | `/api/users` | List all alumni users | — |
+| `GET` | `/api/users/:id` | Fetch single user by ID | — |
+| `POST` | `/api/users` | Create new alumni user | JSON, form-data, x-www-form-urlencoded |
+| `PUT` | `/api/users/:id` | Fully update user (all fields required) | JSON, form-data, x-www-form-urlencoded |
+| `PATCH` | `/api/users/:id` | Partially update user (selective fields) | JSON, form-data, x-www-form-urlencoded |
+| `DELETE` | `/api/users/:id` | Delete user record by ID | — |
 
 ### Utility
-| Method | Endpoint | Açıklama |
+| Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/hello/:name` | `Hello,{name}!` selamlama mesajı döndürür |
-| `GET` | `/sum/:num1/:num2` | İki sayının toplamını döndürür |
+| `GET` | `/hello/:name` | Returns greeting message: `Hello,{name}!` |
+| `GET` | `/sum/:num1/:num2` | Returns sum of two numbers |
 
-### Pages
-| Method | Endpoint | Açıklama |
+### Pages (View Layer)
+| Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/` | Ana sayfa (index.html) |
-| `GET` | `/about` | Hakkında sayfası (about.html) |
-| `GET` | `/alumni` | Mezunlar arayüzü (alumni.html) |
-| `GET` | `/api/swagger` | Swagger UI — İnteraktif API dokümantasyonu |
+| `GET` | `/` | Home / Landing page (`index.html`) |
+| `GET` | `/about` | About page (`about.html`) |
+| `GET` | `/alumni` | Alumni directory & management UI (`alumni.html`) |
+| `GET` | `/api/swagger` | Interactive Swagger UI portal |
 
-### Örnek API İstekleri
+### Example API Requests
 
-#### Tüm Kullanıcıları Listele
+#### List All Users
 ```bash
 curl http://localhost:5000/api/users
 ```
 
-#### Yeni Kullanıcı Ekle (JSON)
+#### Create New User (JSON)
 ```bash
 curl -X POST http://localhost:5000/api/users \
   -H "Content-Type: application/json" \
-  -d '{"name":"Ali Vural","email":"ali@alumni.edu","graduationYear":2023,"department":"Yazılım Mühendisliği","company":"SAP","role":"Backend Developer"}'
+  -d '{"name":"Ali Vural","email":"ali@alumni.edu","graduationYear":2023,"department":"Software Engineering","company":"SAP","role":"Backend Developer"}'
 ```
 
-#### Kullanıcı Kısmi Güncelle (PATCH)
+#### Partially Update User (PATCH)
 ```bash
 curl -X PATCH http://localhost:5000/api/users/1 \
   -H "Content-Type: application/json" \
   -d '{"company":"Tesla","role":"Senior Engineer"}'
 ```
 
-#### Kullanıcı Sil
+#### Delete User
 ```bash
 curl -X DELETE http://localhost:5000/api/users/1
 ```
@@ -562,10 +570,10 @@ docker compose up -d --build
 
 ### 3. Service Endpoints
 - **Backend API**: [http://localhost:5000](http://localhost:5000)
-- **Swagger UI**: [http://localhost:5000/api/swagger](http://localhost:5000/api/swagger) — İnteraktif API dokümantasyonu
+- **Swagger UI**: [http://localhost:5000/api/swagger](http://localhost:5000/api/swagger) — Interactive API documentation
 - **Swagger JSON**: [http://localhost:5000/api/swagger.json](http://localhost:5000/api/swagger.json)
 - **Health Check**: [http://localhost:5000/api/health](http://localhost:5000/api/health)
-- **Mezunlar Arayüzü**: [http://localhost:5000/alumni](http://localhost:5000/alumni)
+- **Alumni Web Directory**: [http://localhost:5000/alumni](http://localhost:5000/alumni)
 
 ### 4. Useful Commands
 ```bash
@@ -587,37 +595,37 @@ npm run dev
 
 ## 🗺️ Roadmap & Weekly Milestones
 
-- [x] **Phase 1 (W1): Environment & Architecture Setup** *(Tamamlandı)*
-  - Git deposu, `.gitignore` ve ilk README dokümantasyonu.
-  - Node.js 18 Alpine `Dockerfile` ve `docker-compose.yml` kurulumu.
-  - Express.js HTTP sunucusu ve temel yardımcı endpoint'ler (`/hello`, `/sum`).
-- [x] **Phase 2 (W2): View Katmanı & Kurumsal Web Arayüzü** *(Tamamlandı)*
-  - Karşılama hero alanı, sayaçlar ve özellik kartlarıyla ana sayfa (`index.html`).
-  - Üniversite (İstanbul Yeni Yüzyıl Üni. YBS) ve geliştirici hakkında sayfası (`about.html`).
-  - Kurumsal renk paletli duyarlı global stil sistemi (`css/style.css`).
-- [x] **Phase 3 (W3): RESTful API, Health Telemetri & Swagger UI** *(Tamamlandı)*
-  - Users CRUD operasyonları (`GET`, `POST`, `PUT`, `PATCH`, `DELETE /api/users`).
-  - `multer` ile `multipart/form-data` ve URL-encoded veri desteği.
-  - Sunucu CPU, RAM, işletim sistemi ve çalışma süresi telemetrisi (`/api/health`).
-  - OpenAPI 3.0 spesifikasyonu ve interaktif Swagger UI dokümantasyonu (`/api/swagger`).
-  - Anlık arama, departman/yıl filtreleme ve mezun ekleme modallı dinamik arayüz (`alumni.html`).
-- [x] **Phase 4 (W4 - Bu Hafta): MVC Mimarisi & Postman Test Paketi** *(Tamamlandı ⭐)*
-  - Model-View-Controller (MVC) mimari analizi ve detaylı teknik belgelendirme.
-  - Tüm dizin, klasör ve dosyaların mimari rol etiketleriyle haritalandırılması.
-  - Kullanıcıdan sunucuya ve arayüze veri akışını gösteren Mermaid sekans diyagramları.
-  - 14 adet uçtan uca API isteği içeren Postman Test Koleksiyonu entegrasyonu.
-  - Modüler MVC klasör yapısı geçiş planı.
-- [ ] **Phase 5 (W5): Veritabanı (MongoDB Atlas) & JWT Kimlik Doğrulama**
-  - Mongoose ODM ile User ve Alumni şemalarının bulut veritabanına bağlanması.
-  - bcrypt ile şifre hashleme ve JWT token tabanlı yetkilendirme (Auth Middleware).
-  - Rol tabanlı erişim kontrolü (Admin / Mezun).
-- [ ] **Phase 6 (W6): Gelişmiş Mezun Özellikleri & Raporlama**
-  - Mezun etkinlikleri ve buluşma yönetimi modülü.
-  - Mezun listesi dışa aktarma (CSV / PDF formatları).
-  - Admin istatistik ve metrik panosu.
-- [ ] **Phase 7 (W7): React + Vite SPA Dönüşümü & Bulut Dağıtımı**
-  - React.js bileşen mimarisi ve Vite derleyicisi ile SPA dönüşümü.
-  - Docker üretim imajı derlemesi ve bulut sunucusuna (Cloud) canlı dağıtım.
+- [x] **Phase 1 (W1): Environment & Architecture Setup** *(Completed)*
+  - Git repository, `.gitignore`, and initial README documentation.
+  - Node.js 18 Alpine `Dockerfile` and `docker-compose.yml` configuration.
+  - Express.js HTTP backend server with foundational utility routes (`/hello`, `/sum`).
+- [x] **Phase 2 (W2): View Layer & Core Web UI** *(Completed)*
+  - Application landing page with hero greeting, live counters, and feature cards (`index.html`).
+  - Institutional about page with academic context, mission, and developer bio (`about.html`).
+  - Responsive global design system with custom CSS properties (`css/style.css`).
+- [x] **Phase 3 (W3): RESTful API, Health Telemetry & Swagger UI** *(Completed)*
+  - Users CRUD operations (`GET`, `POST`, `PUT`, `PATCH`, `DELETE /api/users`).
+  - `multer` integration for `multipart/form-data` and URL-encoded payload handling.
+  - Server CPU, RAM, OS, and uptime telemetry endpoint (`/api/health`).
+  - OpenAPI 3.0 specification and interactive Swagger UI documentation (`/api/swagger`).
+  - Interactive alumni dashboard with real-time search, filters, and modal form (`alumni.html`).
+- [x] **Phase 4 (W4 - This Week): MVC Architecture & Postman Test Suite** *(Completed ⭐)*
+  - Formal Model-View-Controller (MVC) architectural analysis and detailed technical documentation.
+  - Comprehensive directory, folder, and file mapping matrix with explicit MVC role tags.
+  - Mermaid end-to-end request-response sequence diagrams.
+  - Postman API test collection containing 14 automated requests.
+  - Blueprint for modular MVC directory scaling.
+- [ ] **Phase 5 (W5): Database Persistence (MongoDB Atlas) & JWT Authentication**
+  - Connect Mongoose ODM User and Alumni schemas to MongoDB Atlas cloud database.
+  - Password hashing with bcrypt and JWT token-based authentication (Auth Middleware).
+  - Role-based access control (Admin / Alumni).
+- [ ] **Phase 6 (W6): Advanced Alumni Management, Admin Portal & Reporting**
+  - Event management and reunion module.
+  - Export alumni records (CSV and PDF formats).
+  - Admin analytics dashboard and verification workflows.
+- [ ] **Phase 7 (W7): Frontend SPA (React + Vite) Migration & Cloud Deployment**
+  - Refactor frontend views into React components with Vite build system.
+  - Production Docker builds and automated CI/CD deployment to cloud hosting.
 
 ---
 
