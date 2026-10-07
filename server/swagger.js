@@ -416,20 +416,32 @@ API for Istanbul University Alumni Tracking and Management Platform (Management 
         }
       },
       '/users': {
+        get: {
+          tags: ['Web Users'],
+          summary: 'Display alumni directory view (Listing)',
+          description: 'Dispatches to UserController.index() to serve the interactive alumni directory HTML view (View Layer).',
+          responses: {
+            '200': {
+              description: 'Rendered HTML presentation view listing all alumni records'
+            }
+          }
+        },
         post: {
           tags: ['Web Users'],
-          summary: 'Submit web form to create an alumnus',
-          description: 'Dispatches to UserController.store() to process browser form data and redirect to /alumni upon success.',
+          summary: 'Submit web form to create an alumnus (Creating)',
+          description: 'Dispatches to UserController.store() to process browser form data, persist via User Model, and redirect to /users (View Layer).',
           requestBody: {
             required: true,
             content: {
               'multipart/form-data': { schema: { $ref: '#/components/schemas/UserInput' } },
-              'application/x-www-form-urlencoded': { schema: { $ref: '#/components/schemas/UserInput' } }
+              'application/x-www-form-urlencoded': { schema: { $ref: '#/components/schemas/UserInput' } },
+              'application/json': { schema: { $ref: '#/components/schemas/UserInput' } }
             }
           },
           responses: {
-            '302': { description: 'Redirects to /alumni directory upon creation' },
-            '400': { description: 'HTML error page on validation failure' }
+            '302': { description: 'Redirects to /users alumni directory view upon successful creation' },
+            '400': { description: 'HTML error view on validation or missing required fields' },
+            '409': { description: 'HTML error view on duplicate email conflict' }
           }
         }
       },

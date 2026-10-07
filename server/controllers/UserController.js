@@ -96,20 +96,26 @@ class UserController {
   store(req, res) {
     try {
       const newUser = User.create(req.body);
-      // Redirect to directory upon successful creation in web flow
+      // Redirect to listing view upon successful creation in web flow
       if (typeof req.accepts === 'function' && req.accepts('html')) {
-        return res.redirect('/alumni');
+        return res.redirect('/users');
       }
-      return res.redirect ? res.redirect('/alumni') : res.status(201).json({ success: true, data: newUser });
+      return res.redirect ? res.redirect('/users') : res.status(201).json({ success: true, data: newUser });
     } catch (err) {
       return res.status(err.statusCode || 400).send(`
         <!DOCTYPE html>
-        <html>
-        <head><title>Error</title></head>
-        <body style="font-family:sans-serif;padding:40px;">
-          <h2>Submission Failed</h2>
-          <p style="color:red;">${err.message}</p>
-          <a href="/alumni">← Return to Alumni Directory</a>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Submission Failed — Alumni Tracker</title>
+          <link rel="stylesheet" href="/css/style.css">
+        </head>
+        <body style="padding: 40px; font-family: 'Inter', sans-serif; background: #F8FAFC;">
+          <div style="max-width: 500px; margin: 60px auto; background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;">
+            <h2 style="color: #dc2626; margin-bottom: 12px;">Submission Failed</h2>
+            <p style="color: #475569; margin-bottom: 24px;">${err.message}</p>
+            <a href="/users" style="display: inline-block; padding: 10px 24px; background: #0A1628; color: #D4AF37; text-decoration: none; border-radius: 8px; font-weight: 600;">← Return to Alumni Directory</a>
+          </div>
         </body>
         </html>
       `);
@@ -130,12 +136,18 @@ class UserController {
     } catch (err) {
       return res.status(err.statusCode || 400).send(`
         <!DOCTYPE html>
-        <html>
-        <head><title>Update Failed</title></head>
-        <body style="font-family:sans-serif;padding:40px;">
-          <h2>Update Failed</h2>
-          <p style="color:red;">${err.message}</p>
-          <a href="/alumni">← Return to Directory</a>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Update Failed — Alumni Tracker</title>
+          <link rel="stylesheet" href="/css/style.css">
+        </head>
+        <body style="padding: 40px; font-family: 'Inter', sans-serif; background: #F8FAFC;">
+          <div style="max-width: 500px; margin: 60px auto; background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;">
+            <h2 style="color: #dc2626; margin-bottom: 12px;">Update Failed</h2>
+            <p style="color: #475569; margin-bottom: 24px;">${err.message}</p>
+            <a href="/users" style="display: inline-block; padding: 10px 24px; background: #0A1628; color: #D4AF37; text-decoration: none; border-radius: 8px; font-weight: 600;">← Return to Directory</a>
+          </div>
         </body>
         </html>
       `);
@@ -150,18 +162,24 @@ class UserController {
     try {
       User.delete(req.params.id);
       if (typeof req.accepts === 'function' && req.accepts('html')) {
-        return res.redirect('/alumni');
+        return res.redirect('/users');
       }
-      return res.redirect ? res.redirect('/alumni') : res.status(200).json({ success: true, message: 'Deleted' });
+      return res.redirect ? res.redirect('/users') : res.status(200).json({ success: true, message: 'Deleted' });
     } catch (err) {
       return res.status(err.statusCode || 404).send(`
         <!DOCTYPE html>
-        <html>
-        <head><title>Delete Failed</title></head>
-        <body style="font-family:sans-serif;padding:40px;">
-          <h2>Delete Failed</h2>
-          <p style="color:red;">${err.message}</p>
-          <a href="/alumni">← Return to Directory</a>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Delete Failed — Alumni Tracker</title>
+          <link rel="stylesheet" href="/css/style.css">
+        </head>
+        <body style="padding: 40px; font-family: 'Inter', sans-serif; background: #F8FAFC;">
+          <div style="max-width: 500px; margin: 60px auto; background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;">
+            <h2 style="color: #dc2626; margin-bottom: 12px;">Delete Failed</h2>
+            <p style="color: #475569; margin-bottom: 24px;">${err.message}</p>
+            <a href="/users" style="display: inline-block; padding: 10px 24px; background: #0A1628; color: #D4AF37; text-decoration: none; border-radius: 8px; font-weight: 600;">← Return to Directory</a>
+          </div>
         </body>
         </html>
       `);

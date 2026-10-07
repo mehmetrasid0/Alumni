@@ -13,26 +13,28 @@ const UserController = require('../controllers/UserController');
  * ============================================================================
  */
 
-// GET / - Application home landing page
+// Home Landing Page View
 router.get('/', (req, res) => UserController.home(req, res));
 
-// GET /about - Institutional About page
+// Institutional About Page View
 router.get('/about', (req, res) => UserController.about(req, res));
 
-// GET /alumni - Interactive alumni directory dashboard
+// ============================================================================
+// Web View Layer Routes for Users (Listing & Creating)
+// ============================================================================
+
+// 1. GET /users (and aliases /user, /alumni) — Listing with View Layer
+router.get('/users', (req, res) => UserController.index(req, res));
+router.get('/user', (req, res) => UserController.index(req, res));
 router.get('/alumni', (req, res) => UserController.index(req, res));
 
-// GET /users/:id - HTML profile view for a specific alumnus
-router.get('/users/:id', (req, res) => UserController.show(req, res));
-
-// POST /users - Web form submission for creating a new alumnus
+// 2. POST /users (and alias /user) — Creating with View Layer
 router.post('/users', upload.none(), (req, res) => UserController.store(req, res));
+router.post('/user', upload.none(), (req, res) => UserController.store(req, res));
 
-// POST /users/:id/update - Web form submission for updating an alumnus
+// Additional Web User View & Form Actions
+router.get('/users/:id', (req, res) => UserController.show(req, res));
 router.post('/users/:id/update', upload.none(), (req, res) => UserController.update(req, res));
-
-// POST /users/:id/delete - Web form action for deleting an alumnus
 router.post('/users/:id/delete', (req, res) => UserController.destroy(req, res));
 
 module.exports = router;
-
