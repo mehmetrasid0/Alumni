@@ -9,7 +9,7 @@ const options = {
       description: `
 ## 🎓 Alumni Tracker — RESTful API Documentation
 
-API for Istanbul Yeni Yüzyıl University Alumni Tracking and Management Platform (Information Systems / YBS).
+API for Istanbul University Alumni Tracking and Management Platform (Management Information Systems / YBS).
 
 ### System Capabilities
 - **API User Management**: RESTful JSON CRUD operations (\`GET\`, \`POST\`, \`PUT\`, \`PATCH\`, \`DELETE\`)

@@ -1,6 +1,6 @@
 # 🎓 Alumni Tracker
 
-A modern, containerized full-stack web application for tracking and managing university alumni. Built as a course project for **Web Programming** at Istanbul Yeni Yüzyıl University — Information Systems (YBS), 3rd Year.
+A modern, containerized full-stack web application for tracking and managing university alumni. Built as a course project for **Web Programming** at Istanbul University — Management Information Systems (YBS), 3rd Year.
 
 ---
 
@@ -94,7 +94,7 @@ This project is developed in weekly milestones throughout the academic semester.
   * [`e612c51`](https://github.com/mehmetrasid0/Alumni/commit/e612c51) — *feat: add homepage UI and about page with developer info*
 * **Accomplishments**:
   1. **Landing Page (`server/public/index.html`)**: Designed greeting hero banner, real-time platform statistics counters, feature highlight cards, and call-to-action buttons.
-  2. **About Page (`server/public/about.html`)**: Authored academic project overview for Istanbul Yeni Yüzyıl University (Information Systems / YBS, 3rd Year), vision, mission, and developer biography.
+  2. **About Page (`server/public/about.html`)**: Authored academic project overview for Istanbul University (Management Information Systems / YBS, 3rd Year), vision, mission, and developer biography.
   3. **Global Design System (`server/public/css/style.css`)**: Built unified CSS design tokens utilizing an institutional Navy (`--navy-900`) and Gold (`--gold-400`) palette, typography scale, responsive CSS Grid/Flexbox layouts, and mobile drawer navigation.
   4. Configured static asset delivery using Express static middleware (`express.static('public')`).
 * **Related Files**: `server/public/index.html`, `server/public/about.html`, `server/public/css/style.css`, `server/server.js`.
@@ -251,7 +251,7 @@ The **View** is responsible for presenting data to the user, capturing user inte
 
 * **Current Implementation (`server/public/`)**:
   * **`index.html` (Landing View)**: Brand hero section, quick navigation, key university information, and platform statistics overview.
-  * **`about.html` (Informational View)**: Project motivation, academic department curriculum context (Istanbul Yeni Yüzyıl University YBS), and development background.
+  * **`about.html` (Informational View)**: Project motivation, academic department curriculum context (Istanbul University YBS), and development background.
   * **`alumni.html` (Dynamic Alumni Directory View)**:
     * **Reactive Search & Filtering**: Real-time client-side search across names, emails, companies, and roles, alongside department and graduation year select filters.
     * **Card Generator Engine**: Dynamic DOM generation converting user objects into styled card components with initials avatars and metadata tags.
@@ -415,7 +415,7 @@ alumni-tracker/
 | **`Alumni/server/models/User.js`** | **Model** | Model Class (ES6) | In-memory User data store and complete CRUD operations (`findAll`, `findById`, `findByEmail`, `create`, `update`, `delete`). |
 | **`Alumni/server/swagger.js`** | **Model** | Schema Contracts | Defines formal OpenAPI data models (`User`, `UserInput`, `UserPatch`), constraints, and examples. |
 | **`Alumni/server/public/index.html`** | **View** | Presentation (HTML5) | Application landing page with hero banner, feature highlights, and navigation links. |
-| **`Alumni/server/public/about.html`** | **View** | Presentation (HTML5) | Department context (Istanbul Yeni Yüzyıl University YBS), project objectives, and author details. |
+| **`Alumni/server/public/about.html`** | **View** | Presentation (HTML5) | Department context (Istanbul University YBS), project objectives, and author details. |
 | **`Alumni/server/public/alumni.html`** | **View** | Interactive UI (HTML5 + JS) | Search input, filter selectors, alumni card grid rendering, modal form, and toast alerts. |
 | **`Alumni/server/public/css/style.css`** | **View** | Styling (CSS3) | Design tokens, color system, typography, animations, responsive layout rules, card styling. |
 | **`http://localhost:5000/api/swagger`** | **View** | API UI (Swagger) | Interactive OpenAPI 3.0 browser view for testing endpoints and inspecting model schemas. |
@@ -681,7 +681,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 👤 Author
 
-**Mehmet Raşid Ünlüel** — Istanbul Yeni Yüzyıl University, Information Systems (YBS), 3rd Year
+**Mehmet Raşid Ünlüel** — Istanbul University, Management Information Systems (YBS), 3rd Year
 
 - GitHub: [@mehmetrasid0](https://github.com/mehmetrasid0)
 
