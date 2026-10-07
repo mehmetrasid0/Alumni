@@ -681,7 +681,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 👤 Author
 
-**Mehmet Raşid** — Istanbul Yeni Yüzyıl University, Information Systems (YBS), 3rd Year
+**Mehmet Raşid Ünlüel** — Istanbul Yeni Yüzyıl University, Information Systems (YBS), 3rd Year
 
 - GitHub: [@mehmetrasid0](https://github.com/mehmetrasid0)
 

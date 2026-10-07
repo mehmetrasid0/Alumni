@@ -8,7 +8,7 @@
     "dev": "nodemon --legacy-watch server.js"
   },
   "keywords": [],
-  "author": "Mehmet Raşid",
+  "author": "Mehmet Raşid Ünlüel",
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.3.1",

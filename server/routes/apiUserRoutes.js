@@ -32,3 +32,4 @@ router.patch('/:id', upload.none(), (req, res) => ApiUserController.patch(req, r
 router.delete('/:id', (req, res) => ApiUserController.delete(req, res));
 
 module.exports = router;
+

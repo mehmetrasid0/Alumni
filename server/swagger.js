@@ -33,7 +33,7 @@ API for Istanbul Yeni Yüzyıl University Alumni Tracking and Management Platfor
 | **409 Conflict** | Business constraint violation (e.g. duplicate email) |
       `,
       contact: {
-        name: 'Mehmet Raşid Demiröz',
+        name: 'Mehmet Raşid Ünlüel',
         url: 'https://github.com/mehmetrasid0'
       },
       license: {

@@ -35,3 +35,4 @@ router.post('/users/:id/update', upload.none(), (req, res) => UserController.upd
 router.post('/users/:id/delete', (req, res) => UserController.destroy(req, res));
 
 module.exports = router;
+
