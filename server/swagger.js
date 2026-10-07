@@ -50,6 +50,8 @@ API for Istanbul University Alumni Tracking and Management Platform (Management 
     tags: [
       { name: 'API Users', description: 'RESTful API User CRUD endpoints (/api/users)' },
       { name: 'Web Users', description: 'Web client user profile view and form actions (/users)' },
+      { name: 'API Announcements', description: 'RESTful API Announcement CRUD endpoints (/api/announcements)' },
+      { name: 'Web Announcements', description: 'Web Announcement Management Interface and form actions (/announcements)' },
       { name: 'Health', description: 'System health diagnostic telemetry endpoints' },
       { name: 'Utility', description: 'Greeting and mathematical utility endpoints' },
       { name: 'Pages', description: 'Client HTML presentation page routes' }
@@ -175,6 +177,141 @@ API for Istanbul University Alumni Tracking and Management Platform (Management 
           properties: {
             success: { type: 'boolean', example: false },
             error: { type: 'string', example: 'Error message description' }
+          }
+        },
+        Announcement: {
+          type: 'object',
+          required: ['title', 'content'],
+          properties: {
+            id: {
+              type: 'integer',
+              description: 'Auto-incremented unique announcement identifier',
+              example: 1
+            },
+            title: {
+              type: 'string',
+              description: 'Title of the announcement',
+              example: 'Annual Alumni Homecoming & Networking Gala 2026'
+            },
+            content: {
+              type: 'string',
+              description: 'Full body content and details of the announcement',
+              example: 'Join us on the historic Beyazit Campus for the annual Istanbul University Alumni Reunion.'
+            },
+            category: {
+              type: 'string',
+              description: 'Classification category (Event, Career, Academic, Networking, General)',
+              example: 'Event'
+            },
+            priority: {
+              type: 'string',
+              enum: ['low', 'medium', 'high', 'urgent'],
+              description: 'Priority urgency level',
+              example: 'high'
+            },
+            status: {
+              type: 'string',
+              enum: ['published', 'draft', 'archived'],
+              description: 'Publication state',
+              example: 'published'
+            },
+            author: {
+              type: 'string',
+              description: 'Author or issuing university department',
+              example: 'Istanbul University Alumni Office'
+            },
+            targetAudience: {
+              type: 'string',
+              description: 'Intended target audience',
+              example: 'All Alumni & Faculty'
+            },
+            pinned: {
+              type: 'boolean',
+              description: 'Whether announcement is pinned to top of listings',
+              example: true
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              example: '2026-09-15T09:00:00.000Z'
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+              nullable: true,
+              example: null
+            }
+          }
+        },
+        AnnouncementInput: {
+          type: 'object',
+          required: ['title', 'content'],
+          properties: {
+            title: {
+              type: 'string',
+              example: 'Alumni Mentorship Applications Now Open'
+            },
+            content: {
+              type: 'string',
+              example: 'Apply now to mentor final-year students in Management Information Systems.'
+            },
+            category: {
+              type: 'string',
+              example: 'Networking'
+            },
+            priority: {
+              type: 'string',
+              enum: ['low', 'medium', 'high', 'urgent'],
+              example: 'high'
+            },
+            status: {
+              type: 'string',
+              enum: ['published', 'draft', 'archived'],
+              example: 'published'
+            },
+            author: {
+              type: 'string',
+              example: 'Istanbul University Alumni Office'
+            },
+            targetAudience: {
+              type: 'string',
+              example: 'Alumni with 2+ Years Experience'
+            },
+            pinned: {
+              type: 'boolean',
+              example: false
+            }
+          }
+        },
+        AnnouncementPatch: {
+          type: 'object',
+          properties: {
+            title: { type: 'string', example: 'Updated Title' },
+            content: { type: 'string', example: 'Updated content body' },
+            category: { type: 'string', example: 'Career' },
+            priority: { type: 'string', enum: ['low', 'medium', 'high', 'urgent'], example: 'urgent' },
+            status: { type: 'string', enum: ['published', 'draft', 'archived'], example: 'published' },
+            author: { type: 'string', example: 'YBS Career Center' },
+            targetAudience: { type: 'string', example: 'Graduating Students' },
+            pinned: { type: 'boolean', example: true }
+          }
+        },
+        AnnouncementSuccessResponse: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: true },
+            data: { $ref: '#/components/schemas/Announcement' }
+          }
+        },
+        AnnouncementListResponse: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: true },
+            count: { type: 'integer', example: 5 },
+            data: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/Announcement' }
+            }
           }
         }
       }
@@ -529,6 +666,297 @@ API for Istanbul University Alumni Tracking and Management Platform (Management 
           responses: {
             '302': { description: 'Redirects to /users directory upon deletion' },
             '404': { description: 'HTML error page if alumnus not found' }
+          }
+        }
+      },
+      '/api/announcements': {
+        get: {
+          tags: ['API Announcements'],
+          summary: 'List all announcements',
+          description: 'Retrieves all campus and alumni announcements with optional keyword search and filtering by category, status, and priority.',
+          parameters: [
+            {
+              name: 'query',
+              in: 'query',
+              required: false,
+              description: 'Keyword search across title, content, author, and category',
+              schema: { type: 'string', example: 'Career' }
+            },
+            {
+              name: 'category',
+              in: 'query',
+              required: false,
+              description: 'Filter by category (Event, Career, Academic, Networking, General)',
+              schema: { type: 'string', example: 'Event' }
+            },
+            {
+              name: 'priority',
+              in: 'query',
+              required: false,
+              description: 'Filter by priority level (low, medium, high, urgent)',
+              schema: { type: 'string', enum: ['low', 'medium', 'high', 'urgent'] }
+            },
+            {
+              name: 'status',
+              in: 'query',
+              required: false,
+              description: 'Filter by publication status (published, draft, archived)',
+              schema: { type: 'string', enum: ['published', 'draft', 'archived'] }
+            }
+          ],
+          responses: {
+            '200': {
+              description: 'List of announcements retrieved successfully',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/AnnouncementListResponse' }
+                }
+              }
+            },
+            '500': {
+              description: 'Server error',
+              content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+            }
+          }
+        },
+        post: {
+          tags: ['API Announcements'],
+          summary: 'Create a new announcement',
+          description: 'Creates and persists a new announcement record in-memory.',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/AnnouncementInput' } },
+              'multipart/form-data': { schema: { $ref: '#/components/schemas/AnnouncementInput' } },
+              'application/x-www-form-urlencoded': { schema: { $ref: '#/components/schemas/AnnouncementInput' } }
+            }
+          },
+          responses: {
+            '201': {
+              description: 'Announcement created successfully',
+              content: {
+                'application/json': { schema: { $ref: '#/components/schemas/AnnouncementSuccessResponse' } }
+              }
+            },
+            '400': {
+              description: 'Validation failed or missing required fields',
+              content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+            }
+          }
+        }
+      },
+      '/api/announcements/{id}': {
+        get: {
+          tags: ['API Announcements'],
+          summary: 'Get announcement by ID',
+          description: 'Retrieves a single announcement by its numeric identifier.',
+          parameters: [{
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric announcement identifier',
+            schema: { type: 'integer', example: 1 }
+          }],
+          responses: {
+            '200': {
+              description: 'Announcement retrieved successfully',
+              content: { 'application/json': { schema: { $ref: '#/components/schemas/AnnouncementSuccessResponse' } } }
+            },
+            '404': {
+              description: 'Announcement not found',
+              content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+            }
+          }
+        },
+        put: {
+          tags: ['API Announcements'],
+          summary: 'Fully update an announcement',
+          description: 'Replaces all attributes of the target announcement (requires title and content).',
+          parameters: [{
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric announcement identifier',
+            schema: { type: 'integer', example: 1 }
+          }],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/AnnouncementInput' } },
+              'multipart/form-data': { schema: { $ref: '#/components/schemas/AnnouncementInput' } },
+              'application/x-www-form-urlencoded': { schema: { $ref: '#/components/schemas/AnnouncementInput' } }
+            }
+          },
+          responses: {
+            '200': {
+              description: 'Announcement updated successfully',
+              content: { 'application/json': { schema: { $ref: '#/components/schemas/AnnouncementSuccessResponse' } } }
+            },
+            '400': { description: 'Validation failed' },
+            '404': { description: 'Announcement not found' }
+          }
+        },
+        patch: {
+          tags: ['API Announcements'],
+          summary: 'Partially update an announcement',
+          description: 'Modifies specific attributes of the target announcement.',
+          parameters: [{
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric announcement identifier',
+            schema: { type: 'integer', example: 1 }
+          }],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/AnnouncementPatch' } },
+              'multipart/form-data': { schema: { $ref: '#/components/schemas/AnnouncementPatch' } },
+              'application/x-www-form-urlencoded': { schema: { $ref: '#/components/schemas/AnnouncementPatch' } }
+            }
+          },
+          responses: {
+            '200': {
+              description: 'Announcement patched successfully',
+              content: { 'application/json': { schema: { $ref: '#/components/schemas/AnnouncementSuccessResponse' } } }
+            },
+            '400': { description: 'Invalid payload' },
+            '404': { description: 'Announcement not found' }
+          }
+        },
+        delete: {
+          tags: ['API Announcements'],
+          summary: 'Delete an announcement',
+          description: 'Permanently removes the target announcement by numeric ID.',
+          parameters: [{
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric announcement identifier',
+            schema: { type: 'integer', example: 1 }
+          }],
+          responses: {
+            '200': {
+              description: 'Announcement deleted successfully',
+              content: { 'application/json': { schema: { $ref: '#/components/schemas/AnnouncementSuccessResponse' } } }
+            },
+            '404': { description: 'Announcement not found' }
+          }
+        }
+      },
+      '/announcements': {
+        get: {
+          tags: ['Web Announcements'],
+          summary: 'Render Announcement Management Interface',
+          description: 'Dispatches to AnnouncementController.index() to serve the interactive web management dashboard (announcements.html).',
+          responses: {
+            '200': { description: 'Rendered HTML Announcement Management Interface' }
+          }
+        },
+        post: {
+          tags: ['Web Announcements'],
+          summary: 'Submit web form to create an announcement',
+          description: 'Dispatches to AnnouncementController.store() to process browser form data, create announcement, and redirect to /announcements.',
+          requestBody: {
+            required: true,
+            content: {
+              'application/x-www-form-urlencoded': { schema: { $ref: '#/components/schemas/AnnouncementInput' } },
+              'multipart/form-data': { schema: { $ref: '#/components/schemas/AnnouncementInput' } },
+              'application/json': { schema: { $ref: '#/components/schemas/AnnouncementInput' } }
+            }
+          },
+          responses: {
+            '302': { description: 'Redirects to /announcements upon creation' },
+            '400': { description: 'HTML error page on validation failure' }
+          }
+        }
+      },
+      '/announcements/create': {
+        get: {
+          tags: ['Web Announcements'],
+          summary: 'Render announcement creation form view',
+          description: 'Dispatches to AnnouncementController.create() to render the HTML form view for authoring an announcement.',
+          responses: {
+            '200': { description: 'Rendered HTML authoring form view' }
+          }
+        }
+      },
+      '/announcements/{id}': {
+        get: {
+          tags: ['Web Announcements'],
+          summary: 'Render announcement detail view',
+          description: 'Dispatches to AnnouncementController.show() to render an HTML presentation card for the specified announcement.',
+          parameters: [{
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric announcement identifier',
+            schema: { type: 'integer', example: 1 }
+          }],
+          responses: {
+            '200': { description: 'Rendered HTML detail page' },
+            '404': { description: 'HTML error page if announcement not found' }
+          }
+        }
+      },
+      '/announcements/{id}/edit': {
+        get: {
+          tags: ['Web Announcements'],
+          summary: 'Render announcement edit form view',
+          description: 'Dispatches to AnnouncementController.edit() to render a pre-populated HTML edit form for modifying the announcement.',
+          parameters: [{
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric announcement identifier',
+            schema: { type: 'integer', example: 1 }
+          }],
+          responses: {
+            '200': { description: 'Rendered HTML edit form view' },
+            '404': { description: 'HTML error page if announcement not found' }
+          }
+        }
+      },
+      '/announcements/{id}/update': {
+        post: {
+          tags: ['Web Announcements'],
+          summary: 'Submit web form to update an announcement',
+          description: 'Dispatches to AnnouncementController.update() to process browser form updates and redirect to /announcements/{id}.',
+          parameters: [{
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric announcement identifier',
+            schema: { type: 'integer', example: 1 }
+          }],
+          requestBody: {
+            required: true,
+            content: {
+              'application/x-www-form-urlencoded': { schema: { $ref: '#/components/schemas/AnnouncementPatch' } },
+              'multipart/form-data': { schema: { $ref: '#/components/schemas/AnnouncementPatch' } }
+            }
+          },
+          responses: {
+            '302': { description: 'Redirects to /announcements/{id} detail view upon update' },
+            '400': { description: 'HTML error page on update failure' }
+          }
+        }
+      },
+      '/announcements/{id}/delete': {
+        post: {
+          tags: ['Web Announcements'],
+          summary: 'Web form action to delete an announcement',
+          description: 'Dispatches to AnnouncementController.destroy() to delete the announcement and redirect to /announcements.',
+          parameters: [{
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric announcement identifier',
+            schema: { type: 'integer', example: 1 }
+          }],
+          responses: {
+            '302': { description: 'Redirects to /announcements management interface upon deletion' },
+            '404': { description: 'HTML error page if announcement not found' }
           }
         }
       },

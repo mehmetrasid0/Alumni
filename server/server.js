@@ -8,6 +8,8 @@ const swaggerSpec = require('./swagger');
 // Import Routes
 const userRoutes = require('./routes/userRoutes');
 const apiUserRoutes = require('./routes/apiUserRoutes');
+const announcementRoutes = require('./routes/announcementRoutes');
+const apiAnnouncementRoutes = require('./routes/apiAnnouncementRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -44,7 +46,9 @@ app.get('/api/swagger.json', (req, res) => {
 // Application Routes (Mounted to Modular Routers)
 // ============================================================================
 app.use('/api/users', apiUserRoutes);
+app.use('/api/announcements', apiAnnouncementRoutes);
 app.use('/', userRoutes);
+app.use('/', announcementRoutes);
 
 // GET /hello/:name → Returns greeting message
 app.get('/hello/:name', (req, res) => {

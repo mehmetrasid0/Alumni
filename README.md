@@ -223,26 +223,35 @@ graph TD
 ---
 
 ### 🧠 1. Model Layer (Data & Schema Contracts)
-The **Model** represents core data structures, business logic constraints, and schema validations. It manages the state and rules governing alumni entities.
+The **Model** represents core data structures, business logic constraints, and schema validations without requiring external database connections:
 
-* **Current Implementation (`server/models/User.js` & `server/swagger.js`)**:
-  * **User Model Class (`server/models/User.js`)**:
-    * Encapsulates all data state and business validation without requiring an external database connection.
-    * Implements comprehensive **CRUD methods**:
-      * `findAll(filters)`: Retrieves the alumni collection with optional keyword search, department, and graduation year filtering.
-      * `findById(id)`: Fetches a single user record by numeric ID.
-      * `findByEmail(email)`: Queries user by email for duplicate checks and authentication.
-      * `create(userData)`: Validates required fields, enforces email uniqueness, auto-increments primary ID, and timestamps creation.
-      * `update(id, updateData, isPartial)`: Handles both full entity replacement (`PUT`) and selective field mutations (`PATCH`) while guarding immutable fields.
-      * `delete(id)`: Removes user record from the data store by ID.
-      * `count()`: Returns active total record count.
-  * **Schema Definition & Data Contracts (`server/swagger.js`)**:
-    * `User`: Complete entity model (`id`, `name`, `email`, `graduationYear`, `department`, `company`, `role`).
-    * `UserInput`: Validation schema for incoming registration payloads.
-    * `UserPatch`: Validation schema for selective field modifications.
-    * `HealthCheckResponse`: Specification contract for system diagnostics telemetry.
-* **Target Persistence Layer**:
-  * Mongoose ODM models (`models/User.js`, `models/Alumni.js`) mapped to MongoDB Atlas cloud collections.
+* **1. User Model (`server/models/User.js` & `server/swagger.js`)**:
+  * Encapsulates all data state and business validation without requiring an external database connection.
+  * Implements comprehensive **CRUD methods**:
+    * `findAll(filters)`: Retrieves the alumni collection with optional keyword search, department, and graduation year filtering.
+    * `findById(id)`: Fetches a single user record by numeric ID.
+    * `findByEmail(email)`: Queries user by email for duplicate checks and authentication.
+    * `create(userData)`: Validates required fields, enforces email uniqueness, auto-increments primary ID, and timestamps creation.
+    * `update(id, updateData, isPartial)`: Handles both full entity replacement (`PUT`) and selective field mutations (`PATCH`) while guarding immutable fields.
+    * `delete(id)`: Removes user record from the data store by ID.
+    * `count()`: Returns active total record count.
+    * `reset()`: Re-initializes seed records for predictable testing.
+
+* **2. Announcement Model (`server/models/Announcement.js` & `server/swagger.js`)**:
+  * Encapsulates campus bulletins, career opportunities, event notices, and institutional updates without a database connection.
+  * Entity attributes: `id`, `title`, `content`, `category` (Event, Career, Academic, Networking, General), `priority` (low, medium, high, urgent), `status` (published, draft, archived), `author`, `targetAudience`, `pinned`, `createdAt`, `updatedAt`.
+  * Implements comprehensive **CRUD methods**:
+    * `findAll(filters)`: Retrieves announcements sorted by pinned status and newest first, with query (`query`/`q`), category, status, and priority filtering.
+    * `findById(id)`: Fetches a single announcement record by numeric ID.
+    * `create(data)`: Validates mandatory title and content fields, applies default category and priority, auto-increments ID.
+    * `update(id, updateData, isPartial)`: Supports full replacement (`PUT`) and selective field updates (`PATCH`).
+    * `delete(id)`: Removes announcement record by ID.
+    * `count(filters)`: Returns active announcement count.
+    * `reset()`: Re-initializes seed announcements.
+
+* **Schema Definition & Data Contracts (`server/swagger.js`)**:
+  * Models: `User`, `UserInput`, `UserPatch`, `Announcement`, `AnnouncementInput`, `AnnouncementPatch`.
+  * Response Schemas: `SuccessResponse`, `UsersListResponse`, `AnnouncementSuccessResponse`, `AnnouncementListResponse`, `ErrorResponse`.
 
 ---
 
@@ -257,6 +266,16 @@ The **View** is responsible for presenting data to the user, capturing user inte
     * **Card Generator Engine**: Dynamic DOM generation converting user objects into styled card components with initials avatars and metadata tags.
     * **Modal Dialog & Form Handling**: Intercepts user inputs, formats JSON payloads, and communicates asynchronously with backend endpoints via `fetch()`.
     * **Toast Notification System**: Real-time feedback alerts for successful operations or HTTP errors.
+  * **`announcements.html` (Announcement Management Dashboard & Interface)**:
+    * **KPI Summary Cards**: Real-time counters for Total Announcements, Published Notices, Urgent/High Priority, and Drafts.
+    * **Multi-Facet Controls**: Live search filtering by title, content, or author; category filter pills (All, Event, Career, Academic, Networking, General); publication status filter pills (All, Published, Draft, Archived).
+    * **Management Table & Actions**: Comprehensive grid displaying notice title, excerpt, category badge, color-coded priority pill, status tag, audience, author, and date.
+    * **Direct Action Buttons**: In-line "View" (`/announcements/:id`), "Edit" (`/announcements/:id/edit`), and "Delete" with browser confirmation.
+    * **Creation & Edit Modal**: Embedded responsive modal form enabling seamless in-page authoring and updates.
+  * **Dedicated Server-Rendered HTML Views (`server/controllers/`)**:
+    * `create()`: Dedicated HTML registration forms (`/users/create`, `/announcements/create`).
+    * `show()`: Standalone HTML presentation cards with action controls (`/users/:id`, `/announcements/:id`).
+    * `edit()`: Pre-populated HTML editing form views (`/users/:id/edit`, `/announcements/:id/edit`).
   * **`css/style.css` (Visual Design System)**:
     * CSS Custom Properties (design tokens for colors: `--navy-900`, `--gold-400`, typography, elevation shadows, transitions).
     * Responsive CSS Grid and Flexbox layouts supporting desktop, tablet, and mobile breakpoints.
@@ -266,9 +285,9 @@ The **View** is responsible for presenting data to the user, capturing user inte
 ---
 
 ### 🎮 3. Controller Layer (Routing & Request Orchestration)
-The **Controller** layer serves as the intermediary orchestrator between incoming requests, the **User Model**, and the **View**. In accordance with clean MVC separation, the application provides **two specialized controllers**:
+The **Controller** layer serves as the intermediary orchestrator between incoming requests, the **Models**, and the **Views**. In accordance with clean MVC separation, the application provides specialized Web and API controllers:
 
-* **1. `UserController` (`server/controllers/UserController.js`) — Web View & Complete CRUD Operations**:
+* **1. `UserController` (`server/controllers/UserController.js`) — Web User Views & CRUD**:
   * Manages browser-facing HTTP routes, static HTML delivery, and web-oriented CRUD operations with View Layer:
     * `home(req, res)`: Serves the landing page view (`GET /` $\rightarrow$ `index.html`).
     * `about(req, res)`: Serves the institutional about page view (`GET /about` $\rightarrow$ `about.html`).
@@ -281,7 +300,7 @@ The **Controller** layer serves as the intermediary orchestrator between incomin
     * `destroy(req, res)`: [CRUD: Delete] Handles web deletion actions (`POST /users/:id/delete`, `GET /users/:id/delete` $\rightarrow$ deletes via Model & redirects to `/users`).
 
 * **2. `ApiUserController` (`server/controllers/ApiUserController.js`) — RESTful API Operations**:
-  * Manages all headless JSON REST API endpoints, parses request payloads, delegates business logic to the `User` model, and delivers standard HTTP status codes:
+  * Manages all headless JSON REST API endpoints for alumni users:
     * `getAll(req, res)`: `GET /api/users` $\rightarrow$ Returns all alumni with optional query filtering (`200 OK`).
     * `getById(req, res)`: `GET /api/users/:id` $\rightarrow$ Retrieves single user or `404 Not Found`.
     * `create(req, res)`: `POST /api/users` $\rightarrow$ Validates input and persists new user (`201 Created` or `400/409`).
@@ -289,20 +308,34 @@ The **Controller** layer serves as the intermediary orchestrator between incomin
     * `patch(req, res)`: `PATCH /api/users/:id` $\rightarrow$ Selective field update (`200 OK` or `400/404/409`).
     * `delete(req, res)`: `DELETE /api/users/:id` $\rightarrow$ Removes user record (`200 OK` or `404 Not Found`).
 
+* **3. `AnnouncementController` (`server/controllers/AnnouncementController.js`) — Web Announcement Management**:
+  * Manages browser-facing views and form submissions for the Announcement Management Interface:
+    * `index(req, res)`: Serves the interactive Announcement Management Interface (`GET /announcements` $\rightarrow$ `announcements.html`).
+    * `create(req, res)`: Renders the HTML form view to compose a new announcement (`GET /announcements/create`, `GET /announcements/new`).
+    * `store(req, res)`: Processes announcement creation form submission and redirects (`POST /announcements` $\rightarrow$ redirects to `/announcements`).
+    * `show(req, res)`: Renders formatted single announcement detail card view with category badges, author info, and action controls (`GET /announcements/:id`).
+    * `edit(req, res)`: Renders pre-populated HTML form view for modifying announcement attributes (`GET /announcements/:id/edit`).
+    * `update(req, res)`: Processes update form submission and redirects (`POST /announcements/:id/update` $\rightarrow$ redirects to `/announcements/:id`).
+    * `destroy(req, res)`: Processes deletion form submission and redirects (`POST /announcements/:id/delete` $\rightarrow$ redirects to `/announcements`).
+
+* **4. `ApiAnnouncementController` (`server/controllers/ApiAnnouncementController.js`) — RESTful API Operations**:
+  * Manages all headless JSON REST API endpoints for announcements:
+    * `getAll(req, res)`: `GET /api/announcements` $\rightarrow$ Returns all announcements with query, category, status, and priority filters (`200 OK`).
+    * `getById(req, res)`: `GET /api/announcements/:id` $\rightarrow$ Retrieves single announcement or `404 Not Found`.
+    * `create(req, res)`: `POST /api/announcements` $\rightarrow$ Validates input and persists announcement (`201 Created` or `400`).
+    * `update(req, res)`: `PUT /api/announcements/:id` $\rightarrow$ Full replacement of announcement (`200 OK` or `400/404`).
+    * `patch(req, res)`: `PATCH /api/announcements/:id` $\rightarrow$ Selective attribute mutation (`200 OK` or `400/404`).
+    * `delete(req, res)`: `DELETE /api/announcements/:id` $\rightarrow$ Removes announcement (`200 OK` or `404 Not Found`).
+
 * **Modular Routing Layer (`server/routes/`)**:
-  * **`userRoutes.js` (`server/routes/userRoutes.js`)**: Encapsulates browser endpoints and form actions with View Layer:
-    * `GET /users` (and `/alumni`, `/user`): **Listing** alumni directory with View Layer.
-    * `GET /users/create` (and `/users/new`): **Create Form** view for new alumnus.
-    * `POST /users` (and `/user`): **Creating** new alumnus with View Layer (persists and redirects to `/users`).
-    * `GET /users/:id`: Single alumnus HTML profile card view with action buttons.
-    * `GET /users/:id/edit`: **Edit Form** view pre-populated with alumni details.
-    * `POST /users/:id/update`: Form update mutation (redirects to `/users/:id`).
-    * `POST /users/:id/delete` (and `GET /users/:id/delete`): Form delete action (redirects to `/users`).
-    * `GET /` & `GET /about`: Presentation page routes (`index.html`, `about.html`).
-  * **`apiUserRoutes.js` (`server/routes/apiUserRoutes.js`)**: Encapsulates RESTful JSON endpoints mounted at `/api/users`, routing directly to `ApiUserController` methods (`/`, `/:id`).
+  * **`userRoutes.js` (`server/routes/userRoutes.js`)**: Encapsulates browser endpoints and form actions for alumni directory and profiles.
+  * **`apiUserRoutes.js` (`server/routes/apiUserRoutes.js`)**: Encapsulates RESTful JSON endpoints mounted at `/api/users`.
+  * **`announcementRoutes.js` (`server/routes/announcementRoutes.js`)**: Encapsulates browser management routes and form actions for announcements (`/announcements`).
+  * **`apiAnnouncementRoutes.js` (`server/routes/apiAnnouncementRoutes.js`)**: Encapsulates RESTful JSON endpoints mounted at `/api/announcements`.
 
 * **Application Dispatcher & System Endpoints (`server/server.js`)**:
   * Initializes Express middleware pipeline (`express.json()`, `urlencoded`, `express.static`).
+  * Mounts `apiUserRoutes` (`/api/users`), `apiAnnouncementRoutes` (`/api/announcements`), `userRoutes` (`/`), and `announcementRoutes` (`/`).
   * Mounts `apiUserRoutes` (`/api/users`) and `userRoutes` (`/`).
   * Serves interactive OpenAPI 3.0 documentation via Swagger UI (`/api/swagger`) and raw spec (`/api/swagger.json`).
   * System diagnostics & health check: `GET /api/health`.
@@ -376,24 +409,29 @@ alumni-tracker/
         │
         ├── routes/                             # 🚦 [ROUTING LAYER]
         │   ├── userRoutes.js                   # Web routes mapped to UserController (/, /about, /alumni, /users)
-        │   └── apiUserRoutes.js                # REST API routes mapped to ApiUserController (/api/users)
+        │   ├── apiUserRoutes.js                # REST API routes mapped to ApiUserController (/api/users)
+        │   ├── announcementRoutes.js           # Web routes mapped to AnnouncementController (/announcements)
+        │   └── apiAnnouncementRoutes.js        # REST API routes mapped to ApiAnnouncementController (/api/announcements)
         │
         ├── controllers/                        # 🎮 [CONTROLLER LAYER]
-        │   ├── UserController.js               # Web Page & Form Controller (home, about, index, show, store, update, destroy)
-        │   └── ApiUserController.js            # RESTful JSON API Controller (getAll, getById, create, update, patch, delete)
+        │   ├── UserController.js               # Web User & View Controller (home, about, index, show, create, store, edit, update, destroy)
+        │   ├── ApiUserController.js            # RESTful JSON User Controller (getAll, getById, create, update, patch, delete)
+        │   ├── AnnouncementController.js       # Web Announcement Controller (index, show, create, store, edit, update, destroy)
+        │   └── ApiAnnouncementController.js    # RESTful JSON Announcement Controller (getAll, getById, create, update, patch, delete)
         │
         ├── models/                             # 🧠 [MODEL LAYER]
-        │   └── User.js                         # In-memory User Model with complete CRUD methods & business validation
+        │   ├── User.js                         # In-memory User Model with complete CRUD methods & business validation
+        │   └── Announcement.js                 # In-memory Announcement Model with CRUD methods, filters & categories
         │
         ├── swagger.js                          # 🧠 [MODEL & SCHEMA CONTRACTS]
         │                                       # • OpenAPI 3.0 specification & Swagger UI configuration
-        │                                       # • Entity schemas: User, UserInput, UserPatch
-        │                                       # • Response schemas: SuccessResponse, ErrorResponse
+        │                                       # • Entity schemas: User, UserInput, UserPatch, Announcement, AnnouncementInput
+        │                                       # • Response schemas: SuccessResponse, ErrorResponse, AnnouncementSuccessResponse
         │                                       # • Endpoint parameter docs & HTTP status code contracts
         │
         ├── server.js                           # 🎮 [APPLICATION DISPATCHER & BOOTSTRAP]
         │                                       # • Express application initialization & middleware chain
-        │                                       # • Mounts routes/userRoutes and routes/apiUserRoutes
+        │                                       # • Mounts routes/userRoutes, apiUserRoutes, announcementRoutes, apiAnnouncementRoutes
         │                                       # • System health diagnostics controller: GET /api/health
         │                                       # • Utility calculation controllers: GET /hello, GET /sum
         │                                       # • Server lifecycle listener on configured PORT
@@ -401,13 +439,13 @@ alumni-tracker/
         └── public/                             # 👁️ [VIEW LAYER] Client-Facing Presentation
             ├── index.html                      # [View - Home] Landing page, platform highlights & call to action
             ├── about.html                      # [View - About] University, department (YBS) & project mission info
-            ├── alumni.html                     # [View - Alumni] Main interactive directory:
-            │                                   #   • Real-time search by keyword (name, company, role)
-            │                                   #   • Department & graduation year dropdown filters
-            │                                   #   • Dynamic card grid rendering with avatar initials
-            │                                   #   • New alumni addition modal dialog
-            │                                   #   • Toast alert notification component
-            │                                   #   • Responsive mobile navigation drawer
+            ├── alumni.html                     # [View - Alumni] Main interactive directory & card grid
+            ├── announcements.html              # [View - Announcements] Management Interface & Dashboard
+            │                                   #   • KPI counters (Total, Published, Urgent, Drafts)
+            │                                   #   • Multi-filter pills (Category & Status)
+            │                                   #   • Real-time search by title, content, or author
+            │                                   #   • Table view with quick actions (View, Edit, Delete)
+            │                                   #   • In-page creation and editing modal dialog
             │
             └── css/
                 └── style.css                   # [View - Styling] Global stylesheet:
@@ -423,16 +461,22 @@ alumni-tracker/
 | Path | MVC Layer | Component Type | Primary Responsibilities |
 | :--- | :--- | :--- | :--- |
 | **`Alumni/server/models/User.js`** | **Model** | Model Class (ES6) | In-memory User data store and complete CRUD operations (`findAll`, `findById`, `findByEmail`, `create`, `update`, `delete`). |
-| **`Alumni/server/swagger.js`** | **Model** | Schema Contracts | Defines formal OpenAPI data models (`User`, `UserInput`, `UserPatch`), constraints, and examples. |
+| **`Alumni/server/models/Announcement.js`** | **Model** | Model Class (ES6) | In-memory Announcement data store with full CRUD operations (`findAll`, `findById`, `create`, `update`, `delete`), categories, priorities, and search. |
+| **`Alumni/server/swagger.js`** | **Model** | Schema Contracts | Defines formal OpenAPI data models (`User`, `UserInput`, `UserPatch`, `Announcement`, `AnnouncementInput`, `AnnouncementPatch`), constraints, and examples. |
 | **`Alumni/server/public/index.html`** | **View** | Presentation (HTML5) | Application landing page with hero banner, feature highlights, and navigation links. |
 | **`Alumni/server/public/about.html`** | **View** | Presentation (HTML5) | Department context (Istanbul University YBS), project objectives, and author details. |
 | **`Alumni/server/public/alumni.html`** | **View** | Interactive UI (HTML5 + JS) | Search input, filter selectors, alumni card grid rendering, modal form, and toast alerts. |
+| **`Alumni/server/public/announcements.html`** | **View** | Interactive Management UI | Announcement Management Dashboard: KPI counters, category/status filters, search bar, table, modal authoring. |
 | **`Alumni/server/public/css/style.css`** | **View** | Styling (CSS3) | Design tokens, color system, typography, animations, responsive layout rules, card styling. |
 | **`http://localhost:5000/api/swagger`** | **View** | API UI (Swagger) | Interactive OpenAPI 3.0 browser view for testing endpoints and inspecting model schemas. |
 | **`Alumni/server/routes/userRoutes.js`** | **Routing** | Web Router | Dispatches browser page requests and web form submissions to `UserController`. |
 | **`Alumni/server/routes/apiUserRoutes.js`** | **Routing** | REST API Router | Dispatches `/api/users` RESTful CRUD endpoints to `ApiUserController`. |
+| **`Alumni/server/routes/announcementRoutes.js`** | **Routing** | Web Router | Dispatches `/announcements` management interface and web form CRUD submissions to `AnnouncementController`. |
+| **`Alumni/server/routes/apiAnnouncementRoutes.js`** | **Routing** | REST API Router | Dispatches `/api/announcements` RESTful JSON CRUD endpoints to `ApiAnnouncementController`. |
 | **`Alumni/server/controllers/UserController.js`** | **Controller** | Web Controller | Handles browser page delivery (`home`, `about`, `index`, `show`) and web form CRUD submissions (`store`, `update`, `destroy`). |
 | **`Alumni/server/controllers/ApiUserController.js`** | **Controller** | REST API Controller | Handles headless JSON REST endpoints with full CRUD operations (`getAll`, `getById`, `create`, `update`, `patch`, `delete`). |
+| **`Alumni/server/controllers/AnnouncementController.js`** | **Controller** | Web Controller | Handles Announcement Management Interface delivery (`index`), detail view (`show`), create view (`create`), and form mutations (`store`, `update`, `destroy`). |
+| **`Alumni/server/controllers/ApiAnnouncementController.js`** | **Controller** | REST API Controller | Handles headless JSON REST endpoints with full CRUD operations (`getAll`, `getById`, `create`, `update`, `patch`, `delete`). |
 | **`Alumni/server/server.js`** *(Dispatcher)* | **Controller** | Router & Dispatcher | Initializes Express middleware pipeline, registers Swagger docs, and mounts route modules. |
 | **`Alumni/server/server.js`** *(Health & Util)* | **Controller** | Diagnostics & Utilities | Computes CPU core utilization, memory thresholds, OS metrics, uptime statistics, and utility calculation endpoints. |
 | **`Alumni/Dockerfile`** | **DevOps** | Containerization | Defines container build instructions for Node.js 18 Alpine runtime environment. |
@@ -542,6 +586,27 @@ To interactively explore, test, and view schemas for all API endpoints, use **Sw
 | `PATCH` | `/api/users/:id` | Partially update user (selective fields) | JSON, form-data, x-www-form-urlencoded |
 | `DELETE` | `/api/users/:id` | Delete user record by ID | — |
 
+### Announcements (CRUD - REST API)
+| Method | Endpoint | Description | Accepted Formats |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/announcements` | List all announcements (supports `query`, `category`, `status`, `priority`) | — |
+| `GET` | `/api/announcements/:id`| Fetch single announcement by ID | — |
+| `POST` | `/api/announcements` | Create new announcement | JSON, form-data, x-www-form-urlencoded |
+| `PUT` | `/api/announcements/:id`| Fully update announcement (title & content required) | JSON, form-data, x-www-form-urlencoded |
+| `PATCH` | `/api/announcements/:id`| Partially update announcement fields | JSON, form-data, x-www-form-urlencoded |
+| `DELETE` | `/api/announcements/:id`| Delete announcement record by ID | — |
+
+### Web Announcement Management & Views
+| Method | Endpoint | Description | Layer |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/announcements` | Interactive Announcement Management Dashboard & Interface (`announcements.html`) | View Layer |
+| `GET` | `/announcements/create` | Standalone HTML form view to author a new announcement | View Layer |
+| `POST` | `/announcements` | Submit form to create an announcement (redirects to `/announcements`) | Controller |
+| `GET` | `/announcements/:id` | Detailed presentation card view for a single announcement | View Layer |
+| `GET` | `/announcements/:id/edit` | Pre-populated HTML form view to modify an announcement | View Layer |
+| `POST` | `/announcements/:id/update` | Submit form to update an announcement (redirects to `/announcements/:id`) | Controller |
+| `POST` | `/announcements/:id/delete` | Submit form to delete an announcement (redirects to `/announcements`) | Controller |
+
 ### Utility
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
@@ -554,6 +619,7 @@ To interactively explore, test, and view schemas for all API endpoints, use **Sw
 | `GET` | `/` | Home / Landing page (`index.html`) |
 | `GET` | `/about` | About page (`about.html`) |
 | `GET` | `/alumni` | Alumni directory & management UI (`alumni.html`) |
+| `GET` | `/announcements` | Announcement Management Interface (`announcements.html`) |
 | `GET` | `/api/swagger` | Interactive Swagger UI portal |
 
 ### Example API Requests
