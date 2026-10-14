@@ -8,7 +8,9 @@
     "dev": "nodemon --legacy-watch server.js",
     "docker:up": "docker compose -f ../docker-compose.yml up -d",
     "docker:down": "docker compose -f ../docker-compose.yml down",
-    "docker:logs": "docker compose -f ../docker-compose.yml logs -f"
+    "docker:logs": "docker compose -f ../docker-compose.yml logs -f",
+    "db:seed": "node database/seeders/DatabaseSeeder.js",
+    "db:seed:fresh": "node database/seeders/DatabaseSeeder.js --clean --alumni=20 --announcements=10"
   },
   "keywords": [],
   "author": "Mehmet Raşid Ünlüel",
@@ -17,6 +19,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "multer": "^2.4.0",
+    "pg": "^8.23.1",
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1"
   },
