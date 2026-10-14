@@ -4,8 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Alumni Tracker — Istanbul University Announcement Management System">
-  <title>Announcements Management | Istanbul University Alumni Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="/css/style.css">
+  <script>
+    if (window.location.protocol === 'file:') {
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('a[href]').forEach(a => {
+          const h = a.getAttribute('href');
+          if (h === '/') a.href = 'index.html';
+          else if (h === '/announcements') a.href = 'announcements.html';
+          else if (h === '/users' || h === '/alumni') a.href = 'alumni.html';
+          else if (h === '/about') a.href = 'about.html';
+        });
+      });
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">

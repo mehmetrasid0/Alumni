@@ -5,7 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Alumni Tracker — Mezun listesi ve yönetim paneli. Mezunları görüntüle, ara ve yeni mezun ekle.">
   <title>Mezunlar | Alumni Tracker</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css" id="alumniStylesheet">
+  <script>
+    if (window.location.protocol === 'file:') {
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('a[href]').forEach(a => {
+          const h = a.getAttribute('href');
+          if (h === '/') a.href = 'index.html';
+          else if (h === '/announcements') a.href = 'announcements.html';
+          else if (h === '/users' || h === '/alumni') a.href = 'alumni.html';
+          else if (h === '/about') a.href = 'about.html';
+        });
+      });
+    }
+  </script>
   <style>
     /* ==================== Alumni Page Styles ==================== */
     .alumni-page {
@@ -540,6 +554,12 @@
 </head>
 <body>
 
+  <!-- Protocol Warning Banner for Direct File Browsing -->
+  <div id="fileProtocolBanner" style="display:none; background: #FEF3C7; color: #92400E; padding: 12px 24px; text-align: center; font-size: 0.95rem; font-family: 'IBM Plex Sans', sans-serif; border-bottom: 2px solid #F59E0B; position: relative; z-index: 9999;">
+    ⚠️ <strong>Uyarı:</strong> Bu sayfayı doğrudan yerel dosya olarak (<code>file://</code>) açtınız. Tasarımın ve dinamik mezun verilerinin çalışması için lütfen çalışan sunucu adresi üzerinden açınız: 
+    <a href="http://localhost:5000/alumni" style="color: #1D4ED8; text-decoration: underline; font-weight: 700; margin-left: 6px;">http://localhost:5000/alumni</a>
+  </div>
+
   <!-- Navbar -->
   <nav class="navbar" id="navbar">
     <div class="container">
@@ -724,11 +744,14 @@
           renderCards(allUsers);
         }
       } catch (err) {
+        const isFileProtocol = window.location.protocol === 'file:';
         grid.innerHTML = `
           <div class="no-results">
             <div class="no-icon">⚠️</div>
-            <h3>Bağlantı hatası</h3>
-            <p>Sunucuya ulaşılamıyor. Lütfen tekrar deneyin.</p>
+            <h3>${isFileProtocol ? 'Sunucu Bağlantısı Gerekli' : 'Bağlantı Hatası'}</h3>
+            <p>${isFileProtocol 
+              ? 'Bu sayfayı doğrudan dosya olarak (<code>file://</code>) açtığınız için backend API verilerine ulaşılamıyor.<br>Lütfen çalışan sunucunuz üzerinden açınız: <a href="http://localhost:5000/alumni" style="color:var(--gold-500);font-weight:700;text-decoration:underline;">http://localhost:5000/alumni</a>' 
+              : 'Sunucuya ulaşılamıyor. Lütfen Express sunucusunun açık olduğundan emin olun.'}</p>
           </div>`;
       }
     }
@@ -907,6 +930,10 @@
     });
 
     // Init
+    if (window.location.protocol === 'file:') {
+      const banner = document.getElementById('fileProtocolBanner');
+      if (banner) banner.style.display = 'block';
+    }
     fetchUsers();
   </script>
 

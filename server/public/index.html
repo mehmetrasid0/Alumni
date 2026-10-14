@@ -5,7 +5,357 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Alumni Tracker — İstanbul Üniversitesi mezun takip ve yönetim platformu. Mezunlarımızla bağımızı güçlendiriyoruz.">
   <title>Alumni Tracker | İstanbul Üniversitesi</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css" id="mainStylesheet">
+  <script>
+    if (window.location.protocol === 'file:') {
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('a[href]').forEach(a => {
+          const h = a.getAttribute('href');
+          if (h === '/') a.href = 'index.html';
+          else if (h === '/announcements') a.href = 'announcements.html';
+          else if (h === '/users' || h === '/alumni') a.href = 'alumni.html';
+          else if (h === '/about') a.href = 'about.html';
+        });
+      });
+    }
+  </script>
+  <style>
+    /* Card Visibility & Animations */
+    .announcement-card, .scholarship-card, .alumni-card, .event-card, .post-card {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .announcements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .announcement-card {
+      background: var(--bg-card, #FFFFFF);
+      border: 1px solid var(--border, #D1CCC3);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .announcement-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(10,22,40,0.1);
+      border-color: var(--gold-400, #D4AF37);
+    }
+    .announcement-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+    .tag-urgent { background: #FEE2E2; color: #DC2626; }
+    .tag-event { background: #FEF3C7; color: #D97706; }
+    .tag-academic { background: #EDE9FE; color: #7C3AED; }
+    .tag-career { background: #DBEAFE; color: #2563EB; }
+    .tag-general { background: #E2E8F0; color: #475569; }
+    .announcement-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-light, #6B7280);
+      border-top: 1px solid var(--border-light, #E5E1D8);
+      padding-top: 12px;
+      margin-top: 14px;
+    }
+    .scholarships-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .scholarship-card {
+      background: var(--bg-card, #FFFFFF);
+      border: 1px solid var(--border, #D1CCC3);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: transform 0.2s ease;
+    }
+    .scholarship-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold-400, #D4AF37);
+    }
+
+    /* ==================== Hero High-Contrast & Beyazit Gate Styling ==================== */
+    .hero {
+      background: radial-gradient(circle at 85% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+                  linear-gradient(135deg, #07101E 0%, #0D1B2A 50%, #152538 100%) !important;
+      padding: 130px 0 80px !important;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 3px solid var(--gold-500, #D4AF37) !important;
+    }
+    .hero .container {
+      display: grid !important;
+      grid-template-columns: 1.15fr 0.85fr !important;
+      gap: 48px !important;
+      align-items: center !important;
+    }
+    .hero-content-col {
+      display: flex;
+      flex-direction: column;
+      z-index: 2;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 50px;
+      color: #F6D06E !important;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+      width: fit-content;
+      backdrop-filter: blur(8px);
+    }
+    .hero-title, .hero h1 {
+      font-family: 'Playfair Display', 'Source Serif 4', Georgia, serif !important;
+      font-size: 3.1rem !important;
+      font-weight: 800 !important;
+      color: #FFFFFF !important;
+      line-height: 1.2 !important;
+      letter-spacing: -0.5px;
+      margin-bottom: 20px !important;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    .hero-title .highlight, .hero h1 .highlight {
+      background: linear-gradient(135deg, #FFF0B3 0%, #D4AF37 50%, #F59E0B 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+      display: inline-block;
+    }
+    .hero-subtitle, .hero p.hero-subtitle {
+      color: #E2E8F0 !important;
+      font-size: 1.08rem !important;
+      line-height: 1.75 !important;
+      margin-bottom: 30px !important;
+      max-width: 540px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+    .hero-search {
+      display: flex;
+      align-items: center;
+      position: relative;
+      max-width: 480px;
+      margin-bottom: 34px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      background: rgba(13, 27, 42, 0.95);
+    }
+    .hero-search input {
+      flex: 1;
+      padding: 14px 20px;
+      background: transparent;
+      border: none;
+      color: #FFFFFF !important;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .hero-search input::placeholder {
+      color: rgba(226, 232, 240, 0.65) !important;
+    }
+    .hero-search button {
+      background: linear-gradient(135deg, #D4AF37, #C59B27);
+      color: #0A1628;
+      border: none;
+      padding: 0 24px;
+      height: 48px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-search button:hover {
+      background: linear-gradient(135deg, #F3C94D, #D4AF37);
+      transform: scale(1.02);
+    }
+    .hero-stats {
+      display: grid !important;
+      grid-template-columns: repeat(4, 1fr) !important;
+      gap: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 12px;
+      padding: 18px 16px;
+      backdrop-filter: blur(8px);
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat .number {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: #F6D06E !important;
+      line-height: 1.2;
+    }
+    .hero-stat .label {
+      font-size: 0.78rem;
+      color: #CBD5E1 !important;
+      margin-top: 4px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Beyazit Gate Visual Card */
+    .hero-visual-col {
+      display: flex;
+      justify-content: center;
+      z-index: 2;
+    }
+    .iu-gate-card {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(13, 27, 42, 0.85);
+      border: 2px solid rgba(212, 175, 55, 0.45);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55), 0 0 35px rgba(212, 175, 55, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .iu-gate-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 25px 55px rgba(0, 0, 0, 0.65), 0 0 45px rgba(212, 175, 55, 0.3);
+      border-color: #D4AF37;
+    }
+    .gate-image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      overflow: hidden;
+      background: #0A1628;
+    }
+    .iu-gate-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+    .iu-gate-card:hover .iu-gate-img {
+      transform: scale(1.05);
+    }
+    .gate-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(10,22,40,0.1) 0%, rgba(10,22,40,0.65) 100%);
+      pointer-events: none;
+    }
+    .gate-floating-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(10, 22, 40, 0.88);
+      border: 1px solid rgba(212, 175, 55, 0.65);
+      color: #F6D06E;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      padding: 6px 14px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 8px #10B981;
+    }
+    .gate-card-caption {
+      padding: 18px 22px 20px;
+      background: linear-gradient(180deg, rgba(13, 27, 42, 0.95), rgba(7, 16, 30, 0.98));
+      border-top: 1px solid rgba(212, 175, 55, 0.25);
+    }
+    .gate-title-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .gate-icon {
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+    .gate-title-row h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #FFFFFF !important;
+      margin-bottom: 3px;
+    }
+    .gate-title-row p {
+      font-size: 0.82rem;
+      color: #CBD5E1 !important;
+      margin: 0;
+      line-height: 1.4;
+    }
+    .gate-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .gate-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #F6D06E;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    @media (max-width: 992px) {
+      .hero .container {
+        grid-template-columns: 1fr !important;
+        gap: 40px !important;
+      }
+      .hero-title, .hero h1 {
+        font-size: 2.3rem !important;
+      }
+      .gate-image-wrapper {
+        height: 250px;
+      }
+      .hero-stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -34,37 +384,68 @@
   <section class="hero" id="hero">
     <div class="hero-grid"></div>
     <div class="container">
-      <div class="hero-badge">
-        ✨ İstanbul Üniversitesi Mezun Platformu
+      <!-- Sol Kolon: Başlık, Açıklama, Arama, İstatistikler -->
+      <div class="hero-content-col">
+        <div class="hero-badge">
+          🏛️ İstanbul Üniversitesi Mezun Platformu • 1453'ten Bugüne
+        </div>
+        <h1 class="hero-title">
+          Mezunlarımızla<br>
+          <span class="highlight">Geleceği Birlikte</span> İnşa Ediyoruz
+        </h1>
+        <p class="hero-subtitle">
+          Kariyer yolculuğunuzu takip edin, burs ve mentorluk fırsatlarını keşfedin, 
+          köklü İstanbul Üniversitesi ağınızla her zaman bağlantıda kalın.
+        </p>
+        <form class="hero-search" id="heroSearchForm" onsubmit="event.preventDefault(); window.location.href='/users?q=' + encodeURIComponent(document.getElementById('searchInput').value);">
+          <input type="text" placeholder="Mezun ara... (isim, bölüm, şirket, unvan)" id="searchInput">
+          <button type="submit" aria-label="Ara">🔍</button>
+        </form>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="number">2,847</div>
+            <div class="label">Toplam Mezun</div>
+          </div>
+          <div class="hero-stat">
+            <div class="number">156</div>
+            <div class="label">Şirket Ortağı</div>
+          </div>
+          <div class="hero-stat">
+            <div class="number">23</div>
+            <div class="label">Ülke</div>
+          </div>
+          <div class="hero-stat">
+            <div class="number">94%</div>
+            <div class="label">İstihdam Oranı</div>
+          </div>
+        </div>
       </div>
-      <h1>
-        Mezunlarımızla<br>
-        <span class="highlight">Geleceği Birlikte</span> İnşa Ediyoruz
-      </h1>
-      <p class="hero-subtitle">
-        Kariyer yolculuğunuzu takip edin, burs fırsatlarını keşfedin, 
-        üniversite ağınızla bağlantıda kalın.
-      </p>
-      <div class="hero-search">
-        <input type="text" placeholder="Mezun ara... (isim, bölüm, şirket)" id="searchInput">
-        <button type="button" aria-label="Ara">🔍</button>
-      </div>
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="number">2,847</div>
-          <div class="label">Toplam Mezun</div>
-        </div>
-        <div class="hero-stat">
-          <div class="number">156</div>
-          <div class="label">Şirket Ortağı</div>
-        </div>
-        <div class="hero-stat">
-          <div class="number">23</div>
-          <div class="label">Ülke</div>
-        </div>
-        <div class="hero-stat">
-          <div class="number">94%</div>
-          <div class="label">İstihdam Oranı</div>
+
+      <!-- Sağ Kolon: İstanbul Üniversitesi Tarihi Ana Kapısı Kartı -->
+      <div class="hero-visual-col">
+        <div class="iu-gate-card">
+          <div class="gate-image-wrapper">
+            <img src="img/iu_main_gate.jpg" alt="İstanbul Üniversitesi Tarihi Beyazıt Kapısı" class="iu-gate-img">
+            <div class="gate-overlay"></div>
+            <div class="gate-floating-badge">
+              <span class="badge-dot"></span>
+              <span>T.C. İSTANBUL ÜNİVERSİTESİ</span>
+            </div>
+          </div>
+          <div class="gate-card-caption">
+            <div class="gate-title-row">
+              <span class="gate-icon">🏛️</span>
+              <div>
+                <h4>Tarihi Beyazıt Kapısı</h4>
+                <p>Türkiye'nin En Köklü Yükseköğretim Çatısı • Kur. 1453</p>
+              </div>
+            </div>
+            <div class="gate-card-tags">
+              <span class="gate-tag">Yönetim Bilişim Sistemleri</span>
+              <span class="gate-tag">Mezun Bilgi Ağı</span>
+              <span class="gate-tag">Beyazıt Yerleşkesi</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -104,32 +485,50 @@
         <div class="accent-line"></div>
         <p>Üniversiteden en güncel haberler ve duyurular</p>
       </div>
-      <div class="announcements-grid">
+      <div class="announcements-grid" id="announcementsGrid">
         <div class="announcement-card">
-          <span class="announcement-tag tag-urgent">🔴 Önemli</span>
-          <h3>2026 Mezuniyet Töreni Tarihi Açıklandı</h3>
-          <p>2025-2026 akademik yılı mezuniyet töreni 28 Haziran 2026 tarihinde kampüs ana salonda gerçekleşecektir.</p>
-          <div class="announcement-meta">
-            <span class="date">📅 20 Eylül 2026</span>
-            <a href="#" class="read-more">Devamını Oku →</a>
-          </div>
-        </div>
-        <div class="announcement-card">
-          <span class="announcement-tag tag-general">📋 Genel</span>
-          <h3>Mezun Bilgi Sistemi Güncellendi</h3>
-          <p>Profil bilgilerinizi güncelleyerek iş fırsatlarından ve etkinliklerden haberdar olabilirsiniz.</p>
-          <div class="announcement-meta">
-            <span class="date">📅 18 Eylül 2026</span>
-            <a href="#" class="read-more">Devamını Oku →</a>
-          </div>
-        </div>
-        <div class="announcement-card">
-          <span class="announcement-tag tag-event">🎉 Etkinlik</span>
-          <h3>Kariyer Günleri — Teknoloji Sektörü</h3>
-          <p>Büyük teknoloji şirketlerinden temsilciler üniversitemize geliyor. Mezunlarımıza özel networking fırsatı.</p>
+          <span class="announcement-tag tag-event">📌 Sabit • 🎉 Etkinlik</span>
+          <h3>Annual Alumni Homecoming & Networking Gala 2026</h3>
+          <p>Tarihi Beyazıt Kampüsü'nde geleneksel İstanbul Üniversitesi Mezunlar Buluşması. Sektör liderlerinden açılış konuşmaları, networking akşam yemekleri ve kampüs turları.</p>
           <div class="announcement-meta">
             <span class="date">📅 15 Eylül 2026</span>
-            <a href="#" class="read-more">Devamını Oku →</a>
+            <span class="author">🏛️ Mezunlar Ofisi</span>
+          </div>
+        </div>
+        <div class="announcement-card">
+          <span class="announcement-tag tag-career">📌 Sabit • 💼 Kariyer</span>
+          <h3>Tech Career Fair & Executive Mentorship Program</h3>
+          <p>YBS ve mühendislik mezunlarımız için Google, Microsoft ve Amazon gibi küresel teknoloji firmaları ile özel kariyer ve staj fırsatları.</p>
+          <div class="announcement-meta">
+            <span class="date">📅 20 Eylül 2026</span>
+            <span class="author">🏛️ YBS Kariyer Merkezi</span>
+          </div>
+        </div>
+        <div class="announcement-card">
+          <span class="announcement-tag tag-academic">🏛️ Akademik</span>
+          <h3>Guest Lecture: Artificial Intelligence & Enterprise Architecture</h3>
+          <p>Değerli mezunlarımızdan modern mikroservisler, bulut telemetrisi ve kurumsal yönetim bilişim sistemlerinde yapay zeka entegrasyonu semineri.</p>
+          <div class="announcement-meta">
+            <span class="date">📅 25 Eylül 2026</span>
+            <span class="author">🏛️ İÜ Enstitü</span>
+          </div>
+        </div>
+        <div class="announcement-card">
+          <span class="announcement-tag tag-general">🎖️ Burs & Destek</span>
+          <h3>Scholarship Fund for Underrepresented MIS Students</h3>
+          <p>Başarılı ve desteğe ihtiyaç duyan Yönetim Bilişim Sistemleri lisans öğrencileri için mezun bağış fonu burs başvuruları başladı.</p>
+          <div class="announcement-meta">
+            <span class="date">📅 28 Eylül 2026</span>
+            <span class="author">🏛️ İÜ Burs Komitesi</span>
+          </div>
+        </div>
+        <div class="announcement-card">
+          <span class="announcement-tag tag-career">🚀 Kariyer</span>
+          <h3>Launch of Alumni Mentorship Network Portal</h3>
+          <p>Kıdemli mezunlarımız ile genç mezun ve öğrencileri birebir eşleştiren dijital mentorluk ağımız resmi olarak yayında.</p>
+          <div class="announcement-meta">
+            <span class="date">📅 02 Ekim 2026</span>
+            <span class="author">🏛️ Mentorluk Kurulu</span>
           </div>
         </div>
       </div>
@@ -212,76 +611,58 @@
       </div>
       <div class="alumni-grid" id="alumniGrid">
 
-        <div class="alumni-card" data-category="akademisyen">
-          <div class="alumni-avatar avatar-1">AY</div>
-          <h4>Prof. Dr. Ahmet Yılmaz</h4>
-          <span class="alumni-position pos-akademisyen">👨‍🏫 Akademisyen</span>
-          <div class="alumni-detail">🏛️ İstanbul Üniversitesi</div>
-          <div class="alumni-detail">📖 Bilgisayar Mühendisliği</div>
-          <span class="alumni-year">🎓 Mezuniyet: 2008</span>
-        </div>
-
         <div class="alumni-card" data-category="muhendis">
-          <div class="alumni-avatar avatar-2">EK</div>
-          <h4>Elif Kaya</h4>
-          <span class="alumni-position pos-muhendis">⚙️ Yazılım Mühendisi</span>
+          <div class="alumni-avatar avatar-1">AY</div>
+          <h4>Ahmet Yılmaz</h4>
+          <span class="alumni-position pos-muhendis">⚙️ Software Engineer</span>
           <div class="alumni-detail">🏢 Google</div>
-          <div class="alumni-detail">📖 Bilişim Sistemleri</div>
-          <span class="alumni-year">🎓 Mezuniyet: 2019</span>
+          <div class="alumni-detail">📖 Computer Engineering</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2020</span>
         </div>
 
         <div class="alumni-card" data-category="yonetici">
-          <div class="alumni-avatar avatar-3">MÖ</div>
-          <h4>Mehmet Özdemir</h4>
-          <span class="alumni-position pos-yonetici">💼 Genel Müdür</span>
-          <div class="alumni-detail">🏢 Türk Telekom</div>
-          <div class="alumni-detail">📖 İşletme</div>
-          <span class="alumni-year">🎓 Mezuniyet: 2005</span>
-        </div>
-
-        <div class="alumni-card" data-category="doktor">
-          <div class="alumni-avatar avatar-5">ZA</div>
-          <h4>Dr. Zeynep Aksoy</h4>
-          <span class="alumni-position pos-doktor">🩺 Uzman Doktor</span>
-          <div class="alumni-detail">🏥 Acıbadem Hastanesi</div>
-          <div class="alumni-detail">📖 Tıp Fakültesi</div>
-          <span class="alumni-year">🎓 Mezuniyet: 2014</span>
+          <div class="alumni-avatar avatar-2">ED</div>
+          <h4>Elif Demir</h4>
+          <span class="alumni-position pos-yonetici">💼 Product Manager</span>
+          <div class="alumni-detail">🏢 Microsoft</div>
+          <div class="alumni-detail">📖 Electrical & Electronics</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2019</span>
         </div>
 
         <div class="alumni-card" data-category="muhendis">
-          <div class="alumni-avatar avatar-6">BD</div>
-          <h4>Burak Demir</h4>
-          <span class="alumni-position pos-muhendis">⚙️ Backend Developer</span>
-          <div class="alumni-detail">🏢 Microsoft</div>
-          <div class="alumni-detail">📖 Bilgisayar Mühendisliği</div>
+          <div class="alumni-avatar avatar-3">MK</div>
+          <h4>Mehmet Kaya</h4>
+          <span class="alumni-position pos-muhendis">📊 Data Analyst</span>
+          <div class="alumni-detail">🏢 Amazon</div>
+          <div class="alumni-detail">📖 Industrial Engineering</div>
           <span class="alumni-year">🎓 Mezuniyet: 2021</span>
         </div>
 
-        <div class="alumni-card" data-category="avukat">
-          <div class="alumni-avatar avatar-4">SÇ</div>
-          <h4>Av. Selin Çelik</h4>
-          <span class="alumni-position pos-avukat">⚖️ Avukat</span>
-          <div class="alumni-detail">🏢 Çelik Hukuk Bürosu</div>
-          <div class="alumni-detail">📖 Hukuk Fakültesi</div>
-          <span class="alumni-year">🎓 Mezuniyet: 2016</span>
-        </div>
-
-        <div class="alumni-card" data-category="girisimci">
-          <div class="alumni-avatar avatar-7">CT</div>
-          <h4>Can Tekin</h4>
-          <span class="alumni-position pos-girisimci">🚀 Kurucu & CEO</span>
-          <div class="alumni-detail">🏢 TechPay Startup</div>
-          <div class="alumni-detail">📖 Bilişim Sistemleri</div>
+        <div class="alumni-card" data-category="muhendis">
+          <div class="alumni-avatar avatar-4">ZÇ</div>
+          <h4>Zeynep Çelik</h4>
+          <span class="alumni-position pos-muhendis">💻 Frontend Developer</span>
+          <div class="alumni-detail">🏢 Meta</div>
+          <div class="alumni-detail">📖 Computer Engineering</div>
           <span class="alumni-year">🎓 Mezuniyet: 2018</span>
         </div>
 
-        <div class="alumni-card" data-category="akademisyen">
-          <div class="alumni-avatar avatar-8">FA</div>
-          <h4>Doç. Dr. Fatma Arslan</h4>
-          <span class="alumni-position pos-akademisyen">👨‍🏫 Akademisyen</span>
-          <div class="alumni-detail">🏛️ İYYÜ</div>
-          <div class="alumni-detail">📖 Endüstri Mühendisliği</div>
-          <span class="alumni-year">🎓 Mezuniyet: 2011</span>
+        <div class="alumni-card" data-category="muhendis">
+          <div class="alumni-avatar avatar-5">CÖ</div>
+          <h4>Can Öztürk</h4>
+          <span class="alumni-position pos-muhendis">📱 iOS Developer</span>
+          <div class="alumni-detail">🏢 Apple</div>
+          <div class="alumni-detail">📖 Software Engineering</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2022</span>
+        </div>
+
+        <div class="alumni-card" data-category="yonetici">
+          <div class="alumni-avatar avatar-6">OE</div>
+          <h4>Ofe Emor Demiroz</h4>
+          <span class="alumni-position pos-yonetici">🎬 Cast Manager</span>
+          <div class="alumni-detail">🏢 Ay Yapım</div>
+          <div class="alumni-detail">📖 Information Systems (YBS)</div>
+          <span class="alumni-year">🎓 Mezuniyet: 2023</span>
         </div>
 
       </div>
@@ -550,21 +931,62 @@
       });
     }
 
-    // Intersection Observer for animations
-    const observerOptions = { threshold: 0.2, rootMargin: '0px 0px -50px 0px' };
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
-          observer.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
-
+    // Cards are immediately visible with smooth CSS transitions
     document.querySelectorAll('.announcement-card, .scholarship-card, .alumni-card, .event-card, .post-card').forEach(el => {
-      el.style.opacity = '0';
-      observer.observe(el);
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
     });
+
+    // Dynamic Live Hydration from backend API (if running)
+    async function hydrateLiveRecords() {
+      try {
+        const resAnn = await fetch('/api/announcements');
+        const dataAnn = await resAnn.json();
+        if (dataAnn.success && dataAnn.data && dataAnn.data.length > 0) {
+          const grid = document.getElementById('announcementsGrid');
+          if (grid) {
+            grid.innerHTML = dataAnn.data.slice(0, 6).map(a => `
+              <div class="announcement-card">
+                <span class="announcement-tag tag-${(a.category || 'general').toLowerCase()}">
+                  ${a.pinned ? '📌 Sabit • ' : ''}${a.category || 'Genel'} • ${(a.priority || 'medium').toUpperCase()}
+                </span>
+                <h3>${a.title}</h3>
+                <p>${a.content}</p>
+                <div class="announcement-meta">
+                  <span class="date">📅 ${new Date(a.createdAt).toLocaleDateString('tr-TR')}</span>
+                  <span class="author">🏛️ ${a.author || 'Mezunlar Ofisi'}</span>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (err) {}
+
+      try {
+        const resUsers = await fetch('/api/users');
+        const dataUsers = await resUsers.json();
+        if (dataUsers.success && dataUsers.data && dataUsers.data.length > 0) {
+          const grid = document.getElementById('alumniGrid');
+          if (grid) {
+            grid.innerHTML = dataUsers.data.map((u, i) => {
+              const initials = u.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+              return `
+                <div class="alumni-card" data-category="muhendis">
+                  <div class="alumni-avatar avatar-${(i % 6) + 1}">${initials}</div>
+                  <h4>${u.name}</h4>
+                  <span class="alumni-position pos-muhendis">💼 ${u.role || 'Mezun'}</span>
+                  <div class="alumni-detail">🏢 ${u.company || 'Serbest'}</div>
+                  <div class="alumni-detail">📖 ${u.department || 'Bölüm Belirtilmedi'}</div>
+                  <span class="alumni-year">🎓 Mezuniyet: ${u.graduationYear || '-'}</span>
+                </div>
+              `;
+            }).join('');
+          }
+        }
+      } catch (err) {}
+    }
+
+    hydrateLiveRecords();
 
     // Start counter animation when stats bar is visible
     const statsObserver = new IntersectionObserver((entries) => {
