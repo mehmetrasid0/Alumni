@@ -36,8 +36,8 @@ A modern, containerized full-stack web application for tracking and managing uni
 | Layer | Technology | Description |
 | :--- | :--- | :--- |
 | **Backend** | **Node.js** + **Express.js** | High-performance RESTful API with modular route architecture. |
-| **Database** | **MongoDB** (Atlas) | Flexible NoSQL document database for alumni and user data (Planned). |
-| **ODM** | **Mongoose** | Schema-based data modeling and validation for MongoDB (Planned). |
+| **Database** | **PostgreSQL** (Relational ORDBMS) | Enterprise-grade SQL database with native JSONB support for hybrid structured and semi-structured alumni records (Selected). |
+| **ORM / Client** | **Prisma** / **pg** | Next-generation schema migration, type-safety, and connection pooling (Planned). |
 | **Frontend** | **HTML5** + **CSS3** + **Vanilla JS (ES6+)** | Responsive, accessible UI with real-time filtering (React + Vite planned for Phase 7). |
 | **Documentation** | **Swagger UI** + **OpenAPI 3.0** | Interactive API documentation and in-browser testing portal. |
 | **Containerization** | **Docker** & **Docker Compose** | Reproducible development environment with volume synchronization. |
@@ -83,7 +83,7 @@ This project is developed in weekly milestones throughout the academic semester.
   1. Initialized Git repository with clean `.gitignore` rule configurations.
   2. Configured containerization using `Dockerfile` (Node.js 18 Alpine) and `docker-compose.yml` with live volume reload.
   3. Initialized Express.js HTTP backend server with foundational utility routes (`GET /hello/:name`, `GET /sum/:number1/:number2`).
-  4. Designed preliminary Entity-Relationship (ER) schema for MongoDB Atlas and established a multi-phased development roadmap.
+  4. Designed preliminary Entity-Relationship (ER) schema for PostgreSQL and established a multi-phased development roadmap.
 * **Related Files**: `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `server/server.js`, `README.md`.
 
 ---
@@ -166,7 +166,7 @@ graph TD
     User(["🌐 Web Client / Browser"]) -->|HTTP Requests| View["👁️ View Layer: Static HTML / CSS / Vanilla JS :5000"]
     View -->|REST API Calls via Fetch| Controller["🎮 Controller Layer: Express.js Routing & Handlers :5000"]
     Controller -->|CRUD & Validation| Model["🧠 Model Layer: In-Memory Store & Swagger Schemas"]
-    Controller -.->|Target DB Integration| DB[("MongoDB Atlas via Mongoose")]
+    Controller -.->|Target DB Integration| DB[("PostgreSQL via Prisma / pg")]
     Controller -->|Interactive API Docs| SwaggerUI["📘 Swagger UI: /api/swagger"]
 ```
 
@@ -198,7 +198,7 @@ graph TD
         M_Memory["In-Memory Data Store<br/>(User Model & nextId counter)"]
         M_Validation["Business Rules & Validation<br/>(Required fields, Email uniqueness)"]
         M_Swagger["OpenAPI 3.0 Schemas<br/>(User, UserInput, UserPatch)"]
-        M_TargetDB[("Future: MongoDB + Mongoose<br/>(User & Alumni Schemas)")]
+        M_TargetDB[("Target: PostgreSQL + Prisma/pg<br/>(Relational & JSONB Schemas)")]
     end
 
     User(["👤 End User"]) -->|Interacts with UI| VIEW_LAYER
@@ -493,10 +493,10 @@ As the project expands in Phase 5 through Phase 7 (database persistence and auth
 ```text
 Alumni/server/
 ├── config/
-│   └── db.js                   # [Model/Config] MongoDB Atlas connection via Mongoose
+│   └── db.js                   # [Model/Config] PostgreSQL connection pool via pg / Prisma client
 ├── models/
-│   ├── User.js                 # [Model] Mongoose User schema & password hashing hooks
-│   └── Alumni.js               # [Model] Mongoose Alumni profile schema & indexing
+│   ├── User.js                 # [Model] PostgreSQL User entity & password hashing hooks
+│   └── Alumni.js               # [Model] PostgreSQL Alumni profile entity & relational mapping
 ├── controllers/
 │   ├── authController.js       # [Controller] Register, Login, JWT issuance
 │   ├── alumniController.js     # [Controller] Alumni directory query, search & CRUD operations
@@ -515,36 +515,76 @@ Alumni/server/
 
 ---
 
-## 🗄️ Database Schema (MongoDB Atlas - Target Model)
+## 🗄️ Database Architecture & Schema (PostgreSQL — Selected Model)
+
+### 🏆 Database Architecture Selection: Why PostgreSQL? (Evaluation vs. MongoDB & MySQL)
+
+In designing the data persistence layer for the **Alumni Tracker**, three primary database architectures were critically evaluated: **MongoDB (NoSQL Document Store)**, **MySQL (Traditional RDBMS)**, and **PostgreSQL (Advanced Object-Relational DBMS)**.
+
+| Evaluation Criteria | NoSQL (MongoDB) | MySQL (RDBMS) | PostgreSQL (Selected 🥇) |
+| :--- | :--- | :--- | :--- |
+| **Relational Integrity (ACID)** | ⚠️ Weak / Manual (Requires application-level joins or duplicate data) | ✅ Strong (Foreign keys, cascade operations) | 🏆 **Superior** (Strict referential integrity, table constraints, transactional reliability) |
+| **Semi-Structured Data (JSON)** | ✅ Native BSON document model | ⚠️ Basic JSON support (Limited indexing, no GIN) | 🏆 **Best-of-Both-Worlds** (Native **`JSONB`** binary storage with **GIN** indexing for fast attribute querying) |
+| **Complex Queries & Filtering** | ⚠️ Complex pipeline aggregation required for multi-collection joins | ✅ Standard SQL `JOIN` | 🏆 **Advanced SQL Engine** (Window functions, CTEs, multi-column compound filtering, full-text search) |
+| **Search Capabilities** | ⚠️ Text index requires Atlas Search or external ElasticSearch | ⚠️ Basic `LIKE` & rudimentary FULLTEXT | 🏆 **Native Full-Text Search** (`tsvector` & `tsquery` for searching alumni by bio, role, or company) |
+| **Node.js & Docker Ecosystem** | ✅ Mongoose ODM | ✅ mysql2 / Sequelize | 🏆 **First-Class** (Native Docker `postgres:alpine` container, exceptional Prisma ORM & `pg` connection pooling) |
+| **Decision** | ❌ Excluded (High risk of orphaned alumni data) | ❌ Excluded (Less flexible with semi-structured fields) | **✅ SELECTED**: Best fit for academic & career directory systems |
+
+#### Key Justifications for PostgreSQL:
+1. **Strict Academic & Identity Integrity:** An alumni platform inherently demands strict relational consistency. A user account maps to student IDs, degrees, departments, and announcement publications. PostgreSQL guarantees referential integrity (`ON DELETE CASCADE`, `FOREIGN KEY`, `UNIQUE`), eliminating orphaned records.
+2. **Hybrid Relational + NoSQL Capabilities via `JSONB`:** PostgreSQL enables storing flexible, dynamic data (e.g. `skills: ["Node.js", "Docker", "PostgreSQL"]`, dynamic social links, custom profile attributes) in binary JSON format while maintaining strict table schemas for critical fields.
+3. **Advanced Filtering & Directory Search:** Querying alumni by department, graduation year, employer, and skills is accelerated by PostgreSQL's compound B-Tree and GIN indexes.
+4. **Seamless Docker & Express Integration:** PostgreSQL runs seamlessly in Docker Compose alongside the Express backend with persistent volume mounting and zero external cloud dependency for local development.
+
+---
+
+### 📊 Relational Entity-Relationship (ER) Schema
 
 ```mermaid
 erDiagram
-    USERS ||--o{ ALUMNI_PROFILES : has
+    USERS ||--|| ALUMNI_PROFILES : "has profile (1:1)"
+    USERS ||--o{ ANNOUNCEMENTS : "authors (1:N)"
+
     USERS {
-        ObjectId _id PK
-        string name "Full name"
-        string email "Unique email address"
-        string password "Hashed with bcrypt"
-        string role "alumni | admin"
-        date createdAt "Account creation date"
+        UUID id PK "Primary Key (gen_random_uuid())"
+        VARCHAR(255) name "Full Name"
+        VARCHAR(255) email UK "Unique Email Address"
+        VARCHAR(255) password_hash "Bcrypt Hashed Password"
+        VARCHAR(50) role "alumni | admin (default: alumni)"
+        TIMESTAMP created_at "Account creation timestamp"
+        TIMESTAMP updated_at "Account modification timestamp"
     }
 
     ALUMNI_PROFILES {
-        ObjectId _id PK
-        ObjectId user FK "Reference to Users"
-        string studentId "University student number"
-        string department "Department or major"
-        number graduationYear "Year of graduation"
-        string degree "Bachelor | Master | PhD"
-        string currentCompany "Current employer"
-        string jobTitle "Current position"
-        string city "Current city"
-        string country "Current country"
-        string linkedIn "LinkedIn profile URL"
-        string phone "Contact number"
-        string bio "Short biography"
-        array skills "List of skills"
-        date updatedAt "Last profile update"
+        UUID id PK "Primary Key"
+        UUID user_id FK,UK "Foreign Key -> USERS(id) ON DELETE CASCADE"
+        VARCHAR(50) student_id UK "Unique Student Number"
+        VARCHAR(100) department "Academic Department / Major"
+        INTEGER graduation_year "Year of Graduation"
+        VARCHAR(50) degree "Bachelor | Master | PhD"
+        VARCHAR(150) current_company "Current Employer"
+        VARCHAR(100) job_title "Current Position / Role"
+        VARCHAR(100) city "Current City"
+        VARCHAR(100) country "Current Country"
+        VARCHAR(255) linkedin_url "LinkedIn Profile URL"
+        VARCHAR(50) phone "Contact Phone Number"
+        TEXT bio "Professional Biography"
+        JSONB skills "List of Professional Competencies (JSONB array)"
+        TIMESTAMP updated_at "Last Profile Update"
+    }
+
+    ANNOUNCEMENTS {
+        SERIAL id PK "Auto-increment Primary Key"
+        UUID author_id FK "Foreign Key -> USERS(id)"
+        VARCHAR(255) title "Announcement Headline"
+        TEXT content "Detailed Announcement Body"
+        VARCHAR(50) category "Career | Event | Academic | General"
+        VARCHAR(20) priority "low | medium | high | urgent"
+        VARCHAR(20) status "draft | published | archived"
+        VARCHAR(100) target_audience "Target Audience"
+        BOOLEAN pinned "Pin to Top of Feed (boolean)"
+        TIMESTAMP created_at "Publication Timestamp"
+        TIMESTAMP updated_at "Last Modification Timestamp"
     }
 ```
 
@@ -665,7 +705,7 @@ cd Alumni
 Create a `.env` file in the `server/` directory:
 ```env
 PORT=5000
-MONGODB_URI=mongodb+srv://your_connection_string
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/alumni_db?schema=public
 JWT_SECRET=your_secret_key
 NODE_ENV=development
 ```
@@ -727,8 +767,8 @@ npm run dev
   - Mermaid end-to-end request-response sequence diagrams.
   - Postman API test collection containing 14 automated requests.
   - Blueprint for modular MVC directory scaling.
-- [ ] **Phase 5 (W5): Database Persistence (MongoDB Atlas) & JWT Authentication**
-  - Connect Mongoose ODM User and Alumni schemas to MongoDB Atlas cloud database.
+- [ ] **Phase 5 (W5): Database Persistence (PostgreSQL) & JWT Authentication**
+  - Connect PostgreSQL database using Prisma ORM / pg connection pool for normalized User, Alumni, and Announcement tables.
   - Password hashing with bcrypt and JWT token-based authentication (Auth Middleware).
   - Role-based access control (Admin / Alumni).
 - [ ] **Phase 6 (W6): Advanced Alumni Management, Admin Portal & Reporting**
