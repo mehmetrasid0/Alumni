@@ -2,14 +2,8 @@
  * ============================================================================
  * Alumni Tracker — API User Controller (ApiUserController)
  * ============================================================================
- * Architectural Layer: CONTROLLER (REST API Handlers)
- * 
- * Description:
- *   Handles all RESTful HTTP requests for Alumni users. Responsible for:
- *   - Request parsing (query parameters, body payloads, URL path params)
- *   - Input validation orchestration via the User Model
- *   - Returning standard JSON payloads with appropriate HTTP status codes
- *   - Full CRUD operations: getAll, getById, create, update (PUT), patch (PATCH), delete
+ * Architectural Layer: CONTROLLER (REST API Handlers / Database Integrated)
+ * Author: Mehmet Raşid Ünlüel (Istanbul University - YBS)
  * ============================================================================
  */
 
@@ -19,11 +13,11 @@ class ApiUserController {
   /**
    * [GET /api/users]
    * Retrieve all alumni records with optional query filtering.
-   * Query params supported: ?query=, ?department=, ?graduationYear=
+   * Query params supported: ?query=, ?department=, ?graduationYear=, ?skill=
    */
-  getAll(req, res) {
+  async getAll(req, res) {
     try {
-      const users = User.findAll(req.query);
+      const users = await User.findAll(req.query);
       return res.status(200).json({
         success: true,
         count: users.length,
@@ -39,11 +33,11 @@ class ApiUserController {
 
   /**
    * [GET /api/users/:id]
-   * Retrieve a single user by primary numeric ID.
+   * Retrieve a single user by primary ID (UUID or student ID).
    */
-  getById(req, res) {
+  async getById(req, res) {
     try {
-      const user = User.findById(req.params.id);
+      const user = await User.findById(req.params.id);
 
       if (!user) {
         return res.status(404).json({
@@ -66,12 +60,11 @@ class ApiUserController {
 
   /**
    * [POST /api/users]
-   * Create a new alumni record.
-   * Expects JSON, multipart/form-data, or urlencoded body.
+   * Create a new alumni record in PostgreSQL.
    */
-  create(req, res) {
+  async create(req, res) {
     try {
-      const newUser = User.create(req.body);
+      const newUser = await User.create(req.body);
       return res.status(201).json({
         success: true,
         message: 'Alumni record created successfully',
@@ -89,9 +82,9 @@ class ApiUserController {
    * [PUT /api/users/:id]
    * Fully update an existing user (all required fields must be supplied).
    */
-  update(req, res) {
+  async update(req, res) {
     try {
-      const updatedUser = User.update(req.params.id, req.body, false);
+      const updatedUser = await User.update(req.params.id, req.body, false);
       return res.status(200).json({
         success: true,
         message: 'Alumni record fully updated successfully',
@@ -109,9 +102,9 @@ class ApiUserController {
    * [PATCH /api/users/:id]
    * Partially update selective fields of an existing user.
    */
-  patch(req, res) {
+  async patch(req, res) {
     try {
-      const updatedUser = User.update(req.params.id, req.body, true);
+      const updatedUser = await User.update(req.params.id, req.body, true);
       return res.status(200).json({
         success: true,
         message: 'Alumni record partially updated successfully',
@@ -129,9 +122,9 @@ class ApiUserController {
    * [DELETE /api/users/:id]
    * Remove an alumni record by primary ID.
    */
-  delete(req, res) {
+  async delete(req, res) {
     try {
-      const deletedUser = User.delete(req.params.id);
+      const deletedUser = await User.delete(req.params.id);
       return res.status(200).json({
         success: true,
         message: `${deletedUser.name} successfully deleted`,
@@ -148,4 +141,3 @@ class ApiUserController {
 
 // Export singleton instance
 module.exports = new ApiUserController();
-

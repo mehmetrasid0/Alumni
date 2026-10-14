@@ -134,9 +134,9 @@ class AnnouncementController {
    * [POST /announcements]
    * [CRUD: STORE] Process form submission, persist via Announcement Model, and redirect.
    */
-  store(req, res) {
+  async store(req, res) {
     try {
-      Announcement.create(req.body);
+      await Announcement.create(req.body);
       return res.redirect(302, '/announcements');
     } catch (err) {
       return res.status(err.statusCode || 400).send(`
@@ -166,8 +166,8 @@ class AnnouncementController {
    * [GET /announcements/:id]
    * [CRUD: READ ONE / SHOW] Detail view for an announcement.
    */
-  show(req, res) {
-    const item = Announcement.findById(req.params.id);
+  async show(req, res) {
+    const item = await Announcement.findById(req.params.id);
 
     if (!item) {
       return res.status(404).send(`
@@ -265,8 +265,8 @@ class AnnouncementController {
    * [GET /announcements/:id/edit]
    * [CRUD: EDIT FORM] Form view to update an existing announcement.
    */
-  edit(req, res) {
-    const item = Announcement.findById(req.params.id);
+  async edit(req, res) {
+    const item = await Announcement.findById(req.params.id);
 
     if (!item) {
       return res.status(404).send(`
@@ -383,9 +383,9 @@ class AnnouncementController {
    * [POST /announcements/:id/update]
    * [CRUD: UPDATE] Process form updates and redirect to announcement view.
    */
-  update(req, res) {
+  async update(req, res) {
     try {
-      Announcement.update(req.params.id, req.body, false);
+      await Announcement.update(req.params.id, req.body, false);
       return res.redirect(302, `/announcements/${req.params.id}`);
     } catch (err) {
       return res.status(err.statusCode || 400).send(`
@@ -409,9 +409,9 @@ class AnnouncementController {
    * [POST /announcements/:id/delete]
    * [CRUD: DESTROY] Delete announcement and redirect to management interface.
    */
-  destroy(req, res) {
+  async destroy(req, res) {
     try {
-      Announcement.delete(req.params.id);
+      await Announcement.delete(req.params.id);
       return res.redirect(302, '/announcements');
     } catch (err) {
       return res.status(err.statusCode || 404).send(`

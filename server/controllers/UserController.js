@@ -125,9 +125,9 @@ class UserController {
    * [POST /users]
    * [CRUD: STORE / CREATE] Processes web form submission and redirects to /users.
    */
-  store(req, res) {
+  async store(req, res) {
     try {
-      const newUser = User.create(req.body);
+      const newUser = await User.create(req.body);
       if (typeof req.accepts === 'function' && req.accepts('html')) {
         return res.redirect('/users');
       }
@@ -161,9 +161,9 @@ class UserController {
    * [GET /users/:id]
    * [CRUD: READ ONE] Renders detailed profile view with Edit and Delete action controls.
    */
-  show(req, res) {
+  async show(req, res) {
     try {
-      const user = User.findById(req.params.id);
+      const user = await User.findById(req.params.id);
       if (!user) {
         return res.status(404).send(`
           <!DOCTYPE html>
@@ -253,9 +253,9 @@ class UserController {
    * [GET /users/:id/edit]
    * [CRUD: EDIT FORM] Renders the pre-filled HTML form view to modify an existing alumnus.
    */
-  edit(req, res) {
+  async edit(req, res) {
     try {
-      const user = User.findById(req.params.id);
+      const user = await User.findById(req.params.id);
       if (!user) {
         return res.status(404).send(`
           <!DOCTYPE html>
@@ -346,9 +346,9 @@ class UserController {
    * [POST /users/:id/update]
    * [CRUD: UPDATE] Processes form updates and redirects to /users/:id.
    */
-  update(req, res) {
+  async update(req, res) {
     try {
-      const updatedUser = User.update(req.params.id, req.body, true);
+      const updatedUser = await User.update(req.params.id, req.body, true);
       if (typeof req.accepts === 'function' && req.accepts('html')) {
         return res.redirect(`/users/${updatedUser.id}`);
       }
@@ -382,9 +382,9 @@ class UserController {
    * [POST /users/:id/delete] or [GET /users/:id/delete]
    * [CRUD: DESTROY / DELETE] Deletes the user record and redirects to /users.
    */
-  destroy(req, res) {
+  async destroy(req, res) {
     try {
-      User.delete(req.params.id);
+      await User.delete(req.params.id);
       if (typeof req.accepts === 'function' && req.accepts('html')) {
         return res.redirect('/users');
       }
