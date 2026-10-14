@@ -56,6 +56,10 @@ A modern, containerized full-stack web application for tracking and managing uni
 | 🩺 **Health Check (Controller)**| [`http://localhost:5000/api/health`](http://localhost:5000/api/health) | Real-time CPU load, memory utilization, OS details, and server uptime |
 | 📮 **Postman Test Suite** | [`postman/Alumni_Tracker_API.postman_collection.json`](./postman/Alumni_Tracker_API.postman_collection.json) | One-click importable Postman collection containing 14 automated API requests |
 | 🏗️ **MVC Architecture** | [MVC Architecture Specification](#-mvc-architecture-model---view---controller) | Detailed technical breakdown of Model, View, and Controller layers |
+| 🗄️ **Data Design Document (DDD)** | [Data Design Documentation (`DDD.md`)](./DDD.md) | Comprehensive database design: Conceptual (CDM), Logical (LDM), Physical (PDM), Data Dictionary & PostgreSQL DDL |
+| 🐘 **PostgreSQL Database** | [`database/init.sql`](./database/init.sql) & [`db-init.ps1`](./db-init.ps1) | Live containerized PostgreSQL 15 (`alumni-postgres` :5432), DDL schema, GIN indexes, auto-update triggers & seed data |
+| 🌱 **Factory & Seeder Suite** | [`server/database/factories/`](./server/database/factories/) & [`db-seed.ps1`](./db-seed.ps1) | Automated mock data factories, fluent state transformations & database seeding orchestrator |
+| ⚙️ **Env Variables Template** | [`env.example`](./env.example) & [`.env.example`](./.env.example) | Public template for environment variables (`.env` is securely git-ignored) |
 | 📁 **File & Directory Map** | [Project Directory, Folder & File Structure](#-project-directories-folders--files-structure) | Full mapping of project files to their respective MVC roles |
 
 ---
@@ -175,6 +179,8 @@ graph TD
 ## 🏗️ MVC Architecture (Model - View - Controller)
 
 The **Alumni Tracker** application is designed following the **Model-View-Controller (MVC)** architectural pattern. This pattern separates the application into three interconnected components, decoupling internal representations of information from the ways that information is presented to and accepted from the user.
+
+> 📘 **Data Design Documentation (DDD):** For the complete database design specification—including **Conceptual Data Model (CDM)**, **Logical 3NF Normalization (LDM)**, **Comprehensive Data Dictionary**, **PostgreSQL DDL & GIN Indexing**, and **Data Security**—consult the dedicated companion document: [**Data Design Documentation (`DDD.md`)**](./DDD.md).
 
 ```mermaid
 graph TD
@@ -513,6 +519,8 @@ Alumni/server/
 └── server.js                   # [Entry Point] Express bootstrap & middleware registration
 ```
 
+> 💡 **Data Architecture & Persistence Mapping:** To see how this directory blueprint interfaces with the database layer, DAO/repository contracts, and PostgreSQL Docker volumes, consult [**Data Design Documentation (`DDD.md`) — Section 7**](./DDD.md#-in-memory-to-persistent-storage-transition-strategy).
+
 ---
 
 ## 🗄️ Database Architecture & Schema (PostgreSQL — Selected Model)
@@ -520,6 +528,8 @@ Alumni/server/
 ### 🏆 Database Architecture Selection: Why PostgreSQL? (Evaluation vs. MongoDB & MySQL)
 
 In designing the data persistence layer for the **Alumni Tracker**, three primary database architectures were critically evaluated: **MongoDB (NoSQL Document Store)**, **MySQL (Traditional RDBMS)**, and **PostgreSQL (Advanced Object-Relational DBMS)**.
+
+> 📘 **Full Data Design Specification:** For complete Entity-Relationship models (CDM & LDM), 3NF normalization, comprehensive Data Dictionary, and production-ready PostgreSQL DDL with GIN indexes, see the companion document: [**Data Design Documentation (`DDD.md`)**](./DDD.md).
 
 | Evaluation Criteria | NoSQL (MongoDB) | MySQL (RDBMS) | PostgreSQL (Selected 🥇) |
 | :--- | :--- | :--- | :--- |
@@ -702,13 +712,17 @@ git clone https://github.com/mehmetrasid0/Alumni.git
 cd Alumni
 ```
 
-Create a `.env` file in the `server/` directory:
-```env
-PORT=5000
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/alumni_db?schema=public
-JWT_SECRET=your_secret_key
-NODE_ENV=development
+Ortam değişkenlerini hazırlamak için GitHub'da paylaşılan `env.example` (veya `.env.example`) şablonunu kopyalayarak `server/.env` dosyasını oluşturun:
+```bash
+# Windows (PowerShell / CMD):
+copy env.example server\.env
+
+# macOS / Linux:
+cp env.example server/.env
 ```
+
+> **🔒 Güvenlik Notu:** Gerçek parolaları ve gizli anahtarları içeren `.env` dosyası `.gitignore` ile gizlenmiştir ve repoya dahil edilmez. Değer şablonu ise GitHub üzerinde herkese açık olarak [`env.example`](./env.example) ve [`.env.example`](./.env.example) adıyla yer almaktadır.
+
 
 ### 2. Run with Docker Compose (Auto-Start)
 You can start Docker Desktop and spin up the container with one click:
@@ -726,6 +740,8 @@ docker compose up -d --build
 - **Swagger UI**: [http://localhost:5000/api/swagger](http://localhost:5000/api/swagger) — Interactive API documentation
 - **Swagger JSON**: [http://localhost:5000/api/swagger.json](http://localhost:5000/api/swagger.json)
 - **Health Check Telemetry**: [http://localhost:5000/api/health](http://localhost:5000/api/health)
+- **PostgreSQL Database**: `localhost:5432` — Database: `alumni_db`, User: `postgres`, Schema: [`DDD.md`](./DDD.md)
+
 
 ### 4. Useful Commands
 ```bash
@@ -767,10 +783,11 @@ npm run dev
   - Mermaid end-to-end request-response sequence diagrams.
   - Postman API test collection containing 14 automated requests.
   - Blueprint for modular MVC directory scaling.
-- [ ] **Phase 5 (W5): Database Persistence (PostgreSQL) & JWT Authentication**
-  - Connect PostgreSQL database using Prisma ORM / pg connection pool for normalized User, Alumni, and Announcement tables.
-  - Password hashing with bcrypt and JWT token-based authentication (Auth Middleware).
-  - Role-based access control (Admin / Alumni).
+- [x] **Phase 5 (W5): Database Persistence (PostgreSQL) & Data Provisioning Suite** *(Completed ✅)*
+  - PostgreSQL database connection pool (`pg.Pool`) with normalized `users`, `alumni_profiles`, and `announcements` tables.
+  - Full CRUD integration across REST API endpoints (`/api/users`, `/api/announcements`) and web routes (`/users`, `/announcements`).
+  - Enterprise Factory and Seeder suite (`server/database/factories`, `server/database/seeders`) with GIN index skills querying.
+  - Password hashing with salted bcrypt work factor 10.
 - [ ] **Phase 6 (W6): Advanced Alumni Management, Admin Portal & Reporting**
   - Event management and reunion module.
   - Export alumni records (CSV and PDF formats).
