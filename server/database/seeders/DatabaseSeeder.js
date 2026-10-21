@@ -14,6 +14,8 @@
 const db = require('../../db');
 const UserSeeder = require('./UserSeeder');
 const AnnouncementSeeder = require('./AnnouncementSeeder');
+const JobPostingSeeder = require('./JobPostingSeeder');
+const ApplicationSeeder = require('./ApplicationSeeder');
 
 class DatabaseSeeder {
   static parseArgs() {
@@ -21,15 +23,23 @@ class DatabaseSeeder {
     const options = {
       clean: args.includes('--clean'),
       alumniCount: 10,
-      announcementCount: 5
+      announcementCount: 5,
+      jobCount: 4,
+      applicationCount: 6
     };
 
     for (const arg of args) {
+      if (arg.startsWith('--applications=')) {
+        options.applicationCount = parseInt(arg.split('=')[1], 10) || 6;
+      }
       if (arg.startsWith('--alumni=')) {
         options.alumniCount = parseInt(arg.split('=')[1], 10) || 10;
       }
       if (arg.startsWith('--announcements=')) {
         options.announcementCount = parseInt(arg.split('=')[1], 10) || 5;
+      }
+      if (arg.startsWith('--jobs=')) {
+        options.jobCount = parseInt(arg.split('=')[1], 10) || 4;
       }
     }
 
@@ -43,7 +53,7 @@ class DatabaseSeeder {
     console.log('  ALUMNI TRACKER — DATABASE SEEDER (DDD SPECIFICATION)');
     console.log('  Istanbul University - Management Information Systems (YBS)');
     console.log('============================================================================');
-    console.log(`[Config]: Clean Wipe = ${options.clean} | Dynamic Alumni = ${options.alumniCount} | Dynamic Announcements = ${options.announcementCount}\n`);
+    console.log(`[Config]: Clean Wipe = ${options.clean} | Dynamic Alumni = ${options.alumniCount} | Dynamic Bulletins = ${options.announcementCount} | Dynamic Jobs = ${options.jobCount}\n`);
 
     try {
       // 1. Verify DB Connection
@@ -53,7 +63,7 @@ class DatabaseSeeder {
       // 2. Clean tables if requested
       if (options.clean) {
         console.log('[*] Cleaning existing records (TRUNCATE CASCADE)...');
-        await db.query('TRUNCATE TABLE announcements, alumni_profiles, users RESTART IDENTITY CASCADE');
+        await db.query('TRUNCATE TABLE applications, job_postings, announcements, alumni_profiles, users RESTART IDENTITY CASCADE');
         console.log('[v] Database tables truncated successfully.');
       }
 
@@ -63,12 +73,22 @@ class DatabaseSeeder {
 
       // 4. Run Announcement Seeder
       const annStats = await AnnouncementSeeder.run(userStats.adminId, { dynamicCount: options.announcementCount });
-      console.log(`[v] Announcements seeded: ${annStats.coreAnnouncements} core bulletins, ${annStats.factoryAnnouncements} factory bulletins.\n`);
+      console.log(`[v] Announcements seeded: ${annStats.coreAnnouncements} core bulletins, ${annStats.factoryAnnouncements} factory bulletins.`);
 
-      // 5. Query and Display Summary Metrics
+      // 5. Run Job Posting Seeder
+      const jobStats = await JobPostingSeeder.run({ dynamicCount: options.jobCount });
+      console.log(`[v] Job Postings seeded: ${jobStats.coreJobs} core opportunities, ${jobStats.factoryJobs} factory postings.`);
+
+      // 6. Run Application Seeder
+      const appStats = await ApplicationSeeder.run({ dynamicCount: options.applicationCount });
+      console.log(`[v] Applications seeded: ${appStats.coreApplications} core applications, ${appStats.factoryApplications} factory applications.\n`);
+
+      // 7. Query and Display Summary Metrics
       const totalUsers = await db.query('SELECT count(*) FROM users');
       const totalProfiles = await db.query('SELECT count(*) FROM alumni_profiles');
       const totalAnnouncements = await db.query('SELECT count(*) FROM announcements');
+      const totalJobs = await db.query('SELECT count(*) FROM job_postings');
+      const totalApplications = await db.query('SELECT count(*) FROM applications');
       const topSkills = await db.query(`
         SELECT skill, count(*) AS count
         FROM alumni_profiles, jsonb_array_elements_text(skills) AS skill
@@ -83,6 +103,8 @@ class DatabaseSeeder {
       console.log(`  Total Users:            ${totalUsers.rows[0].count}`);
       console.log(`  Total Alumni Profiles:  ${totalProfiles.rows[0].count}`);
       console.log(`  Total Announcements:    ${totalAnnouncements.rows[0].count}`);
+      console.log(`  Total Job Postings:     ${totalJobs.rows[0].count}`);
+      console.log(`  Total Applications:     ${totalApplications.rows[0].count}`);
       console.log('----------------------------------------------------------------------------');
       console.log('  Top 5 Seeded Skills in GIN Index:');
       topSkills.rows.forEach((s, idx) => {

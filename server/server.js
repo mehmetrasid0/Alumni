@@ -10,6 +10,10 @@ const userRoutes = require('./routes/userRoutes');
 const apiUserRoutes = require('./routes/apiUserRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const apiAnnouncementRoutes = require('./routes/apiAnnouncementRoutes');
+const jobRoutes = require('./routes/jobRoutes');
+const apiJobRoutes = require('./routes/apiJobRoutes');
+const applicationRoutes = require('./routes/applicationRoutes');
+const apiApplicationRoutes = require('./routes/apiApplicationRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -47,8 +51,12 @@ app.get('/api/swagger.json', (req, res) => {
 // ============================================================================
 app.use('/api/users', apiUserRoutes);
 app.use('/api/announcements', apiAnnouncementRoutes);
+app.use('/api/jobs', apiJobRoutes);
+app.use('/api/applications', apiApplicationRoutes);
 app.use('/', userRoutes);
 app.use('/', announcementRoutes);
+app.use('/', jobRoutes);
+app.use('/', applicationRoutes);
 
 // GET /hello/:name → Returns greeting message
 app.get('/hello/:name', (req, res) => {

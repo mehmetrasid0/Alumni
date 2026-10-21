@@ -93,6 +93,14 @@ class AnnouncementModel {
       paramIndex++;
     }
 
+    // Filter by author ID (nested route support: /api/users/:userId/announcements)
+    const authorId = filters.authorId || filters.author_id;
+    if (authorId) {
+      conditions.push(`a.author_id = $${paramIndex}`);
+      params.push(String(authorId).trim());
+      paramIndex++;
+    }
+
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     const sql = `

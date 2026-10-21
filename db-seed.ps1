@@ -6,7 +6,8 @@
 param (
     [switch]$Clean,
     [int]$Alumni = 10,
-    [int]$Announcements = 5
+    [int]$Announcements = 5,
+    [int]$Jobs = 4
 )
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -16,5 +17,6 @@ $argsList = @()
 if ($Clean) { $argsList += "--clean" }
 if ($Alumni) { $argsList += "--alumni=$Alumni" }
 if ($Announcements) { $argsList += "--announcements=$Announcements" }
+if ($Jobs) { $argsList += "--jobs=$Jobs" }
 
 node "database\seeders\DatabaseSeeder.js" $argsList
