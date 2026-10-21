@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Candidate Applications & Recruitment Pipeline — Istanbul University Alumni Tracker">
+  <title>Candidate Applications Dashboard — Alumni Tracker</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy-900: #0A1628;
+      --navy-800: #1E293B;
+      --navy-700: #334155;
+      --gold-500: #F59E0B;
+      --gold-400: #FBBF24;
+      --blue-600: #2563EB;
+      --blue-50: #EFF6FF;
+      --purple-600: #7C3AED;
+      --purple-50: #F5F3FF;
+      --emerald-600: #059669;
+      --emerald-50: #ECFDF5;
+      --amber-600: #D97706;
+      --amber-50: #FFFBEB;
+      --rose-600: #DC2626;
+      --rose-50: #FEF2F2;
+      --slate-50: #F8FAFC;
+      --slate-100: #F1F5F9;
+      --slate-200: #E2E8F0;
+      --slate-300: #CBD5E1;
+      --slate-400: #94A3B8;
+      --slate-600: #475569;
+      --slate-800: #1E293B;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #F8FAFC;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--slate-800);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      background: var(--navy-900);
+      color: #fff;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(10, 22, 40, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .top-nav .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.3px;
+    }
+
+    .top-nav .brand span { color: var(--gold-500); }
+
+    .top-nav .nav-menu {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      list-style: none;
+    }
+
+    .top-nav .nav-menu a {
+      color: #94A3B8;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .top-nav .nav-menu a:hover,
+    .top-nav .nav-menu a.active {
+      color: #fff;
+    }
+
+    .top-nav .nav-menu .btn-nav {
+      background: var(--gold-500);
+      color: var(--navy-900);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    /* Container */
+    .dashboard-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Header */
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 32px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .dash-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--purple-50);
+      color: var(--purple-600);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .dash-title {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 2.3rem;
+      color: var(--navy-900);
+      margin: 0 0 8px 0;
+      letter-spacing: -0.5px;
+    }
+
+    .dash-subtitle {
+      color: var(--slate-600);
+      font-size: 1.05rem;
+      max-width: 700px;
+      line-height: 1.6;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-primary {
+      background: var(--navy-900);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(10, 22, 40, 0.15);
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      background: #1E293B;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(10, 22, 40, 0.25);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      border: 1px solid var(--slate-300);
+      color: var(--navy-900);
+      padding: 11px 18px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--slate-100);
+      border-color: var(--slate-400);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid var(--slate-200);
+      border-radius: 16px;
+      padding: 22px 24px;
+      box-shadow: 0 4px 15px rgba(10, 22, 40, 0.02);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(10, 22, 40, 0.06);
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .stat-val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--navy-900);
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--slate-600);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Filters Bar */
+    .filters-bar {
+      background: #fff;
+      border: 1px solid var(--slate-200);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 15px rgba(10, 22, 40, 0.02);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-input-wrap {
+      flex: 1;
+      min-width: 280px;
+      position: relative;
+    }
+
+    .search-input-wrap input {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      border: 1px solid var(--slate-200);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--navy-900);
+      background: var(--slate-50);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input-wrap input:focus {
+      background: #fff;
+      border-color: var(--blue-600);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: var(--slate-400);
+    }
+
+    .filter-select {
+      padding: 12px 16px;
+      border: 1px solid var(--slate-200);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: var(--navy-800);
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .pills-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .pill-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--slate-600);
+      margin-right: 6px;
+    }
+
+    .filter-pill {
+      background: var(--slate-100);
+      color: var(--slate-600);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-pill:hover,
+    .filter-pill.active {
+      background: var(--navy-900);
+      color: #fff;
+    }
+
+    /* Table Container */
+    .table-container {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid var(--slate-200);
+      box-shadow: 0 4px 20px rgba(10, 22, 40, 0.03);
+      overflow: hidden;
+    }
+
+    .table-header-meta {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--slate-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #FAFBFD;
+    }
+
+    .table-header-meta h3 {
+      font-size: 1rem;
+      color: var(--navy-900);
+      font-weight: 700;
+    }
+
+    .table-header-meta span {
+      font-size: 0.85rem;
+      color: var(--slate-400);
+    }
+
+    table.app-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    table.app-table th {
+      background: #F8FAFC;
+      color: var(--slate-600);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    table.app-table td {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--slate-100);
+      vertical-align: middle;
+      font-size: 0.92rem;
+    }
+
+    table.app-table tbody tr {
+      transition: background 0.15s ease;
+    }
+
+    table.app-table tbody tr:hover {
+      background: #F8FAFC;
+    }
+
+    /* Badges */
+    .candidate-name {
+      font-weight: 700;
+      color: var(--navy-900);
+      font-size: 0.98rem;
+      margin-bottom: 4px;
+    }
+
+    .candidate-sub {
+      font-size: 0.8rem;
+      color: var(--slate-400);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .candidate-dept {
+      background: var(--slate-100);
+      color: var(--slate-600);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.75rem;
+    }
+
+    .job-title-link {
+      font-weight: 600;
+      color: var(--navy-900);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .job-title-link:hover {
+      color: var(--blue-600);
+    }
+
+    .company-sub {
+      font-size: 0.82rem;
+      color: var(--slate-600);
+      font-weight: 500;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .status-submitted { background: #F1F5F9; color: #475569; }
+    .status-under_review { background: var(--amber-50); color: var(--amber-600); border: 1px solid #FDE68A; }
+    .status-shortlisted { background: var(--blue-50); color: var(--blue-600); border: 1px solid #BFDBFE; }
+    .status-interview_scheduled { background: var(--purple-50); color: var(--purple-600); border: 1px solid #DDD6FE; }
+    .status-accepted { background: var(--emerald-50); color: var(--emerald-600); border: 1px solid #A7F3D0; }
+    .status-rejected { background: var(--rose-50); color: var(--rose-600); border: 1px solid #FECACA; }
+    .status-withdrawn { background: #F8FAFC; color: #94A3B8; text-decoration: line-through; }
+
+    .btn-action-review {
+      background: var(--navy-900);
+      color: #fff;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-action-review:hover {
+      background: #1E293B;
+      transform: translateY(-1px);
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 22, 40, 0.65);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal-box {
+      background: #fff;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--slate-200);
+      padding-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--navy-900);
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+      cursor: pointer;
+      color: var(--slate-400);
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover { color: var(--navy-900); }
+
+    .meta-box-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 22px;
+      font-size: 0.9rem;
+    }
+
+    .meta-item b {
+      color: var(--navy-900);
+      display: block;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--slate-400);
+      margin-bottom: 4px;
+    }
+
+    .pitch-card {
+      background: #FFFFFF;
+      border: 1px solid var(--slate-200);
+      border-left: 4px solid var(--gold-500);
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #334155;
+      font-style: normal;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--slate-800);
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--slate-200);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--blue-600);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .modal-actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--slate-200);
+    }
+
+    .btn-danger {
+      background: #fff;
+      border: 1px solid #FECACA;
+      color: #DC2626;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-danger:hover {
+      background: #FEF2F2;
+      border-color: #DC2626;
+    }
+
+    /* Toast Alert */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--navy-900);
+      color: #fff;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Footer */
+    footer {
+      background: #fff;
+      border-top: 1px solid var(--slate-200);
+      text-align: center;
+      padding: 24px;
+      color: var(--slate-400);
+      font-size: 0.88rem;
+      margin-top: 60px;
+    }
+
+    @media (max-width: 768px) {
+      .top-nav { padding: 14px 20px; }
+      .dashboard-container { padding: 24px 16px; }
+      .meta-box-grid { grid-template-columns: 1fr; }
+      .form-grid-2 { grid-template-columns: 1fr; }
+      table.app-table th:nth-child(4),
+      table.app-table td:nth-child(4) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <a href="/" class="brand">
+      <span>🎓</span> Alumni<span>Tracker</span>
+    </a>
+    <nav>
+      <ul class="nav-menu">
+        <li><a href="/">Home</a></li>
+        <li><a href="/announcements">Announcements</a></li>
+        <li><a href="/users">Alumni Directory</a></li>
+        <li><a href="/jobs">Jobs</a></li>
+        <li><a href="/applications" class="active">Applications</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/api/swagger" target="_blank" class="btn-nav">Swagger ↗</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-container">
+    
+    <!-- Dashboard Header -->
+    <div class="dash-header">
+      <div>
+        <div class="dash-badge">📑 Candidate Application Ledger & Pipeline</div>
+        <h1 class="dash-title">Candidate Applications & Recruitment</h1>
+        <p class="dash-subtitle">Review alumni applications, assess cover letters, track interview progression, and manage recruitment decisions across all career openings.</p>
+      </div>
+      <div class="header-actions">
+        <a href="/jobs" class="btn-secondary">
+          <span>💼</span> Browse Career Board
+        </a>
+        <button class="btn-primary" onclick="openSubmitModal()">
+          <span>+</span> Submit Application
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #EFF6FF; color: #2563EB;">📑</div>
+        <div>
+          <div class="stat-val" id="statTotal">0</div>
+          <div class="stat-label">Total Applications</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #FEF3C7; color: #D97706;">⏳</div>
+        <div>
+          <div class="stat-val" id="statReview">0</div>
+          <div class="stat-label">Under Review</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #EEF2FF; color: #4F46E5;">⭐</div>
+        <div>
+          <div class="stat-val" id="statShortlisted">0</div>
+          <div class="stat-label">Shortlisted Candidates</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #ECFDF5; color: #059669;">🚀</div>
+        <div>
+          <div class="stat-val" id="statAccepted">0</div>
+          <div class="stat-label">Accepted / Placed</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters & Search Bar -->
+    <div class="filters-bar">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search candidate name, email, target role, or company..." oninput="debounceFilter()">
+        </div>
+        <select id="jobFilter" class="filter-select" onchange="applyFilters()">
+          <option value="all">All Career Openings</option>
+        </select>
+      </div>
+      <div class="pills-row">
+        <span class="pill-label">Pipeline Stage:</span>
+        <button class="filter-pill active" onclick="setStatusFilter('all', this)">All</button>
+        <button class="filter-pill" onclick="setStatusFilter('submitted', this)">Submitted</button>
+        <button class="filter-pill" onclick="setStatusFilter('under_review', this)">Under Review</button>
+        <button class="filter-pill" onclick="setStatusFilter('shortlisted', this)">Shortlisted</button>
+        <button class="filter-pill" onclick="setStatusFilter('interview_scheduled', this)">Interview</button>
+        <button class="filter-pill" onclick="setStatusFilter('accepted', this)">Accepted</button>
+        <button class="filter-pill" onclick="setStatusFilter('rejected', this)">Rejected</button>
+        <button class="filter-pill" onclick="setStatusFilter('withdrawn', this)">Withdrawn</button>
+      </div>
+    </div>
+
+    <!-- Applications Table -->
+    <div class="table-container">
+      <div class="table-header-meta">
+        <h3>Verified Applications Ledger</h3>
+        <span id="recordCountLabel">Showing 0 submissions</span>
+      </div>
+      <table class="app-table">
+        <thead>
+          <tr>
+            <th>Candidate Alumnus</th>
+            <th>Target Opportunity</th>
+            <th>Pipeline Status</th>
+            <th>Applied At</th>
+            <th style="text-align: right;">Evaluation</th>
+          </tr>
+        </thead>
+        <tbody id="applicationsTbody">
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 48px; color: var(--slate-400);">
+              Loading candidate applications...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- ==================== Review Application Modal ==================== -->
+  <div class="modal-backdrop" id="reviewModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <span style="font-size: 0.8rem; font-weight: 700; color: #4F46E5; text-transform: uppercase;" id="revModalMeta">Evaluation Dossier</span>
+          <h2 class="modal-title" id="revCandidateName">Candidate Review</h2>
+        </div>
+        <button class="modal-close" onclick="closeReviewModal()">&times;</button>
+      </div>
+
+      <div class="meta-box-grid">
+        <div class="meta-item">
+          <b>Target Position</b>
+          <span id="revJobTitle" style="font-weight: 600; color: var(--navy-900);">-</span>
+        </div>
+        <div class="meta-item">
+          <b>Hiring Organization</b>
+          <span id="revCompany" style="font-weight: 600; color: var(--navy-900);">-</span>
+        </div>
+        <div class="meta-item">
+          <b>Applicant Email</b>
+          <span id="revApplicantEmail">-</span>
+        </div>
+        <div class="meta-item">
+          <b>Department & Grad Year</b>
+          <span id="revDeptYear">-</span>
+        </div>
+        <div class="meta-item">
+          <b>Submitted Date</b>
+          <span id="revAppliedDate">-</span>
+        </div>
+        <div class="meta-item">
+          <b>Current Stage</b>
+          <span id="revCurrentStatusBadge">-</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Candidate Cover Letter & Pitch</label>
+        <div class="pitch-card" id="revCoverLetter">
+          No cover letter text provided.
+        </div>
+      </div>
+
+      <div id="revResumeSection" style="margin-bottom: 22px;">
+        <label style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--slate-800); margin-bottom: 6px;">
+          Resume / Curriculum Vitae
+        </label>
+        <a id="revResumeLink" href="#" target="_blank" class="btn-secondary" style="display: inline-flex;">
+          📄 Open Candidate CV / Resume Document ↗
+        </a>
+      </div>
+
+      <form id="evaluationForm" onsubmit="handleEvaluationSubmit(event)">
+        <input type="hidden" id="revAppId">
+
+        <div class="form-group">
+          <label>Update Pipeline Stage *</label>
+          <select id="revStatusSelect" required>
+            <option value="submitted">Submitted (Pending Review)</option>
+            <option value="under_review">Under Review</option>
+            <option value="shortlisted">Shortlisted</option>
+            <option value="interview_scheduled">Interview Scheduled</option>
+            <option value="accepted">Accepted (Offer Extended)</option>
+            <option value="rejected">Rejected</option>
+            <option value="withdrawn">Withdrawn</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Recruiter / Interviewer Evaluation Notes</label>
+          <textarea id="revNotesInput" rows="3" placeholder="Add feedback, screening notes, or interview timestamps..."></textarea>
+        </div>
+
+        <div class="modal-actions-row">
+          <button type="button" class="btn-danger" onclick="handleWithdraw()">
+            Withdraw Application
+          </button>
+          <button type="submit" class="btn-primary">
+            Save Status & Notes 💾
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== Submit Application Modal ==================== -->
+  <div class="modal-backdrop" id="submitModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title">Submit Candidate Application</h2>
+        <button class="modal-close" onclick="closeSubmitModal()">&times;</button>
+      </div>
+
+      <form id="submitAppForm" onsubmit="handleApplicationSubmit(event)">
+        <div class="form-group">
+          <label>Select Target Career Opportunity *</label>
+          <select id="subJobSelect" required>
+            <option value="">Loading job openings...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Applicant Alumnus Account *</label>
+          <select id="subApplicantSelect" required>
+            <option value="">Loading alumni profiles...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Resume / CV Document URL</label>
+          <input type="url" id="subResumeUrl" placeholder="https://storage.alumni.edu/cv/alumnus-resume.pdf">
+        </div>
+
+        <div class="form-group">
+          <label>Cover Letter & Personal Statement *</label>
+          <textarea id="subCoverLetter" rows="5" required placeholder="Highlight key projects, Istanbul University coursework, and role alignment..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px;">
+          Submit Application Dossier 🚀
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Alert -->
+  <div class="toast" id="toastAlert">
+    <span id="toastIcon">✅</span>
+    <span id="toastMsg">Action completed successfully.</span>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <b>Alumni Tracker — Candidate Application & Pipeline Module</b> • Istanbul University Management Information Systems (YBS)
+  </footer>
+
+  <!-- Client JavaScript -->
+  <script>
+    let allApplications = [];
+    let allJobs = [];
+    let alumniUsers = [];
+    let currentStatus = 'all';
+    let debounceTimer = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchApplications();
+      fetchJobs();
+      fetchUsers();
+    });
+
+    async function fetchApplications() {
+      try {
+        const res = await fetch('/api/applications');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          allApplications = json.data;
+          renderApplications();
+          updateStats();
+        }
+      } catch (err) {
+        document.getElementById('applicationsTbody').innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 48px; color: #DC2626;">
+              Failed to connect to /api/applications.
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    async function fetchJobs() {
+      try {
+        const res = await fetch('/api/jobs');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          allJobs = json.data;
+          populateJobDropdowns();
+        }
+      } catch {}
+    }
+
+    async function fetchUsers() {
+      try {
+        const res = await fetch('/api/users');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          alumniUsers = json.data;
+          populateUserDropdown();
+        }
+      } catch {}
+    }
+
+    function populateJobDropdowns() {
+      const jobFilter = document.getElementById('jobFilter');
+      const subJobSelect = document.getElementById('subJobSelect');
+
+      let filterOptions = '<option value="all">All Career Openings</option>';
+      let subOptions = '<option value="">-- Choose Job Opening --</option>';
+
+      allJobs.forEach(j => {
+        const title = `${j.title} (${j.companyName || j.company_name})`;
+        filterOptions += `<option value="${j.id}">${title}</option>`;
+        subOptions += `<option value="${j.id}">${title}</option>`;
+      });
+
+      jobFilter.innerHTML = filterOptions;
+      subJobSelect.innerHTML = subOptions;
+    }
+
+    function populateUserDropdown() {
+      const subApplicantSelect = document.getElementById('subApplicantSelect');
+      let options = '<option value="">-- Choose Alumnus Account --</option>';
+
+      alumniUsers.forEach(u => {
+        const name = u.name || u.fullName || u.email;
+        options += `<option value="${u.id}">${name} (${u.email})</option>`;
+      });
+
+      subApplicantSelect.innerHTML = options;
+    }
+
+    function renderApplications() {
+      const tbody = document.getElementById('applicationsTbody');
+      const searchTerm = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const jobFilterVal = document.getElementById('jobFilter').value;
+
+      const filtered = allApplications.filter(a => {
+        // Status filter
+        if (currentStatus !== 'all' && a.status !== currentStatus) {
+          return false;
+        }
+
+        // Job filter
+        if (jobFilterVal !== 'all' && String(a.jobId) !== String(jobFilterVal)) {
+          return false;
+        }
+
+        // Search term
+        if (searchTerm) {
+          const name = (a.applicantName || '').toLowerCase();
+          const email = (a.applicantEmail || '').toLowerCase();
+          const title = (a.jobTitle || '').toLowerCase();
+          const company = (a.companyName || '').toLowerCase();
+          const dept = (a.applicantDepartment || '').toLowerCase();
+
+          if (!name.includes(searchTerm) && !email.includes(searchTerm) &&
+              !title.includes(searchTerm) && !company.includes(searchTerm) &&
+              !dept.includes(searchTerm)) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      document.getElementById('recordCountLabel').innerText = `Showing ${filtered.length} of ${allApplications.length} submissions`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 48px; color: var(--slate-400);">
+              No candidate applications match the selected criteria.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(a => {
+        const statusClass = `status-${a.status || 'submitted'}`;
+        const statusDisplay = (a.status || 'submitted').replace('_', ' ').toUpperCase();
+        const dateStr = a.appliedAt ? new Date(a.appliedAt).toLocaleDateString() : 'N/A';
+        const deptStr = a.applicantDepartment || 'MIS / YBS';
+        const gradStr = a.applicantGraduationYear ? `'${String(a.applicantGraduationYear).slice(-2)}` : '';
+
+        return `
+          <tr>
+            <td>
+              <div class="candidate-name">${escapeHtml(a.applicantName)}</div>
+              <div class="candidate-sub">
+                <span>${escapeHtml(a.applicantEmail)}</span>
+                <span class="candidate-dept">${escapeHtml(deptStr)} ${gradStr}</span>
+              </div>
+            </td>
+            <td>
+              <a href="/jobs" class="job-title-link">${escapeHtml(a.jobTitle)}</a>
+              <div class="company-sub">🏢 ${escapeHtml(a.companyName)}</div>
+            </td>
+            <td>
+              <span class="status-badge ${statusClass}">
+                ● ${statusDisplay}
+              </span>
+            </td>
+            <td style="color: var(--slate-600); font-size: 0.85rem;">
+              ${dateStr}
+            </td>
+            <td style="text-align: right;">
+              <button class="btn-action-review" onclick="openReviewModal('${a.id}')">
+                Review & Evaluate
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateStats() {
+      document.getElementById('statTotal').innerText = allApplications.length;
+
+      const reviewCount = allApplications.filter(a => a.status === 'under_review').length;
+      document.getElementById('statReview').innerText = reviewCount;
+
+      const shortCount = allApplications.filter(a => a.status === 'shortlisted').length;
+      document.getElementById('statShortlisted').innerText = shortCount;
+
+      const acceptCount = allApplications.filter(a => a.status === 'accepted').length;
+      document.getElementById('statAccepted').innerText = acceptCount;
+    }
+
+    function setStatusFilter(status, btn) {
+      currentStatus = status;
+      document.querySelectorAll('.pills-row .filter-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      renderApplications();
+    }
+
+    function debounceFilter() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        renderApplications();
+      }, 200);
+    }
+
+    function applyFilters() {
+      renderApplications();
+    }
+
+    // Review Modal Handlers
+    function openReviewModal(appId) {
+      const app = allApplications.find(a => String(a.id) === String(appId));
+      if (!app) return;
+
+      document.getElementById('revAppId').value = app.id;
+      document.getElementById('revCandidateName').innerText = app.applicantName;
+      document.getElementById('revJobTitle').innerText = app.jobTitle;
+      document.getElementById('revCompany').innerText = app.companyName;
+      document.getElementById('revApplicantEmail').innerText = app.applicantEmail;
+      
+      const dept = app.applicantDepartment || 'Management Information Systems';
+      const year = app.applicantGraduationYear ? `(Class of ${app.applicantGraduationYear})` : '';
+      document.getElementById('revDeptYear').innerText = `${dept} ${year}`;
+      
+      document.getElementById('revAppliedDate').innerText = app.appliedAt ? new Date(app.appliedAt).toLocaleString() : 'N/A';
+      
+      const badgeClass = `status-${app.status || 'submitted'}`;
+      document.getElementById('revCurrentStatusBadge').innerHTML = `
+        <span class="status-badge ${badgeClass}">● ${(app.status || 'submitted').replace('_', ' ').toUpperCase()}</span>
+      `;
+
+      document.getElementById('revCoverLetter').innerText = app.coverLetter || 'No cover letter pitch submitted by candidate.';
+      
+      const resumeSection = document.getElementById('revResumeSection');
+      const resumeLink = document.getElementById('revResumeLink');
+      if (app.resumeUrl) {
+        resumeSection.style.display = 'block';
+        resumeLink.href = app.resumeUrl;
+      } else {
+        resumeSection.style.display = 'none';
+      }
+
+      document.getElementById('revStatusSelect').value = app.status || 'submitted';
+      document.getElementById('revNotesInput').value = app.notes || '';
+
+      document.getElementById('reviewModal').classList.add('open');
+    }
+
+    function closeReviewModal() {
+      document.getElementById('reviewModal').classList.remove('open');
+    }
+
+    async function handleEvaluationSubmit(e) {
+      e.preventDefault();
+      const appId = document.getElementById('revAppId').value;
+      const status = document.getElementById('revStatusSelect').value;
+      const notes = document.getElementById('revNotesInput').value;
+
+      try {
+        const res = await fetch(`/api/applications/${appId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status, notes })
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          closeReviewModal();
+          showToast('Candidate evaluation & status saved! 💾', '✅');
+          fetchApplications();
+        } else {
+          showToast(json.message || 'Failed to update application.', '⚠️');
+        }
+      } catch (err) {
+        showToast('Error communicating with server.', '❌');
+      }
+    }
+
+    async function handleWithdraw() {
+      const appId = document.getElementById('revAppId').value;
+      if (!confirm('Are you sure you want to withdraw/remove this application?')) return;
+
+      try {
+        const res = await fetch(`/api/applications/${appId}`, {
+          method: 'DELETE'
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          closeReviewModal();
+          showToast('Application withdrawn successfully.', 'ℹ️');
+          fetchApplications();
+        } else {
+          showToast(json.message || 'Withdrawal failed.', '⚠️');
+        }
+      } catch (err) {
+        showToast('Error communicating with server.', '❌');
+      }
+    }
+
+    // Submit Application Modal
+    function openSubmitModal() {
+      document.getElementById('submitModal').classList.add('open');
+    }
+
+    function closeSubmitModal() {
+      document.getElementById('submitModal').classList.remove('open');
+      document.getElementById('submitAppForm').reset();
+    }
+
+    async function handleApplicationSubmit(e) {
+      e.preventDefault();
+      const jobId = document.getElementById('subJobSelect').value;
+      const applicantId = document.getElementById('subApplicantSelect').value;
+      const resumeUrl = document.getElementById('subResumeUrl').value;
+      const coverLetter = document.getElementById('subCoverLetter').value;
+
+      try {
+        const res = await fetch('/api/applications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobId, applicantId, resumeUrl, coverLetter })
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          closeSubmitModal();
+          showToast('Candidate application submitted successfully! 🚀', '✅');
+          fetchApplications();
+        } else {
+          showToast(json.message || 'Submission failed.', '⚠️');
+        }
+      } catch (err) {
+        showToast('Error communicating with server.', '❌');
+      }
+    }
+
+    function showToast(msg, icon = '✅') {
+      const toast = document.getElementById('toastAlert');
+      document.getElementById('toastMsg').innerText = msg;
+      document.getElementById('toastIcon').innerText = icon;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  </script>
+</body>
+</html>
