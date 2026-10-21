@@ -10,6 +10,8 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- 2. Drop existing tables in reverse dependency order (Clean setup)
+DROP TABLE IF EXISTS applications CASCADE;
+DROP TABLE IF EXISTS job_postings CASCADE;
 DROP TABLE IF EXISTS announcements CASCADE;
 DROP TABLE IF EXISTS alumni_profiles CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
@@ -98,12 +100,81 @@ CREATE TABLE announcements (
 );
 
 -- ============================================================================
--- 6. PERFORMANCE & FULL-TEXT SEARCH INDEXES
+-- 6. TABLE: job_postings
+-- Stores career opportunities, internship openings, and alumni job postings.
+-- ============================================================================
+CREATE TABLE job_postings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(200) NOT NULL,
+    company_name VARCHAR(150) NOT NULL,
+    department VARCHAR(100),
+    location VARCHAR(100) NOT NULL,
+    employment_type VARCHAR(50) NOT NULL DEFAULT 'Full-time',
+    work_mode VARCHAR(50) NOT NULL DEFAULT 'Hybrid',
+    experience_level VARCHAR(50) NOT NULL DEFAULT 'Mid-Level',
+    salary_range VARCHAR(100),
+    description TEXT NOT NULL,
+    requirements TEXT,
+    skills JSONB NOT NULL DEFAULT '[]'::jsonb,
+    application_url VARCHAR(255),
+    contact_email VARCHAR(255),
+    deadline DATE,
+    status VARCHAR(20) NOT NULL DEFAULT 'active',
+    views_count INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Value Check Constraints
+    CONSTRAINT chk_job_postings_employment_type CHECK (employment_type IN ('Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance')),
+    CONSTRAINT chk_job_postings_work_mode CHECK (work_mode IN ('On-site', 'Hybrid', 'Remote')),
+    CONSTRAINT chk_job_postings_experience_level CHECK (experience_level IN ('Entry-Level', 'Mid-Level', 'Senior', 'Lead', 'Executive', 'Internship')),
+    CONSTRAINT chk_job_postings_status CHECK (status IN ('draft', 'active', 'closed', 'archived')),
+    CONSTRAINT chk_job_postings_skills_array CHECK (jsonb_typeof(skills) = 'array'),
+    CONSTRAINT chk_job_postings_title_length CHECK (char_length(TRIM(title)) >= 3),
+    CONSTRAINT chk_job_postings_company_length CHECK (char_length(TRIM(company_name)) >= 2),
+    CONSTRAINT chk_job_postings_views_positive CHECK (views_count >= 0)
+);
+
+-- ============================================================================
+-- 7. TABLE: applications
+-- Stores alumni applications submitted to published career opportunities.
+-- ============================================================================
+CREATE TABLE applications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    job_id UUID NOT NULL,
+    applicant_id UUID NOT NULL,
+    resume_url VARCHAR(255),
+    cover_letter TEXT,
+    status VARCHAR(30) NOT NULL DEFAULT 'submitted',
+    notes TEXT,
+    applied_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Foreign Key Constraints
+    CONSTRAINT fk_applications_job FOREIGN KEY (job_id)
+        REFERENCES job_postings (id) ON DELETE CASCADE,
+    CONSTRAINT fk_applications_applicant FOREIGN KEY (applicant_id)
+        REFERENCES users (id) ON DELETE CASCADE,
+
+    -- Singularity Invariant: One application per user per job vacancy
+    CONSTRAINT uq_applications_job_applicant UNIQUE (job_id, applicant_id),
+
+    -- Workflow Check Constraints
+    CONSTRAINT chk_applications_status CHECK (status IN (
+        'submitted', 'under_review', 'shortlisted', 
+        'interview_scheduled', 'rejected', 'accepted', 'withdrawn'
+    ))
+);
+
+-- ============================================================================
+-- 8. PERFORMANCE & FULL-TEXT SEARCH INDEXES
 -- ============================================================================
 
 -- Foreign Key Fast Joins
 CREATE INDEX idx_alumni_profiles_user_id ON alumni_profiles (user_id);
 CREATE INDEX idx_announcements_author_id ON announcements (author_id);
+CREATE INDEX idx_applications_job_id ON applications (job_id);
+CREATE INDEX idx_applications_applicant_id ON applications (applicant_id);
 
 -- Compound Index for Directory Filtering (Department + Graduation Year)
 CREATE INDEX idx_alumni_dept_grad_year ON alumni_profiles (department, graduation_year);
@@ -123,8 +194,25 @@ CREATE INDEX idx_alumni_fts ON alumni_profiles USING GIN (
 CREATE INDEX idx_announcements_feed_order ON announcements (pinned DESC, created_at DESC)
     WHERE status = 'published';
 
+-- Job Postings Active Feed Index (Newest active jobs first)
+CREATE INDEX idx_job_postings_feed_order ON job_postings (status, created_at DESC)
+    WHERE status = 'active';
+CREATE INDEX idx_job_postings_filter ON job_postings (work_mode, employment_type);
+CREATE INDEX idx_job_postings_skills_gin ON job_postings USING GIN (skills);
+CREATE INDEX idx_job_postings_fts ON job_postings USING GIN (
+    to_tsvector('simple', COALESCE(title, '') || ' ' || 
+                          COALESCE(company_name, '') || ' ' || 
+                          COALESCE(location, '') || ' ' || 
+                          COALESCE(description, ''))
+);
+
+-- Applications Workflow & Timeline Indexes
+CREATE INDEX idx_applications_status ON applications (status);
+CREATE INDEX idx_applications_job_status ON applications (job_id, status);
+CREATE INDEX idx_applications_applied_at ON applications (applied_at DESC);
+
 -- ============================================================================
--- 7. AUTO-UPDATING TIMESTAMP TRIGGERS
+-- 8. AUTO-UPDATING TIMESTAMP TRIGGERS
 -- ============================================================================
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -146,8 +234,16 @@ CREATE TRIGGER trigger_announcements_updated_at
 BEFORE UPDATE ON announcements
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER trigger_job_postings_updated_at
+BEFORE UPDATE ON job_postings
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER trigger_applications_updated_at
+BEFORE UPDATE ON applications
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- ============================================================================
--- 8. INITIAL SEED DATA POPULATION
+-- 9. INITIAL SEED DATA POPULATION
 -- Populates Admin user, all existing alumni members, and institutional bulletins.
 -- Passwords are cryptographically salted & hashed using bcrypt work factor 10.
 -- ============================================================================
@@ -340,3 +436,145 @@ SELECT
     'General', 'low', 'draft', 'All Graduates', FALSE,
     '2026-10-05 16:20:00+03'
 FROM users u WHERE u.email = 'admin@alumni.edu';
+
+-- ============================================================================
+-- 11. SEED JOB POSTINGS
+-- Seeded tech & corporate positions posted by verified alumni and admin
+-- ============================================================================
+INSERT INTO job_postings (
+    title, company_name, department, location, employment_type, work_mode,
+    experience_level, salary_range, description, requirements, skills,
+    application_url, contact_email, deadline, status, views_count
+) VALUES (
+    'Senior Cloud & Distributed Systems Engineer',
+    'Google',
+    'Computer Engineering',
+    'Istanbul, Turkey',
+    'Full-time',
+    'Hybrid',
+    'Senior',
+    '₺140,000 - ₺180,000 / month',
+    'Join Google Cloud infrastructure team architecting next-generation distributed storage microservices. You will lead technical design reviews, optimize latency-critical services, and mentor junior engineers across EMEA.',
+    'BS/MS in Computer Engineering or related discipline. 5+ years experience in distributed systems (Go/C++), Kubernetes, and gRPC. Strong understanding of concurrent algorithms and Linux kernel internals.',
+    '["Go", "Kubernetes", "Distributed Systems", "Cloud Architecture", "Docker", "gRPC"]'::jsonb,
+    'https://careers.google.com/jobs/results/senior-cloud-engineer-istanbul',
+    'ahmet.careers@google.com',
+    '2026-11-30',
+    'active',
+    142
+);
+
+INSERT INTO job_postings (
+    title, company_name, department, location, employment_type, work_mode,
+    experience_level, salary_range, description, requirements, skills,
+    application_url, contact_email, deadline, status, views_count
+) VALUES (
+    'Product Operations Manager — Enterprise Cloud SaaS',
+    'Microsoft',
+    'Electrical & Electronics',
+    'Dublin, Ireland',
+    'Full-time',
+    'Remote',
+    'Mid-Level',
+    '€85,000 - €105,000 / year',
+    'Lead enterprise product launch strategies and growth roadmaps for Microsoft 365 European cloud customers. Coordinate cross-functional engineering, UX, and marketing teams to enhance customer lifecycle telemetry.',
+    '3+ years of product management experience in SaaS or B2B enterprise software. Proven track record leading Agile/Scrum sprints, user research interviews, and quantitative product metrics analysis.',
+    '["Product Strategy", "Agile", "Scrum", "Cloud Solutions", "User Research", "Data Analytics"]'::jsonb,
+    'https://careers.microsoft.com/jobs/product-manager-dublin',
+    'elif.demir@microsoft.com',
+    '2026-12-15',
+    'active',
+    89
+);
+
+INSERT INTO job_postings (
+    title, company_name, department, location, employment_type, work_mode,
+    experience_level, salary_range, description, requirements, skills,
+    application_url, contact_email, deadline, status, views_count
+) VALUES (
+    'Logistics Data Analyst & Operations Researcher',
+    'Amazon',
+    'Industrial Engineering',
+    'Berlin, Germany',
+    'Full-time',
+    'On-site',
+    'Mid-Level',
+    '€65,000 - €80,000 / year',
+    'Analyze end-to-end European fulfillment network operations, design predictive routing algorithms, and automate daily KPI reporting pipelines using SQL, Python, and Tableau dashboards.',
+    'Degree in Industrial Engineering, Management Information Systems, or Statistics. Strong SQL mastery, Python scripting (Pandas, NumPy), and experience deploying self-service BI dashboards.',
+    '["SQL", "Python", "Tableau", "Data Pipelines", "Power BI", "Operations Research"]'::jsonb,
+    'https://amazon.jobs/en/jobs/data-analyst-berlin',
+    'mehmet.kaya@amazon.de',
+    '2026-12-01',
+    'active',
+    64
+);
+
+INSERT INTO job_postings (
+    title, company_name, department, location, employment_type, work_mode,
+    experience_level, salary_range, description, requirements, skills,
+    application_url, contact_email, deadline, status, views_count
+) VALUES (
+    'Junior Full-Stack Web Developer (IU Technopark)',
+    'Istanbul University Technopark',
+    'Information Systems (YBS)',
+    'Istanbul, Turkey',
+    'Full-time',
+    'Hybrid',
+    'Entry-Level',
+    '₺45,000 - ₺60,000 / month',
+    'Accelerated incubation startup at IU Avcilar Technopark seeks an enthusiastic junior developer to build modern web portals with Node.js, Express, PostgreSQL, and modern reactive frontend components.',
+    'Bachelor degree in YBS or Computer Engineering. Proficiency in modern JavaScript (ES6+), relational database modeling (PostgreSQL), RESTful API design, and Git version control.',
+    '["Node.js", "Express", "PostgreSQL", "JavaScript", "REST APIs", "Docker"]'::jsonb,
+    'https://istanbul.edu.tr/technopark/careers/junior-dev',
+    'careers@alumni.edu',
+    '2026-11-15',
+    'active',
+    210
+);
+
+-- ============================================================================
+-- E. Insert Seed Applications (Connecting Alumni Applicants to Postings)
+-- ============================================================================
+-- Application 1: Zeynep Çelik applying to Senior Cloud & Distributed Systems Engineer at Google
+INSERT INTO applications (
+    job_id, applicant_id, resume_url, cover_letter, status, notes
+)
+SELECT 
+    j.id,
+    u.id,
+    'https://storage.alumni.edu/resumes/zeynep-celik-cv.pdf',
+    'Dear Google Cloud Team, As an Istanbul University alumna with distributed systems experience, I am thrilled to apply for the Senior Cloud & Distributed Systems Engineer role.',
+    'shortlisted',
+    'Candidate demonstrates exceptional distributed systems knowledge and verified alumni standing.'
+FROM job_postings j, users u
+WHERE j.title = 'Senior Cloud & Distributed Systems Engineer' AND u.email = 'zeynep@alumni.edu';
+
+-- Application 2: Mehmet Kaya applying to Product Operations Manager at Microsoft
+INSERT INTO applications (
+    job_id, applicant_id, resume_url, cover_letter, status, notes
+)
+SELECT 
+    j.id,
+    u.id,
+    'https://storage.alumni.edu/resumes/mehmet-kaya-cv.pdf',
+    'Hi Microsoft hiring team! My background at Istanbul University focused heavily on data analytics and product operations telemetry. Looking forward to discussing this position.',
+    'under_review',
+    'Reviewing portfolio and operational analysis experience.'
+FROM job_postings j, users u
+WHERE j.title = 'Product Operations Manager — Enterprise Cloud SaaS' AND u.email = 'mehmet@alumni.edu';
+
+-- Application 3: Can Öztürk applying to Junior Full-Stack Web Developer at Technopark
+INSERT INTO applications (
+    job_id, applicant_id, resume_url, cover_letter, status, notes
+)
+SELECT 
+    j.id,
+    u.id,
+    'https://storage.alumni.edu/resumes/can-ozturk-cv.pdf',
+    'Dear Technopark Team, Having graduated in 2022 with a focus on web programming and modern Node.js development, I would love to contribute to incubation projects.',
+    'submitted',
+    'Initial application received.'
+FROM job_postings j, users u
+WHERE j.title = 'Junior Full-Stack Web Developer (IU Technopark)' AND u.email = 'can@alumni.edu';
+

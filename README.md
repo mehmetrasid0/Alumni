@@ -50,21 +50,25 @@ A modern, containerized full-stack web application for tracking and managing uni
 
 | Verification Item | Direct Link / Resource | Description |
 | :--- | :--- | :--- |
-| ⭐ **This Week (W4)** | [Week 4 — MVC Architecture & Postman](#-week-4-w4--october-07-2026-this-week--current-week-) | Comprehensive MVC breakdown, directory map, and automated test suite |
-| 👁️ **Live UI (View)** | [`http://localhost:5000/alumni`](http://localhost:5000/alumni) | Interactive alumni search, multi-filter directory, and creation modal |
+| ⭐ **This Week (W6)** | [Week 6 — Decoupled M:N Career Architecture & Portals](#-week-6-w6--october-21-2026-this-week--current-week-) | Pure M:N candidate application architecture, decoupled Job Postings, and responsive portals |
+| 💼 **Career Board (Jobs UI)** | [`http://localhost:5000/jobs`](http://localhost:5000/jobs) | Multi-mode job vacancies, dynamic filtering, candidate application modal & live metrics |
+| 📑 **Application Ledger UI** | [`http://localhost:5000/applications`](http://localhost:5000/applications) | Candidate evaluation pipeline, resume inspection, interview progression & decisions |
+| 👁️ **Live UI (Alumni)** | [`http://localhost:5000/alumni`](http://localhost:5000/alumni) | Interactive alumni search, multi-filter directory, and creation modal |
+| 📢 **Announcements Portal** | [`http://localhost:5000/announcements`](http://localhost:5000/announcements) | Institutional bulletins, priority tags, and audience filters |
 | 📘 **Swagger UI (Docs/Model)** | [`http://localhost:5000/api/swagger`](http://localhost:5000/api/swagger) | Interactive OpenAPI 3.0 API documentation & live testing portal |
 | 🩺 **Health Check (Controller)**| [`http://localhost:5000/api/health`](http://localhost:5000/api/health) | Real-time CPU load, memory utilization, OS details, and server uptime |
 | 📮 **Postman Test Suite** | [`postman/Alumni_Tracker_API.postman_collection.json`](./postman/Alumni_Tracker_API.postman_collection.json) | One-click importable Postman collection containing 14 automated API requests |
 | 🏗️ **MVC Architecture** | [MVC Architecture Specification](#-mvc-architecture-model---view---controller) | Detailed technical breakdown of Model, View, and Controller layers |
 | 🗄️ **Data Design Document (DDD)** | [Data Design Documentation (`DDD.md`)](./DDD.md) | Comprehensive database design: Conceptual (CDM), Logical (LDM), Physical (PDM), Data Dictionary & PostgreSQL DDL |
 | 🐘 **PostgreSQL Database** | [`database/init.sql`](./database/init.sql) & [`db-init.ps1`](./db-init.ps1) | Live containerized PostgreSQL 15 (`alumni-postgres` :5432), DDL schema, GIN indexes, auto-update triggers & seed data |
+| 🔄 **Database Migrations** | [`database/migrations/`](./database/migrations/) & [`db-migrate.ps1`](./db-migrate.ps1) | Version-controlled schema migrations with ledger tracking and rollback capability |
 | 🌱 **Factory & Seeder Suite** | [`server/database/factories/`](./server/database/factories/) & [`db-seed.ps1`](./db-seed.ps1) | Automated mock data factories, fluent state transformations & database seeding orchestrator |
 | ⚙️ **Env Variables Template** | [`env.example`](./env.example) & [`.env.example`](./.env.example) | Public template for environment variables (`.env` is securely git-ignored) |
 | 📁 **File & Directory Map** | [Project Directory, Folder & File Structure](#-project-directories-folders--files-structure) | Full mapping of project files to their respective MVC roles |
 
 ---
 
-## 📅 Weekly Development Progress Tracker (W1 — W4)
+## 📅 Weekly Development Progress Tracker (W1 — W6)
 
 This project is developed in weekly milestones throughout the academic semester. The breakdown below details goals, completed work, affected files, and commit references based on the Git commit history:
 
@@ -73,7 +77,9 @@ This project is developed in weekly milestones throughout the academic semester.
 | **W1** | Sep 22 – 23, 2026 | Project Kickoff, Docker Containerization & Express Foundation | `d76cbcb`, `54eeece`, `6b9af53` | ✅ Completed |
 | **W2** | Sep 23 – 29, 2026 | View Layer Foundation, Institutional UI (Home & About), Design System | `e612c51` | ✅ Completed |
 | **W3** | Sep 30, 2026 | RESTful API (Users CRUD), Health Telemetry, Swagger UI, Alumni UI | `cd6b3ef` | ✅ Completed |
-| **W4** | **Oct 07, 2026** | **MVC Architecture Formalization, File Map, Postman Test Suite & Blueprint** | `88f15e5` | 🚀 **This Week (Active)** |
+| **W4** | Oct 07, 2026 | MVC Architecture Formalization, File Map, Postman Test Suite & Blueprint | `88f15e5` | ✅ Completed |
+| **W5** | Oct 14, 2026 | PostgreSQL Persistence, Migrations Runner, Job Postings DDL & Seeders | `e6c4160`, `f0dcf3e` | ✅ Completed |
+| **W6** | **Oct 21, 2026** | **Decoupled M:N Career Architecture, Candidate Applications Table & Portals** | `ac3b67f`, `73e7483` | 🚀 **This Week (Active)** |
 
 ---
 
@@ -130,10 +136,10 @@ This project is developed in weekly milestones throughout the academic semester.
 
 ---
 
-### 🚀 Week 4 (W4) — October 07, 2026 (THIS WEEK / CURRENT WEEK ⭐)
+### 🚀 Week 4 (W4) — October 07, 2026: MVC Architecture Formalization & Postman Test Suite
 * **Objective**: Formalize the **Model-View-Controller (MVC)** architectural pattern, document directory/folder/file responsibilities, produce end-to-end request lifecycle diagrams, build a standardized Postman API test suite, and organize the repository layout.
 * **Focus**: Architectural Integrity, Layer Separation (MVC), Test Automation & Clean Project Template
-* **This Week's Accomplishments (Instructor Evaluation Checklist)**:
+* **Accomplishments**:
   1. **Comprehensive MVC Architecture Implementation & Documentation**:
      * **Model Layer (`server/models/User.js` & `server/swagger.js`)**: Built standalone in-memory `User` Model class with full CRUD methods (`findAll`, `findById`, `findByEmail`, `create`, `update`, `delete`, `count`, `reset`) and business validation rules without requiring an external database connection.
      * **Controller Layer (`server/controllers/`)**: Built two specialized controllers:
@@ -153,13 +159,73 @@ This project is developed in weekly milestones throughout the academic semester.
      * Authored and exported [`postman/Alumni_Tracker_API.postman_collection.json`](./postman/Alumni_Tracker_API.postman_collection.json) containing 14 ready-to-execute automated requests covering CRUD, Health Telemetry, Utilities, and Web Pages.
   5. **Modular MVC Project Template**:
      * Integrated dedicated `models/`, `controllers/`, and `routes/` directories into the codebase, migrating route handlers from monolithic `server.js` while maintaining full application stability.
+* **Related Files**: `server/models/User.js`, `server/controllers/UserController.js`, `server/controllers/ApiUserController.js`, `server/routes/userRoutes.js`, `server/routes/apiUserRoutes.js`, `postman/Alumni_Tracker_API.postman_collection.json`.
+
+---
+
+### 🗄️ Week 5 (W5) — October 14, 2026: PostgreSQL Database Integration, Migrations & Job Postings
+* **Objective**: Transition from in-memory prototyping to persistent relational data storage using containerized **PostgreSQL 15**, implement database migrations runner with schema ledger, design the Data Design Document (`DDD.md`), and construct the `job_postings` table.
+* **Focus**: Data Design (CDM/LDM/PDM), Migration Ledger, GIN Indexes, Factories & Seeders
+* **Accomplishments**:
+  1. **Comprehensive Data Design Documentation (`DDD.md`)**:
+     * Authored comprehensive database design encompassing Conceptual Data Model (CDM), Logical 3NF Data Model (LDM), Physical Data Model (PDM), and column-by-column Data Dictionary.
+     * Established relational baseline: 1:1 (`users` <-> `alumni_profiles`), 1:N (`users` <-> `announcements`), and preparatory schema for career vacancies.
+  2. **Containerized PostgreSQL 15 Infrastructure**:
+     * Integrated `alumni-postgres` container running PostgreSQL 15 Alpine on port 5432 with persistent Docker volume storage and healthchecks.
+     * Engineered robust Node.js connection pooling via `pg` (`server/db.js`) supporting automated reconnection, retry backoff, and graceful shutdown.
+  3. **Version-Controlled Database Migrations**:
+     * Built custom migration runner (`server/database/migrate.js`) with ledger table `schema_migrations`.
+     * Added `001_create_initial_schema.sql` and `002_create_job_postings_table.sql`.
+     * Created CLI scripts `db-migrate.ps1` and `db-migrate.bat` for one-click cross-platform execution.
+  4. **Job Postings Entity & Direct/Nested Routing**:
+     * Implemented PostgreSQL-backed `JobPosting.js` Model with multi-criteria filtering, views impression counters, and dual DTO serialization.
+     * Built dual controllers (`JobController.js` for SSR web views and `ApiJobController.js` for REST API endpoints).
+     * Configured dual routing modules (`jobRoutes.js` and `apiJobRoutes.js`).
+  5. **Factory & Master Seeder Pipeline**:
+     * Engineered `JobPostingFactory.js` and `JobPostingSeeder.js` integrated into `DatabaseSeeder.js` (`--clean` wipe, core anchors, dynamic factory records).
+* **Related Files**: `DDD.md`, `database/init.sql`, `database/migrations/`, `server/db.js`, `server/database/migrate.js`, `server/models/JobPosting.js`, `server/controllers/JobController.js`, `server/controllers/ApiJobController.js`, `server/routes/jobRoutes.js`, `server/routes/apiJobRoutes.js`, `server/database/factories/JobPostingFactory.js`, `server/database/seeders/JobPostingSeeder.js`.
+
+---
+
+### 💼 Week 6 (W6) — October 21, 2026 (THIS WEEK / CURRENT WEEK ⭐)
+* **Objective**: Decouple `job_postings` from direct user coupling to implement a pure **Many-to-Many (M:N)** career engagement architecture resolved through the associative **`applications`** entity (`User 1--N Application N--1 JobPosting`), build full dual CRUD controllers/routes, create rich responsive web portals for Career Board and Candidate Applications, and synchronize `DDD.md` and database schemas.
+* **Focus**: Pure Many-to-Many Architecture, Candidate Application Ledger, Dual Routing Matrix, Live Interactive Portals & Full Database Synchronization
+* **This Week's Accomplishments (Instructor Evaluation Checklist)**:
+  1. **Pure Many-to-Many (M:N) Architectural Refactoring**:
+     * Audited entity relationships in `DDD.md` and database schemas: eliminated direct `poster_id` foreign key coupling from `job_postings`.
+     * Established that Alumni (`users`) interact with Career Vacancies (`job_postings`) exclusively through candidate submissions mediated by the associative **`applications`** entity.
+     * Synchronized Conceptual Data Model (CDM), Logical Data Model (LDM), Data Dictionary, DDL, and Routing Matrix across `DDD.md` and `database/init.sql`.
+  2. **Database Migration `003_create_applications_table.sql`**:
+     * Authored versioned migration creating the `applications` associative table with foreign keys `job_id REFERENCES job_postings(id) ON DELETE CASCADE` and `applicant_id REFERENCES users(id) ON DELETE CASCADE`.
+     * Added unique candidate constraint `uq_applications_job_applicant UNIQUE(job_id, applicant_id)` preventing duplicate submissions for the same opening.
+     * Enforced status lifecycle constraints (`submitted`, `reviewing`, `shortlisted`, `interview`, `offered`, `rejected`, `withdrawn`).
+     * Created optimized composite and B-tree indexes (`idx_applications_job_status`, `idx_applications_applicant_status`, `idx_applications_applied_at`).
+  3. **Application Model & Factory/Seeder Pipeline**:
+     * Built `server/models/Application.js` with rich relational joins (`job_postings`, `users`, `alumni_profiles`) and multi-criteria filtering (`jobId`, `applicantId`, `status`, `search`).
+     * Created `ApplicationFactory.js` and `ApplicationSeeder.js` with dynamic candidate states, cover letter synthesis, and resume URL generation.
+     * Updated `DatabaseSeeder.js` to seed 17 users, 10 announcements, 8 job postings, and 9 candidate applications.
+  4. **Dual Routing Matrix (Direct & Sub-resource Relational Scoping)**:
+     * **Direct Routes**:
+       * `GET /api/applications`, `POST /api/applications`, `GET /api/applications/:id`, `PATCH /api/applications/:id/status`, `DELETE /api/applications/:id`.
+       * `GET /api/jobs`, `POST /api/jobs`, `GET /api/jobs/:id`, `PUT /api/jobs/:id`, `DELETE /api/jobs/:id`.
+     * **Nested Sub-resource Routes**:
+       * `GET /api/jobs/:jobId/applications` (All candidates for a specific job).
+       * `GET /api/users/:userId/applications` (All job applications submitted by an alumnus).
+  5. **Interactive Live Frontend Portals (Career Board & Application Ledger)**:
+     * **Career Board (`/jobs` $\rightarrow$ `server/public/jobs.html`)**:
+       * Modern job vacancy grid with real-time keyword search, work mode badges (Remote, Hybrid, On-site), salary display, and competency tags.
+       * Responsive modal to publish new job openings and direct "Apply Now" modal linking authenticated alumni to vacancies.
+     * **Candidate Application Ledger (`/applications` $\rightarrow$ `server/public/applications.html`)**:
+       * Pipeline metrics bar (Total Applications, In Review, Shortlisted/Interview, Offers Extended).
+       * Candidate cards displaying applicant academic background, cover letter excerpt, and interactive status selector.
+       * Review modal with resume document inspection and status transitions.
 * **Evaluation Reference Links**:
-  * 📖 **MVC Specification**: [🏗️ MVC Architecture](#-mvc-architecture-model---view---controller)
-  * 📁 **Directory Map**: [📁 Project Directories, Folders & Files Structure](#-project-directories-folders--files-structure)
-  * 🌐 **Live Web UI**: [`http://localhost:5000/alumni`](http://localhost:5000/alumni)
+  * 🗄️ **Data Design Document**: [Data Design Documentation (`DDD.md`)](./DDD.md)
+  * 💼 **Live Career Board**: [`http://localhost:5000/jobs`](http://localhost:5000/jobs)
+  * 📑 **Live Application Ledger**: [`http://localhost:5000/applications`](http://localhost:5000/applications)
+  * 👁️ **Live Alumni Directory**: [`http://localhost:5000/alumni`](http://localhost:5000/alumni)
+  * 📢 **Live Announcements**: [`http://localhost:5000/announcements`](http://localhost:5000/announcements)
   * 📘 **Swagger UI**: [`http://localhost:5000/api/swagger`](http://localhost:5000/api/swagger)
-  * 🩺 **Health Telemetry**: [`http://localhost:5000/api/health`](http://localhost:5000/api/health)
-  * 📮 **Postman Test Suite**: [`postman/Alumni_Tracker_API.postman_collection.json`](./postman/Alumni_Tracker_API.postman_collection.json)
 
 ---
 
@@ -333,16 +399,58 @@ The **Controller** layer serves as the intermediary orchestrator between incomin
     * `patch(req, res)`: `PATCH /api/announcements/:id` $\rightarrow$ Selective attribute mutation (`200 OK` or `400/404`).
     * `delete(req, res)`: `DELETE /api/announcements/:id` $\rightarrow$ Removes announcement (`200 OK` or `404 Not Found`).
 
+* **5. `JobController` (`server/controllers/JobController.js`) — Web Career Board Management**:
+  * Manages browser-facing career board views and job submission lifecycles:
+    * `index(req, res)`: Serves the Career Board UI (`GET /jobs`).
+    * `create(req, res)`: Renders HTML form view to author a new vacancy (`GET /jobs/create`).
+    * `store(req, res)`: Processes job publication form submission (`POST /jobs`).
+    * `show(req, res)`: Renders detailed job opportunity card (`GET /jobs/:id`).
+    * `edit(req, res)`: Renders pre-populated form view for job modifications (`GET /jobs/:id/edit`).
+    * `update(req, res)`: Processes update form submission (`POST /jobs/:id/update`).
+    * `destroy(req, res)`: Processes job deletion (`POST /jobs/:id/delete`).
+    * `userJobs(req, res)`: Serves nested sub-resource web view of jobs authored by a specific alumnus (`GET /users/:userId/jobs`).
+
+* **6. `ApiJobController` (`server/controllers/ApiJobController.js`) — RESTful API Operations (Direct & Nested)**:
+  * Manages headless JSON REST API endpoints supporting both direct and nested routes:
+    * `getAll(req, res)`: `GET /api/jobs` or `GET /api/users/:userId/jobs` $\rightarrow$ Returns active openings with dynamic author scoping (`200 OK`).
+    * `getById(req, res)`: `GET /api/jobs/:id` or `GET /api/users/:userId/jobs/:id` $\rightarrow$ Retrieves single job, enforcing user ownership in nested scope (`200 OK` or `404 Not Found`).
+    * `create(req, res)`: `POST /api/jobs` or `POST /api/users/:userId/jobs` $\rightarrow$ Creates new job vacancy with automatic poster binding (`201 Created` or `400`).
+    * `update(req, res)`: `PUT /api/jobs/:id` or `PUT /api/users/:userId/jobs/:id` $\rightarrow$ Full job entity update with ownership check (`200 OK` or `400/403/404`).
+    * `patch(req, res)`: `PATCH /api/jobs/:id` or `PATCH /api/users/:userId/jobs/:id` $\rightarrow$ Selective field update with ownership check (`200 OK` or `400/403/404`).
+    * `delete(req, res)`: `DELETE /api/jobs/:id` or `DELETE /api/users/:userId/jobs/:id` $\rightarrow$ Deletes job vacancy with ownership check (`200 OK` or `404 Not Found`).
+    * `apply(req, res)`: `POST /api/jobs/:id/apply` $\rightarrow$ Processes candidate applications.
+
+* **7. `ApplicationController` (`server/controllers/ApplicationController.js`) — Web Candidate & Recruitment Management**:
+  * Manages browser-facing candidate tracking, review cards, and application forms:
+    * `index(req, res)`: Applications Management Dashboard (`GET /applications`).
+    * `show(req, res)`: Comprehensive candidate review card with resume and pitch (`GET /applications/:id`).
+    * `create(req, res)`: Nested application submission form for a vacancy (`GET /jobs/:jobId/apply`).
+    * `store(req, res)`: Processes application submission form (`POST /jobs/:jobId/apply`).
+    * `userApplications(req, res)`: Nested view of applications submitted by an alumnus (`GET /users/:userId/applications`).
+
+* **8. `ApiApplicationController` (`server/controllers/ApiApplicationController.js`) — RESTful API Operations (Direct & Nested)**:
+  * Manages headless JSON REST API operations supporting multi-level nested routing:
+    * `getAll(req, res)`: `GET /api/applications`, `GET /api/jobs/:jobId/applications`, `GET /api/users/:userId/applications` $\rightarrow$ Returns scoped applications (`200 OK`).
+    * `getById(req, res)`: `GET /api/applications/:id` $\rightarrow$ Retrieves single application with scope check (`200 OK` or `404/403`).
+    * `create(req, res)`: `POST /api/applications` or `POST /api/jobs/:jobId/applications` $\rightarrow$ Submits candidate application with duplicate prevention (`201 Created` or `400/409`).
+    * `update(req, res)`: `PUT /api/applications/:id` $\rightarrow$ Updates candidate review state and notes (`200 OK` or `400/404`).
+    * `patch(req, res)`: `PATCH /api/applications/:id` $\rightarrow$ Partial status mutation (`200 OK`).
+    * `delete(req, res)`: `DELETE /api/applications/:id` $\rightarrow$ Withdraws application (`200 OK`).
+
 * **Modular Routing Layer (`server/routes/`)**:
   * **`userRoutes.js` (`server/routes/userRoutes.js`)**: Encapsulates browser endpoints and form actions for alumni directory and profiles.
-  * **`apiUserRoutes.js` (`server/routes/apiUserRoutes.js`)**: Encapsulates RESTful JSON endpoints mounted at `/api/users`.
+  * **`apiUserRoutes.js` (`server/routes/apiUserRoutes.js`)**: Encapsulates RESTful JSON endpoints mounted at `/api/users`, including nested route mountings (`/:userId/jobs`, `/:userId/applications`).
   * **`announcementRoutes.js` (`server/routes/announcementRoutes.js`)**: Encapsulates browser management routes and form actions for announcements (`/announcements`).
   * **`apiAnnouncementRoutes.js` (`server/routes/apiAnnouncementRoutes.js`)**: Encapsulates RESTful JSON endpoints mounted at `/api/announcements`.
+  * **`jobRoutes.js` (`server/routes/jobRoutes.js`)**: Encapsulates browser career board routes and nested user job views (`/jobs`, `/users/:userId/jobs`).
+  * **`apiJobRoutes.js` (`server/routes/apiJobRoutes.js`)**: Encapsulates RESTful JSON endpoints mounted at `/api/jobs`, with nested `/jobs/:jobId/applications` mounting.
+  * **`applicationRoutes.js` (`server/routes/applicationRoutes.js`)**: Encapsulates browser candidate review and application submission views (`/applications`, `/jobs/:jobId/apply`).
+  * **`apiApplicationRoutes.js` (`server/routes/apiApplicationRoutes.js`)**: Encapsulates RESTful JSON endpoints supporting parameter merging (`mergeParams: true`) mounted directly at `/api/applications`, under `/api/jobs/:jobId/applications`, and under `/api/users/:userId/applications`.
 
 * **Application Dispatcher & System Endpoints (`server/server.js`)**:
   * Initializes Express middleware pipeline (`express.json()`, `urlencoded`, `express.static`).
-  * Mounts `apiUserRoutes` (`/api/users`), `apiAnnouncementRoutes` (`/api/announcements`), `userRoutes` (`/`), and `announcementRoutes` (`/`).
-  * Mounts `apiUserRoutes` (`/api/users`) and `userRoutes` (`/`).
+  * Mounts direct API routers: `app.use('/api/users', apiUserRoutes)`, `app.use('/api/announcements', apiAnnouncementRoutes)`, `app.use('/api/jobs', apiJobRoutes)`, `app.use('/api/applications', apiApplicationRoutes)`.
+  * Mounts web presentation routers: `app.use('/', userRoutes)`, `app.use('/', announcementRoutes)`, `app.use('/', jobRoutes)`, `app.use('/', applicationRoutes)`.
   * Serves interactive OpenAPI 3.0 documentation via Swagger UI (`/api/swagger`) and raw spec (`/api/swagger.json`).
   * System diagnostics & health check: `GET /api/health`.
   * Parameterized utilities: `GET /hello/:name`, `GET /sum/:number1/:number2`.
@@ -554,6 +662,7 @@ In designing the data persistence layer for the **Alumni Tracker**, three primar
 erDiagram
     USERS ||--|| ALUMNI_PROFILES : "has profile (1:1)"
     USERS ||--o{ ANNOUNCEMENTS : "authors (1:N)"
+    USERS ||--o{ JOB_POSTINGS : "publishes (1:N)"
 
     USERS {
         UUID id PK "Primary Key (gen_random_uuid())"
@@ -593,6 +702,29 @@ erDiagram
         VARCHAR(20) status "draft | published | archived"
         VARCHAR(100) target_audience "Target Audience"
         BOOLEAN pinned "Pin to Top of Feed (boolean)"
+        TIMESTAMP created_at "Publication Timestamp"
+        TIMESTAMP updated_at "Last Modification Timestamp"
+    }
+
+    JOB_POSTINGS {
+        UUID id PK "Primary Key (gen_random_uuid())"
+        UUID poster_id FK "Foreign Key -> USERS(id) ON DELETE CASCADE"
+        VARCHAR(200) title "Position Title"
+        VARCHAR(150) company_name "Hiring Company / Organization"
+        VARCHAR(100) department "Target Department / Discipline"
+        VARCHAR(100) location "Job Location / City"
+        VARCHAR(50) employment_type "Full-time | Part-time | Internship"
+        VARCHAR(50) work_mode "On-site | Hybrid | Remote"
+        VARCHAR(50) experience_level "Entry-Level | Mid-Level | Senior"
+        VARCHAR(100) salary_range "Salary Bracket"
+        TEXT description "Detailed Job Description"
+        TEXT requirements "Candidate Qualifications"
+        JSONB skills "Required Competencies (JSONB array)"
+        VARCHAR(255) application_url "Apply URL Link"
+        VARCHAR(255) contact_email "Recruiter Email"
+        DATE deadline "Application Deadline"
+        VARCHAR(20) status "active | closed | draft"
+        INTEGER views_count "Impression Analytics"
         TIMESTAMP created_at "Publication Timestamp"
         TIMESTAMP updated_at "Last Modification Timestamp"
     }
@@ -646,6 +778,71 @@ To interactively explore, test, and view schemas for all API endpoints, use **Sw
 | `PATCH` | `/api/announcements/:id`| Partially update announcement fields | JSON, form-data, x-www-form-urlencoded |
 | `DELETE` | `/api/announcements/:id`| Delete announcement record by ID | — |
 
+### Job Postings (Direct REST API)
+| Method | Endpoint | Description | Accepted Formats |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/jobs` | List all active job postings (supports `query`, `department`, `workMode`, `employmentType`) | — |
+| `GET` | `/api/jobs/:id` | Fetch single job posting by ID | — |
+| `POST` | `/api/jobs` | Publish a new job vacancy (requires `posterId`, `title`, `companyName`) | JSON, form-data, x-www-form-urlencoded |
+| `PUT` | `/api/jobs/:id` | Fully update job posting (all required fields) | JSON, form-data, x-www-form-urlencoded |
+| `PATCH` | `/api/jobs/:id` | Partially update job posting fields | JSON, form-data, x-www-form-urlencoded |
+| `DELETE` | `/api/jobs/:id` | Delete job posting by ID | — |
+| `POST` | `/api/jobs/:id/apply` | Submit job application | JSON, form-data, x-www-form-urlencoded |
+
+### Applications (Direct REST API)
+| Method | Endpoint | Description | Accepted Formats |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/applications` | List all candidate applications (supports `query`, `status`, `jobId`, `applicantId`) | — |
+| `GET` | `/api/applications/:id` | Fetch single application details with applicant & job info | — |
+| `POST` | `/api/applications` | Submit application (requires `jobId`, `applicantId`) | JSON, form-data, x-www-form-urlencoded |
+| `PUT` | `/api/applications/:id` | Fully update application status and recruiter evaluation notes | JSON, form-data, x-www-form-urlencoded |
+| `PATCH` | `/api/applications/:id` | Partially update status or notes | JSON, form-data, x-www-form-urlencoded |
+| `DELETE` | `/api/applications/:id` | Withdraw application by ID | — |
+
+### Relational Nested Sub-Resource Routes (Parent-Child Hierarchy)
+| Method | Endpoint | Relational Scope | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/users/:userId/jobs` | `User 1:N JobPosting` | List all job postings authored by specific alumnus (`:userId`) |
+| `POST` | `/api/users/:userId/jobs` | `User 1:N JobPosting` | Publish job vacancy automatically scoped to `:userId` as recruiter |
+| `GET` | `/api/users/:userId/jobs/:id` | `User 1:N JobPosting` | Fetch specific job vacancy authored by `:userId` (enforces ownership) |
+| `PUT` | `/api/users/:userId/jobs/:id` | `User 1:N JobPosting` | Fully update job vacancy owned by `:userId` |
+| `PATCH` | `/api/users/:userId/jobs/:id` | `User 1:N JobPosting` | Partially update job vacancy owned by `:userId` |
+| `DELETE` | `/api/users/:userId/jobs/:id` | `User 1:N JobPosting` | Delete job vacancy owned by `:userId` |
+| `GET` | `/api/users/:userId/applications` | `User 1:N Application` | List all applications submitted by candidate alumnus (`:userId`) |
+| `GET` | `/api/users/:userId/applications/:id` | `User 1:N Application` | Fetch single application submitted by alumnus (`:userId`) |
+| `DELETE` | `/api/users/:userId/applications/:id` | `User 1:N Application` | Withdraw application submitted by candidate alumnus (`:userId`) |
+| `GET` | `/api/jobs/:jobId/applications` | `JobPosting 1:N Application` | List all candidate applications received for job `:jobId` |
+| `POST` | `/api/jobs/:jobId/applications` | `JobPosting 1:N Application` | Submit application scoped directly to job `:jobId` |
+| `GET` | `/api/jobs/:jobId/applications/:id` | `JobPosting 1:N Application` | Fetch single candidate application for job `:jobId` |
+| `PUT` | `/api/jobs/:jobId/applications/:id` | `JobPosting 1:N Application` | Update review status and notes for job `:jobId` applicant |
+| `PATCH` | `/api/jobs/:jobId/applications/:id` | `JobPosting 1:N Application` | Partial status mutation for job `:jobId` applicant |
+| `DELETE` | `/api/jobs/:jobId/applications/:id` | `JobPosting 1:N Application` | Remove application from job `:jobId` |
+| `GET` | `/api/users/:userId/announcements` | `User 1:N Announcement` | List all bulletins authored by specific alumnus (`:userId`) |
+| `POST` | `/api/users/:userId/announcements` | `User 1:N Announcement` | Publish bulletin automatically authored by `:userId` |
+| `GET` | `/api/users/:userId/profile` | `User 1:1 AlumniProfile` | Retrieve singular alumni profile record linked to `:userId` |
+
+### Web Career Board Management & Views
+| Method | Endpoint | Description | Layer |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/jobs` | Interactive Career Board & Job Listing Dashboard | View Layer |
+| `GET` | `/jobs/create` | Standalone HTML form view to author a new job opening | View Layer |
+| `POST` | `/jobs` | Submit form to create a job opening (redirects to `/jobs`) | Controller |
+| `GET` | `/jobs/:id` | Comprehensive job detail card view with application triggers | View Layer |
+| `GET` | `/jobs/:id/edit` | Pre-populated HTML form view to modify job opening | View Layer |
+| `POST` | `/jobs/:id/update` | Submit form to update job posting (redirects to `/jobs/:id`) | Controller |
+| `POST` | `/jobs/:id/delete` | Submit form to delete job posting (redirects to `/jobs`) | Controller |
+| `GET` | `/users/:userId/jobs` | **Nested** HTML view displaying all vacancies posted by specific alumnus | View Layer |
+
+### Web Applications Management & Views
+| Method | Endpoint | Description | Layer |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/applications` | Candidate Applications Management Dashboard | View Layer |
+| `GET` | `/applications/:id` | Detailed candidate application review card with recruiter actions | View Layer |
+| `GET` | `/jobs/:jobId/applications` | **Nested** candidate applications received for job `:jobId` | View Layer |
+| `GET` | `/jobs/:jobId/apply` | **Nested** HTML application submission form for job `:jobId` | View Layer |
+| `POST` | `/jobs/:jobId/apply` | **Nested** form submission action applying for job `:jobId` | Controller |
+| `GET` | `/users/:userId/applications` | **Nested** portal view for alumnus tracking their submitted applications | View Layer |
+
 ### Web Announcement Management & Views
 | Method | Endpoint | Description | Layer |
 | :--- | :--- | :--- | :--- |
@@ -669,34 +866,137 @@ To interactively explore, test, and view schemas for all API endpoints, use **Sw
 | `GET` | `/` | Home / Landing page (`index.html`) |
 | `GET` | `/about` | About page (`about.html`) |
 | `GET` | `/alumni` | Alumni directory & management UI (`alumni.html`) |
+| `GET` | `/jobs` | Career Board & Job Opportunities (`/jobs`) |
 | `GET` | `/announcements` | Announcement Management Interface (`announcements.html`) |
 | `GET` | `/api/swagger` | Interactive Swagger UI portal |
 
 ### Example API Requests
 
-#### List All Users
-```bash
-curl http://localhost:5000/api/users
-```
+#### 1. Direct Routes Examples (Alumni Users & Global Jobs)
 
-#### Create New User (JSON)
-```bash
-curl -X POST http://localhost:5000/api/users \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Ali Vural","email":"ali@alumni.edu","graduationYear":2023,"department":"Software Engineering","company":"SAP","role":"Backend Developer"}'
-```
+* **List All Alumni (Direct):**
+  ```bash
+  curl http://localhost:5000/api/users
+  ```
 
-#### Partially Update User (PATCH)
-```bash
-curl -X PATCH http://localhost:5000/api/users/1 \
-  -H "Content-Type: application/json" \
-  -d '{"company":"Tesla","role":"Senior Engineer"}'
-```
+* **Create New User (Direct):**
+  ```bash
+  curl -X POST http://localhost:5000/api/users \
+    -H "Content-Type: application/json" \
+    -d '{"name":"Ali Vural","email":"ali@alumni.edu","graduationYear":2023,"department":"Software Engineering","company":"SAP","role":"Backend Developer"}'
+  ```
 
-#### Delete User
-```bash
-curl -X DELETE http://localhost:5000/api/users/1
-```
+* **List All Active Jobs (Direct):**
+  ```bash
+  curl http://localhost:5000/api/jobs
+  ```
+
+* **Filter Jobs by Work Mode & Department (Direct):**
+  ```bash
+  curl "http://localhost:5000/api/jobs?workMode=Remote&department=Engineering"
+  ```
+
+* **Create New Job Posting (Direct):**
+  ```bash
+  curl -X POST http://localhost:5000/api/jobs \
+    -H "Content-Type: application/json" \
+    -d '{
+      "posterId": "1",
+      "title": "Cloud Solutions Architect",
+      "companyName": "Amazon Web Services",
+      "location": "Istanbul / Remote",
+      "employmentType": "Full-time",
+      "workMode": "Remote",
+      "salaryRange": "$85,000 - $110,000",
+      "skills": ["AWS", "Docker", "Terraform", "Node.js"],
+      "description": "Leading cloud migration and infrastructure design for enterprise clients."
+    }'
+  ```
+
+#### 2. Nested Sub-Resource Routes Examples (User-Scoped)
+
+* **List Jobs Posted by Specific Alumnus (Nested):**
+  ```bash
+  curl http://localhost:5000/api/users/1/jobs
+  ```
+
+* **Post a Job as a Specific Alumnus (Nested — Auto-assigns posterId):**
+  ```bash
+  curl -X POST http://localhost:5000/api/users/1/jobs \
+    -H "Content-Type: application/json" \
+    -d '{
+      "title": "Junior Data Analyst",
+      "companyName": "Trendyol Group",
+      "location": "Istanbul",
+      "employmentType": "Full-time",
+      "workMode": "Hybrid",
+      "skills": ["SQL", "Python", "PowerBI"],
+      "description": "Looking for a proactive data enthusiast to join our Marketplace Insights squad."
+    }'
+  ```
+
+* **Fetch Specific Job Owned by Alumnus (Nested — Enforces Ownership):**
+  ```bash
+  curl http://localhost:5000/api/users/1/jobs/101
+  ```
+
+* **List Announcements Authored by Alumnus (Nested):**
+  ```bash
+  curl http://localhost:5000/api/users/1/announcements
+  ```
+
+* **Fetch Single Alumnus Profile (Nested):**
+  ```bash
+  curl http://localhost:5000/api/users/1/profile
+  ```
+
+#### 3. Applications API Examples (Direct & Nested)
+
+* **List All Candidate Applications (Direct):**
+  ```bash
+  curl http://localhost:5000/api/applications
+  ```
+
+* **Filter Applications by Status (Direct):**
+  ```bash
+  curl "http://localhost:5000/api/applications?status=shortlisted"
+  ```
+
+* **Submit Application directly to a Job (Nested under Job):**
+  ```bash
+  curl -X POST http://localhost:5000/api/jobs/JOB_UUID_HERE/applications \
+    -H "Content-Type: application/json" \
+    -d '{
+      "applicantId": "USER_UUID_HERE",
+      "resumeUrl": "https://storage.alumni.edu/resumes/alumnus-cv.pdf",
+      "coverLetter": "Excited to apply for this vacancy with my cloud architecture experience from IU."
+    }'
+  ```
+
+* **List Applications received for a Job (Nested under Job):**
+  ```bash
+  curl http://localhost:5000/api/jobs/JOB_UUID_HERE/applications
+  ```
+
+* **List Applications submitted by an Alumnus (Nested under User):**
+  ```bash
+  curl http://localhost:5000/api/users/USER_UUID_HERE/applications
+  ```
+
+* **Update Candidate Status by Recruiter (Direct or Nested):**
+  ```bash
+  curl -X PATCH http://localhost:5000/api/applications/APP_UUID_HERE \
+    -H "Content-Type: application/json" \
+    -d '{
+      "status": "interview_scheduled",
+      "notes": "Technical screening scheduled for Friday at 14:00."
+    }'
+  ```
+
+* **Withdraw Application (Direct or Nested):**
+  ```bash
+  curl -X DELETE http://localhost:5000/api/applications/APP_UUID_HERE
+  ```
 
 ---
 
