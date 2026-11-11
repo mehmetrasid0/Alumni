@@ -5,6 +5,11 @@ const multer = require('multer');
 const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
+// Import Middleware
+const loggerMiddleware = require('./middleware/logger');
+const notFoundGuardian = require('./middleware/notFoundGuardian');
+const serverErrorGuardian = require('./middleware/serverErrorGuardian');
+
 // Import Routes
 const userRoutes = require('./routes/userRoutes');
 const apiUserRoutes = require('./routes/apiUserRoutes');
@@ -22,6 +27,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+app.use(loggerMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -68,6 +74,20 @@ app.get('/sum/:number1/:number2', (req, res) => {
   const num1 = Number(req.params.number1);
   const num2 = Number(req.params.number2);
   res.send(`${num1 + num2}`);
+});
+
+// GET /api/trigger-500 → Diagnostic endpoint to test 5xx Guardian
+app.get('/api/trigger-500', (req, res, next) => {
+  const err = new Error('Simulated database deadlock or unhandled exception during critical transaction.');
+  err.status = 500;
+  next(err);
+});
+
+// GET /error-test → Diagnostic web endpoint to test HTML 5xx Guardian
+app.get('/error-test', (req, res, next) => {
+  const err = new Error('Template rendering failed: Server could not render dynamic view.');
+  err.status = 500;
+  next(err);
 });
 
 // GET /api/health → Comprehensive server health status (JSON)
@@ -167,6 +187,12 @@ app.get('/api/health', (req, res) => {
     }
   });
 });
+
+// 404 Guardian Middleware (Catches unhandled routes and returns reason)
+app.use(notFoundGuardian);
+
+// 5xx Server Error Guardian Middleware (Catches internal exceptions and returns reason)
+app.use(serverErrorGuardian);
 
 // Start server
 app.listen(PORT, () => {

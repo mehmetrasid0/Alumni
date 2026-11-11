@@ -23,6 +23,9 @@ Thumbs.db
 
 # Logs
 *.log
+*.logs
+logs/
+server/logs/
 npm-debug.log*
 
 # Coverage
