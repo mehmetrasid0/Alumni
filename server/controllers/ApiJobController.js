@@ -75,16 +75,21 @@ class ApiJobController {
     try {
       const payload = { ...req.body };
 
-      // Validate required fields
-      const title = payload.title;
-      const companyName = payload.companyName || payload.company_name;
-      const location = payload.location;
-      const description = payload.description;
+      // Validate required fields: title and companyName are mandatory, location and description are optional
+      const title = payload.title ? String(payload.title).trim() : '';
+      const companyName = payload.companyName || payload.company_name ? String(payload.companyName || payload.company_name).trim() : '';
 
-      if (!title || !companyName || !location || !description) {
+      if (!title || !companyName) {
         return res.status(400).json({
           success: false,
-          error: 'Missing required fields: title, companyName, location, and description are mandatory'
+          error: 'Missing required fields: title and companyName (company) are mandatory'
+        });
+      }
+
+      if (title.length > 120) {
+        return res.status(400).json({
+          success: false,
+          error: 'Validation error: title must not exceed 120 characters'
         });
       }
 

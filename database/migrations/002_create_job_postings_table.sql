@@ -50,15 +50,17 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
 
 CREATE TABLE IF NOT EXISTS job_postings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    title VARCHAR(200) NOT NULL,
+    title VARCHAR(120) NOT NULL,
     company_name VARCHAR(150) NOT NULL,
     department VARCHAR(100),
-    location VARCHAR(100) NOT NULL,
+    location VARCHAR(100),
     employment_type VARCHAR(50) NOT NULL DEFAULT 'Full-time',
     work_mode VARCHAR(50) NOT NULL DEFAULT 'Hybrid',
     experience_level VARCHAR(50) NOT NULL DEFAULT 'Mid-Level',
     salary_range VARCHAR(100),
-    description TEXT NOT NULL,
+    min_wage_multiplier NUMERIC(4,2),
+    process_duration VARCHAR(100),
+    description TEXT,
     requirements TEXT,
     skills JSONB NOT NULL DEFAULT '[]'::jsonb,
     application_url VARCHAR(255),
@@ -75,8 +77,9 @@ CREATE TABLE IF NOT EXISTS job_postings (
     CONSTRAINT chk_job_postings_experience_level CHECK (experience_level IN ('Entry-Level', 'Mid-Level', 'Senior', 'Lead', 'Executive', 'Internship')),
     CONSTRAINT chk_job_postings_status CHECK (status IN ('draft', 'active', 'closed', 'archived')),
     CONSTRAINT chk_job_postings_skills_array CHECK (jsonb_typeof(skills) = 'array'),
-    CONSTRAINT chk_job_postings_title_length CHECK (char_length(TRIM(title)) >= 3),
+    CONSTRAINT chk_job_postings_title_length CHECK (char_length(TRIM(title)) >= 3 AND char_length(title) <= 120),
     CONSTRAINT chk_job_postings_company_length CHECK (char_length(TRIM(company_name)) >= 2),
+    CONSTRAINT chk_job_postings_min_wage_multiplier CHECK (min_wage_multiplier IS NULL OR min_wage_multiplier > 0),
     CONSTRAINT chk_job_postings_views_positive CHECK (views_count >= 0)
 );
 

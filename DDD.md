@@ -137,15 +137,17 @@ erDiagram
 
     JOB_POSTING {
         identifier posting_id
-        string position_title
-        string company_organization
+        string position_title "required, max 120 chars"
+        string company_organization "required"
         string target_department
-        string job_location
+        string job_location "city/location, optional"
         string employment_type
         string work_mode
         string experience_level
         string salary_compensation
-        text role_description
+        number min_wage_multiplier "asgari ucret katsayisi"
+        string process_duration "surec suresi bilgisi"
+        text role_description "optional"
         text qualification_requirements
         list required_skills
         string application_url
@@ -176,6 +178,12 @@ erDiagram
 4. **Unique Matriculation:** A student matriculation number (`student_id`) is permanently unique and immutable once verified.
 5. **Email Identity:** An email address serves as the unique login principal across the entire application ecosystem.
 6. **Application Lifecycle, Cardinality & Singularity:** Registered alumni submit job applications to active career postings. Each user may apply at most once per job posting (enforced by a composite candidate key `(job_id, applicant_id)`). Deleting either the user account or the target job posting cascades to remove the corresponding application records. Application status transitions follow a defined workflow (`submitted` ➔ `under_review` ➔ `shortlisted` / `rejected` ➔ `accepted`).
+7. **Job Posting Integrity, Specification & Compensation Rules:**
+   - **Required Title & Length Invariant (`title`):** Position title is mandatory and strictly bounded to a maximum of 120 characters (`max 120 chars`) for interface consistency.
+   - **Required Company (`company_name`):** Hiring corporation or entity is mandatory.
+   - **Optional City / Location & Description (`location`, `description`):** Both geographic location (city) and detailed role description are optional attributes.
+   - **Average Minimum Wage Coefficient (`min_wage_multiplier`):** Captures the position's budgeted salary tier expressed as a multiple of the official minimum wage (*bu pozisyon için ayrılan ortalama asgari ücret katsayısı*, e.g., 1.5x, 2.5x, 4.0x asgari ücret). Must be a positive decimal value when specified.
+   - **Hiring Process Duration (`process_duration`):** Provides transparent candidate information regarding how long the recruitment, review, and interview process is expected to take (*sürecin ne kadar süreceğine dair bilgi*, e.g., "2-3 hafta", "1 ay", "30 gün").
 
 ---
 
@@ -234,15 +242,17 @@ erDiagram
 
     JOB_POSTINGS {
         UUID id PK "Primary Key"
-        VARCHAR title "Position Title"
-        VARCHAR company_name "Hiring Organization"
+        VARCHAR title "Position Title (Required, max 120 chars)"
+        VARCHAR company_name "Hiring Organization (Required)"
         VARCHAR department "Target Academic Discipline"
-        VARCHAR location "Job Location / City"
+        VARCHAR location "Job Location / City (Optional)"
         VARCHAR employment_type "Employment Type"
         VARCHAR work_mode "Workplace Arrangement"
         VARCHAR experience_level "Seniority Level"
         VARCHAR salary_range "Salary Compensation Range"
-        TEXT description "Job Overview & Responsibilities"
+        DECIMAL min_wage_multiplier "Average Min Wage Multiplier (Katsayı)"
+        VARCHAR process_duration "Recruitment Process Duration (Süreç Bilgisi)"
+        TEXT description "Job Overview & Responsibilities (Optional)"
         TEXT requirements "Candidate Qualifications"
         JSONB skills "Required Technical Skills"
         VARCHAR application_url "External Apply Link"
@@ -351,15 +361,17 @@ The `job_postings` table stores professional job vacancies, corporate and startu
 | Column Name | Physical Data Type | Nullable | Key | Default Value | Description & Constraints | Validation Rules |
 | :--- | :--- | :---: | :---: | :--- | :--- | :--- |
 | **`id`** | `UUID` | ❌ No | **PK** | `gen_random_uuid()` | Universally unique surrogate primary key for job postings. | Valid RFC 4122 UUID v4 |
-| **`title`** | `VARCHAR(200)` | ❌ No | - | *None* | Job title or designation (e.g. *Senior Cloud Architect*). | Min 3 chars, max 200 chars, non-empty |
-| **`company_name`** | `VARCHAR(150)` | ❌ No | - | *None* | Name of hiring corporation, startup, or academic unit. | Min 2 chars, max 150 chars, non-empty |
+| **`title`** | `VARCHAR(120)` | ❌ No | - | *None* | Job title or designation (e.g. *Senior Cloud Architect*). Mandatory field. | Min 3 chars, max 120 chars, non-empty |
+| **`company_name`** | `VARCHAR(150)` | ❌ No | - | *None* | Name of hiring corporation, startup, or academic unit. Mandatory field. | Min 2 chars, max 150 chars, non-empty |
 | **`department`** | `VARCHAR(100)` | ⚠️ Yes | - | *None* | Preferred or target academic discipline (e.g. *Management Information Systems (YBS)*). | Max 100 chars |
-| **`location`** | `VARCHAR(100)` | ❌ No | - | *None* | Primary city and country of work (e.g. *Istanbul, Turkey*, *London, UK*). | Max 100 chars, non-empty |
+| **`location`** | `VARCHAR(100)` | ⚠️ Yes | - | *None* | Primary city / geographic location of work (e.g. *Istanbul*, *Ankara*, *London*). Optional field. | Max 100 chars |
 | **`employment_type`**| `VARCHAR(50)` | ❌ No | - | `'Full-time'` | Contractual engagement structure. Enforced by CHECK constraint. | In: `('Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance')` |
 | **`work_mode`** | `VARCHAR(50)` | ❌ No | - | `'Hybrid'` | Workplace presence arrangement. Enforced by CHECK constraint. | In: `('On-site', 'Hybrid', 'Remote')` |
 | **`experience_level`**| `VARCHAR(50)` | ❌ No | - | `'Mid-Level'` | Target professional seniority tier. Enforced by CHECK constraint. | In: `('Entry-Level', 'Mid-Level', 'Senior', 'Lead', 'Executive', 'Internship')` |
 | **`salary_range`** | `VARCHAR(100)` | ⚠️ Yes | - | *None* | Disclosed monthly/annual compensation bracket or currency. | Max 100 chars |
-| **`description`** | `TEXT` | ❌ No | - | *None* | Comprehensive role overview, day-to-day responsibilities, and team mission. | Min 20 chars, non-empty |
+| **`min_wage_multiplier`** | `NUMERIC(4,2)` | ⚠️ Yes | - | *None* | Bu pozisyon için ayrılan ortalama asgari ücret katsayısı (örn. 1.50, 2.50, 3.75 katı). | `CHECK (min_wage_multiplier > 0)` |
+| **`process_duration`** | `VARCHAR(100)` | ⚠️ Yes | - | *None* | İşe alım ve değerlendirme sürecinin ne kadar süreceğine dair bilgi (örn. *2-3 hafta*, *45 gün*, *3 aşamalı / 1 ay*). | Max 100 chars |
+| **`description`** | `TEXT` | ⚠️ Yes | - | *None* | Comprehensive role overview, day-to-day responsibilities, and team mission. Optional field. | Freeform text |
 | **`requirements`** | `TEXT` | ⚠️ Yes | - | *None* | Mandatory qualifications, degree expectations, and years of experience. | Freeform markdown text |
 | **`skills`** | `JSONB` | ❌ No | - | `'[]'::jsonb` | Binary JSON array of technical/domain skills sought (e.g. `["PostgreSQL", "Node.js", "Docker"]`). | Must be valid JSON array of strings |
 | **`application_url`**| `VARCHAR(255)` | ⚠️ Yes | - | *None* | External career portal, ATS endpoint, or direct submission link. | Must begin with `http://` or `https://` |
@@ -501,15 +513,17 @@ CREATE TABLE announcements (
 -- ============================================================================
 CREATE TABLE job_postings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    title VARCHAR(200) NOT NULL,
+    title VARCHAR(120) NOT NULL,
     company_name VARCHAR(150) NOT NULL,
     department VARCHAR(100),
-    location VARCHAR(100) NOT NULL,
+    location VARCHAR(100),
     employment_type VARCHAR(50) NOT NULL DEFAULT 'Full-time',
     work_mode VARCHAR(50) NOT NULL DEFAULT 'Hybrid',
     experience_level VARCHAR(50) NOT NULL DEFAULT 'Mid-Level',
     salary_range VARCHAR(100),
-    description TEXT NOT NULL,
+    min_wage_multiplier NUMERIC(4,2),
+    process_duration VARCHAR(100),
+    description TEXT,
     requirements TEXT,
     skills JSONB NOT NULL DEFAULT '[]'::jsonb,
     application_url VARCHAR(255),
@@ -526,8 +540,9 @@ CREATE TABLE job_postings (
     CONSTRAINT chk_job_postings_experience_level CHECK (experience_level IN ('Entry-Level', 'Mid-Level', 'Senior', 'Lead', 'Executive', 'Internship')),
     CONSTRAINT chk_job_postings_status CHECK (status IN ('draft', 'active', 'closed', 'archived')),
     CONSTRAINT chk_job_postings_skills_array CHECK (jsonb_typeof(skills) = 'array'),
-    CONSTRAINT chk_job_postings_title_length CHECK (char_length(TRIM(title)) >= 3),
+    CONSTRAINT chk_job_postings_title_length CHECK (char_length(TRIM(title)) >= 3 AND char_length(title) <= 120),
     CONSTRAINT chk_job_postings_company_length CHECK (char_length(TRIM(company_name)) >= 2),
+    CONSTRAINT chk_job_postings_min_wage_multiplier CHECK (min_wage_multiplier IS NULL OR min_wage_multiplier > 0),
     CONSTRAINT chk_job_postings_views_positive CHECK (views_count >= 0)
 );
 
@@ -646,6 +661,77 @@ graph TD
 
     APPLICATION_LEVEL -->|Dispatches Validated Payload| DATABASE_LEVEL
 ```
+
+#### Job Posting Integrity & Business Rules Matrix
+
+| Rule / Field | Enforcement Level | Database Invariant / Constraint | Business Rationale & Description |
+| :--- | :---: | :--- | :--- |
+| **`title` (Required)** | Application & DB | `NOT NULL`, `CHECK (char_length(TRIM(title)) >= 3)` | İlan başlığı zorunludur; boş bırakılamaz. |
+| **`title` (Max 120 Chars)**| Application & DB | `VARCHAR(120)`, `CHECK (char_length(title) <= 120)` | Başlık metni en fazla 120 karakter uzunluğunda olabilir; kart ve liste görünümlerinde taşmayı önler. |
+| **`company_name` (Required)**| Application & DB | `VARCHAR(150) NOT NULL`, `CHECK (char_length(TRIM(company_name)) >= 2)` | İlanı veren şirket/kurum adı zorunludur; doğrulanabilir işveren kimliği sağlar. |
+| **`location` / City (Optional)**| Application & DB | `VARCHAR(100) NULL` (Nullable) | Pozisyon lokasyonu / şehir bilgisi isteğe bağlıdır (özellikle Remote pozisyonlar ve genel istihdam çağrıları için serbest bırakılmıştır). |
+| **`description` (Optional)**| Application & DB | `TEXT NULL` (Nullable) | Detaylı pozisyon açıklaması isteğe bağlıdır; hızlı ilan yayınlama ve harici link/başvuru odaklı ilanları destekler. |
+| **Ortalama Asgari Ücret Katsayısı (`min_wage_multiplier`)**| Application & DB | `NUMERIC(4,2) NULL`, `CHECK (min_wage_multiplier IS NULL OR min_wage_multiplier > 0)` | Bu pozisyon için ayrılan bütçenin güncel net/brüt asgari ücrete göre ortalama katsayı karşılığıdır (örn. 1.50x, 2.50x, 4.00x katı). |
+| **Süreç Bilgisi (`process_duration`)**| Application & DB | `VARCHAR(100) NULL` | İşe alım, teknik mülakat ve teklif sürecinin tahmini ne kadar süreceğine dair adayları bilgilendiren süreç süresi (örn. *"2-3 hafta"*, *"1 ay"*, *"45 gün"*). |
+
+#### Terminal HTTP Logger Middleware (`server/middleware/logger.js`)
+
+To provide real-time request observability on the terminal, the Express pipeline includes a lightweight custom `loggerMiddleware` that intercepts every HTTP request and writes structured telemetry to `stdout` when the response finishes (`res.on('finish')`):
+
+* **Log Row Format:** `<time> <method> <route> <res-type> <duration>`
+* **Example Terminal Output:**
+  ```text
+  10:20:30 POST /user 201 18ms
+  10:20:35 GET /api/jobs 200 12ms
+  10:21:02 POST /api/jobs 201 24ms
+  ```
+
+| Field | Format / Source | Example | Description |
+| :--- | :--- | :--- | :--- |
+| **`time`** | `HH:MM:SS` | `10:20:30` | İsteğin tamamlandığı yerel sunucu saati. |
+| **`method`** | `req.method` | `POST` | HTTP istek metodu (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`). |
+| **`route`** | `req.originalUrl` | `/user` | İstek yapılan uç nokta (endpoint / URL yolu). |
+| **`res-type`** | `res.statusCode` | `201` | HTTP yanıt durum kodu (`200`, `201`, `400`, `404`, `500`). |
+| **`duration`** | `<ms>ms` | `18ms` | İsteğin başlangıcından yanıtın tamamlanmasına kadar geçen süre (milisaniye). |
+
+* **Kalıcı Hata Günlüğü (`logs/error.logs`):**
+  Sunucuda meydana gelen tüm `4xx` (İstemci / Bulunamadı hataları) ve `5xx` (Sunucu istisnaları) anında dosya sistemindeki [`logs/error.logs`](./server/logs/error.logs) dosyasına tarih, HTTP metodu, rota, durum kodu, yanıt süresi, istemci IP'si, hata gerekçesi (**reason**) ve stack trace detaylarıyla birlikte kalıcı olarak kaydedilir. Böylece geçmiş hatalar ve anomaliler geriye dönük olarak denetlenebilir.
+
+#### 404 Guardian Middleware (`server/middleware/notFoundGuardian.js`)
+
+Tanımlanmamış veya yanlış yazılmış rotaları yakalayarak istemciye hatanın kaynağını ve nedenini açıklayan bir gerekçe (**reason**) ile standart 404 yanıtı döndürür:
+
+* **API Rotaları (`/api/*` veya JSON talepleri):**
+  ```json
+  {
+    "success": false,
+    "status": 404,
+    "error": "Not Found",
+    "method": "GET",
+    "path": "/api/nonexistent-route",
+    "reason": "Endpoint 'GET /api/nonexistent-route' was not found. Please check the URL path, HTTP method, or consult the API specification at /api/swagger.",
+    "timestamp": "2026-11-11T07:26:56.641Z"
+  }
+  ```
+* **Web / Tarayıcı Rotaları (Generic 404 Page & Redirection):** Kullanıcıyı düz bir metin veya siyah JSON ekranına düşürmek yerine, tüm geçersiz web istekleri doğrudan bağımsız **Generic 404 Sayfasına (`/404`)** yönlendirilir (`redirect invalid request`). Bu rota, tam teşekküllü kurumsal şablonu (Navbar, Footer, Beyazıt teması, aranan URL ve gerekçe kutusu) içeren [`server/public/404.html`](./server/public/404.html) sayfasını gerçek **HTTP 404 Not Found** durum koduyla sunar. Sayfada "Ana Sayfaya Dön", "Mezun Rehberi", "İş İlanları" ve "Duyurular" hızlı bağlantıları yer alır.
+
+#### 5xx Server Error Guardian Middleware (`server/middleware/serverErrorGuardian.js`)
+
+Sunucu tarafında meydana gelen beklenmedik istisnaları (`Unhandled Exceptions`), veritabanı bağlantı kopmalarını (`ECONNREFUSED`), kısıt ihlallerini (`Unique/FK Constraint Violation`) ve runtime hatalarını yakalayan Express hata yakalama ara yazılımıdır (`err, req, res, next`). Hatayı terminale detaylı stack trace ile loglarken istemciye hatanın gerekçesini (**reason**) içeren güvenli bir 5xx yanıtı sunar:
+
+* **API / JSON Yanıtı (500 Internal Server Error):**
+  ```json
+  {
+    "success": false,
+    "status": 500,
+    "error": "Internal Server Error",
+    "method": "POST",
+    "path": "/api/jobs",
+    "reason": "Database connection failed: The database service is unreachable or not accepting connections.",
+    "timestamp": "2026-11-11T07:30:38.157Z"
+  }
+  ```
+* **Web / Tarayıcı Yanıtı:** Kullanıcıyı sitenin ana sayfasında tutarak hata kodunu (`500`), hatanın nedenini (`Reason`) ve sayfayı yeniden deneme butonunu içeren modern bir modal açar.
 
 ---
 

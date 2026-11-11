@@ -23,6 +23,8 @@ class JobPostingFactory extends Factory {
         mode: 'Hybrid',
         level: 'Senior',
         salary: '₺140,000 - ₺180,000 / month',
+        multiplier: 5.50,
+        duration: '3-4 hafta',
         skills: ['Go', 'Kubernetes', 'Distributed Systems', 'Cloud Architecture', 'Docker', 'gRPC'],
         domain: 'google.com'
       },
@@ -35,6 +37,8 @@ class JobPostingFactory extends Factory {
         mode: 'Remote',
         level: 'Mid-Level',
         salary: '€85,000 - €105,000 / year',
+        multiplier: 4.25,
+        duration: '1 ay',
         skills: ['Product Strategy', 'Agile', 'Scrum', 'Cloud Solutions', 'User Research', 'Data Analytics'],
         domain: 'microsoft.com'
       },
@@ -47,6 +51,8 @@ class JobPostingFactory extends Factory {
         mode: 'On-site',
         level: 'Mid-Level',
         salary: '€65,000 - €80,000 / year',
+        multiplier: 3.50,
+        duration: '3 hafta',
         skills: ['SQL', 'Python', 'Tableau', 'Data Pipelines', 'Power BI', 'Operations Research'],
         domain: 'amazon.com'
       },
@@ -59,6 +65,8 @@ class JobPostingFactory extends Factory {
         mode: 'Hybrid',
         level: 'Senior',
         salary: '£90,000 - £115,000 / year',
+        multiplier: 4.75,
+        duration: '2-3 hafta',
         skills: ['React', 'TypeScript', 'Next.js', 'Web Performance', 'GraphQL', 'TailwindCSS'],
         domain: 'meta.com'
       },
@@ -71,6 +79,8 @@ class JobPostingFactory extends Factory {
         mode: 'Hybrid',
         level: 'Entry-Level',
         salary: '₺45,000 - ₺60,000 / month',
+        multiplier: 2.25,
+        duration: '2 hafta',
         skills: ['Node.js', 'Express', 'PostgreSQL', 'JavaScript', 'REST APIs', 'Docker'],
         domain: 'istanbul.edu.tr'
       },
@@ -83,6 +93,8 @@ class JobPostingFactory extends Factory {
         mode: 'On-site',
         level: 'Senior',
         salary: '$150,000 - $185,000 / year',
+        multiplier: 6.00,
+        duration: '4 hafta',
         skills: ['Swift', 'SwiftUI', 'Combine', 'iOS SDK', 'CoreData', 'CI/CD'],
         domain: 'apple.com'
       },
@@ -95,6 +107,8 @@ class JobPostingFactory extends Factory {
         mode: 'Hybrid',
         level: 'Internship',
         salary: '₺25,000 - ₺32,000 / month',
+        multiplier: 1.25,
+        duration: '10 gün',
         skills: ['SQL', 'Python', 'Power BI', 'Excel Modeling', 'E-commerce Analytics'],
         domain: 'trendyol.com'
       }
@@ -113,6 +127,8 @@ class JobPostingFactory extends Factory {
       work_mode: pick.mode,
       experience_level: pick.level,
       salary_range: pick.salary,
+      min_wage_multiplier: pick.multiplier || 2.50,
+      process_duration: pick.duration || '2-3 hafta',
       description: `We are seeking an exceptional professional to join ${pick.company} as ${pick.title}. In this role, you will collaborate with cross-functional teams to architect, deploy, and scale high-impact solutions serving millions of global users.`,
       requirements: `Required Qualifications: Degree in ${pick.department} or equivalent practical experience. Demonstrated proficiency with ${pick.skills.slice(0, 3).join(', ')}. Strong problem-solving aptitude, communication skills, and commitment to software engineering best practices.`,
       skills: pick.skills,
@@ -164,11 +180,11 @@ class JobPostingFactory extends Factory {
     const res = await db.query(
       `INSERT INTO job_postings (
         title, company_name, department, location, employment_type,
-        work_mode, experience_level, salary_range, description, requirements,
-        skills, application_url, contact_email, deadline, status, views_count,
-        created_at
+        work_mode, experience_level, salary_range, min_wage_multiplier, process_duration,
+        description, requirements, skills, application_url, contact_email, deadline,
+        status, views_count, created_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
       RETURNING *`,
       [
         data.title,
@@ -179,6 +195,8 @@ class JobPostingFactory extends Factory {
         data.work_mode,
         data.experience_level,
         data.salary_range,
+        data.min_wage_multiplier,
+        data.process_duration,
         data.description,
         data.requirements,
         JSON.stringify(data.skills),

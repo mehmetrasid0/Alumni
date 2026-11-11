@@ -50,7 +50,11 @@ function formatJobPosting(row) {
     experience_level: row.experience_level || 'Mid-Level',
     salaryRange: row.salary_range || null,
     salary_range: row.salary_range || null,
-    description: row.description,
+    minWageMultiplier: row.min_wage_multiplier !== null && row.min_wage_multiplier !== undefined ? parseFloat(row.min_wage_multiplier) : null,
+    min_wage_multiplier: row.min_wage_multiplier !== null && row.min_wage_multiplier !== undefined ? parseFloat(row.min_wage_multiplier) : null,
+    processDuration: row.process_duration || null,
+    process_duration: row.process_duration || null,
+    description: row.description || null,
     requirements: row.requirements || null,
     skills,
     applicationUrl: row.application_url || null,
@@ -193,14 +197,37 @@ class JobPostingModel {
    */
   async create(jobData) {
     const title = String(jobData.title || '').trim();
+    if (!title) {
+      throw new Error('Position title is required');
+    }
+    if (title.length > 120) {
+      throw new Error('Position title must not exceed 120 characters');
+    }
+
     const companyName = String(jobData.companyName || jobData.company_name || '').trim();
+    if (!companyName) {
+      throw new Error('Company name is required');
+    }
+
     const department = jobData.department ? String(jobData.department).trim() : null;
-    const location = String(jobData.location || '').trim();
+    const location = jobData.location !== undefined && jobData.location !== null ? String(jobData.location).trim() : null;
     const employmentType = jobData.employmentType || jobData.employment_type || 'Full-time';
     const workMode = jobData.workMode || jobData.work_mode || 'Hybrid';
     const experienceLevel = jobData.experienceLevel || jobData.experience_level || 'Mid-Level';
     const salaryRange = jobData.salaryRange || jobData.salary_range || null;
-    const description = String(jobData.description || '').trim();
+
+    let minWageMultiplier = jobData.minWageMultiplier !== undefined ? jobData.minWageMultiplier : jobData.min_wage_multiplier;
+    if (minWageMultiplier !== undefined && minWageMultiplier !== null && minWageMultiplier !== '') {
+      minWageMultiplier = parseFloat(minWageMultiplier);
+      if (isNaN(minWageMultiplier) || minWageMultiplier <= 0) {
+        throw new Error('Minimum wage multiplier must be a positive number');
+      }
+    } else {
+      minWageMultiplier = null;
+    }
+
+    const processDuration = jobData.processDuration || jobData.process_duration || null;
+    const description = jobData.description !== undefined && jobData.description !== null ? String(jobData.description).trim() : null;
     const requirements = jobData.requirements ? String(jobData.requirements).trim() : null;
     const applicationUrl = jobData.applicationUrl || jobData.application_url || null;
     const contactEmail = jobData.contactEmail || jobData.contact_email || null;
@@ -221,10 +248,10 @@ class JobPostingModel {
     const query = `
       INSERT INTO job_postings (
         title, company_name, department, location, employment_type,
-        work_mode, experience_level, salary_range, description, requirements,
-        skills, application_url, contact_email, deadline, status
+        work_mode, experience_level, salary_range, min_wage_multiplier, process_duration,
+        description, requirements, skills, application_url, contact_email, deadline, status
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING *
     `;
 
@@ -237,6 +264,8 @@ class JobPostingModel {
       workMode,
       experienceLevel,
       salaryRange,
+      minWageMultiplier,
+      processDuration,
       description,
       requirements,
       JSON.stringify(skills),
@@ -264,11 +293,15 @@ class JobPostingModel {
     if (!existing) return null;
 
     const title = updateData.title !== undefined ? String(updateData.title).trim() : existing.title;
+    if (title && title.length > 120) {
+      throw new Error('Position title must not exceed 120 characters');
+    }
+
     const companyName = (updateData.companyName || updateData.company_name) !== undefined
       ? String(updateData.companyName || updateData.company_name).trim()
       : existing.companyName;
     const department = updateData.department !== undefined ? updateData.department : existing.department;
-    const location = updateData.location !== undefined ? String(updateData.location).trim() : existing.location;
+    const location = updateData.location !== undefined ? (updateData.location ? String(updateData.location).trim() : null) : existing.location;
     const employmentType = (updateData.employmentType || updateData.employment_type) !== undefined
       ? (updateData.employmentType || updateData.employment_type)
       : existing.employmentType;
@@ -281,7 +314,25 @@ class JobPostingModel {
     const salaryRange = (updateData.salaryRange || updateData.salary_range) !== undefined
       ? (updateData.salaryRange || updateData.salary_range)
       : existing.salaryRange;
-    const description = updateData.description !== undefined ? String(updateData.description).trim() : existing.description;
+
+    let minWageMultiplier = existing.minWageMultiplier;
+    if (updateData.minWageMultiplier !== undefined || updateData.min_wage_multiplier !== undefined) {
+      const rawMultiplier = updateData.minWageMultiplier !== undefined ? updateData.minWageMultiplier : updateData.min_wage_multiplier;
+      if (rawMultiplier !== null && rawMultiplier !== '') {
+        minWageMultiplier = parseFloat(rawMultiplier);
+        if (isNaN(minWageMultiplier) || minWageMultiplier <= 0) {
+          throw new Error('Minimum wage multiplier must be a positive number');
+        }
+      } else {
+        minWageMultiplier = null;
+      }
+    }
+
+    const processDuration = (updateData.processDuration || updateData.process_duration) !== undefined
+      ? (updateData.processDuration || updateData.process_duration)
+      : existing.processDuration;
+
+    const description = updateData.description !== undefined ? (updateData.description ? String(updateData.description).trim() : null) : existing.description;
     const requirements = updateData.requirements !== undefined ? updateData.requirements : existing.requirements;
     const applicationUrl = (updateData.applicationUrl || updateData.application_url) !== undefined
       ? (updateData.applicationUrl || updateData.application_url)
@@ -315,15 +366,17 @@ class JobPostingModel {
         work_mode = $6,
         experience_level = $7,
         salary_range = $8,
-        description = $9,
-        requirements = $10,
-        skills = $11,
-        application_url = $12,
-        contact_email = $13,
-        deadline = $14,
-        status = $15,
+        min_wage_multiplier = $9,
+        process_duration = $10,
+        description = $11,
+        requirements = $12,
+        skills = $13,
+        application_url = $14,
+        contact_email = $15,
+        deadline = $16,
+        status = $17,
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = $16
+      WHERE id = $18
       RETURNING *
     `;
 
@@ -336,6 +389,8 @@ class JobPostingModel {
       workMode,
       experienceLevel,
       salaryRange,
+      minWageMultiplier,
+      processDuration,
       description,
       requirements,
       JSON.stringify(skills),

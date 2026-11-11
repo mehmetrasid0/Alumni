@@ -29,10 +29,10 @@ const JobPostingModelDefinition = {
       description: 'Universally unique surrogate primary key (RFC 4122 UUID v4).'
     },
     title: {
-      type: 'VARCHAR(200)',
+      type: 'VARCHAR(120)',
       allowNull: false,
-      validate: { minLength: 3, maxLength: 200 },
-      description: 'Designation / job title (e.g. Senior Cloud Engineer).'
+      validate: { minLength: 3, maxLength: 120 },
+      description: 'Designation / job title (e.g. Senior Cloud Engineer). Maximum 120 chars.'
     },
     company_name: {
       type: 'VARCHAR(150)',
@@ -47,8 +47,8 @@ const JobPostingModelDefinition = {
     },
     location: {
       type: 'VARCHAR(100)',
-      allowNull: false,
-      description: 'Geographic location / primary city of employment.'
+      allowNull: true,
+      description: 'Geographic location / primary city of employment (Optional).'
     },
     employment_type: {
       type: 'VARCHAR(50)',
@@ -82,11 +82,21 @@ const JobPostingModelDefinition = {
       allowNull: true,
       description: 'Disclosed compensation bracket.'
     },
+    min_wage_multiplier: {
+      type: 'NUMERIC(4,2)',
+      allowNull: true,
+      validate: { min: 0 },
+      description: 'Average minimum wage multiplier (Ortalama asgari ucret katsayisi).'
+    },
+    process_duration: {
+      type: 'VARCHAR(100)',
+      allowNull: true,
+      description: 'Estimated duration of hiring process (Surec bilgisi).'
+    },
     description: {
       type: 'TEXT',
-      allowNull: false,
-      validate: { minLength: 20 },
-      description: 'Comprehensive role overview and daily responsibilities.'
+      allowNull: true,
+      description: 'Comprehensive role overview and daily responsibilities (Optional).'
     },
     requirements: {
       type: 'TEXT',
@@ -194,15 +204,17 @@ async function up(db) {
     await db.query(`
       CREATE TABLE IF NOT EXISTS job_postings (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        title VARCHAR(200) NOT NULL,
+        title VARCHAR(120) NOT NULL,
         company_name VARCHAR(150) NOT NULL,
         department VARCHAR(100),
-        location VARCHAR(100) NOT NULL,
+        location VARCHAR(100),
         employment_type VARCHAR(50) NOT NULL DEFAULT 'Full-time',
         work_mode VARCHAR(50) NOT NULL DEFAULT 'Hybrid',
         experience_level VARCHAR(50) NOT NULL DEFAULT 'Mid-Level',
         salary_range VARCHAR(100),
-        description TEXT NOT NULL,
+        min_wage_multiplier NUMERIC(4,2),
+        process_duration VARCHAR(100),
+        description TEXT,
         requirements TEXT,
         skills JSONB NOT NULL DEFAULT '[]'::jsonb,
         application_url VARCHAR(255),
@@ -218,8 +230,9 @@ async function up(db) {
         CONSTRAINT chk_job_postings_experience_level CHECK (experience_level IN ('Entry-Level', 'Mid-Level', 'Senior', 'Lead', 'Executive', 'Internship')),
         CONSTRAINT chk_job_postings_status CHECK (status IN ('draft', 'active', 'closed', 'archived')),
         CONSTRAINT chk_job_postings_skills_array CHECK (jsonb_typeof(skills) = 'array'),
-        CONSTRAINT chk_job_postings_title_length CHECK (char_length(TRIM(title)) >= 3),
+        CONSTRAINT chk_job_postings_title_length CHECK (char_length(TRIM(title)) >= 3 AND char_length(title) <= 120),
         CONSTRAINT chk_job_postings_company_length CHECK (char_length(TRIM(company_name)) >= 2),
+        CONSTRAINT chk_job_postings_min_wage_multiplier CHECK (min_wage_multiplier IS NULL OR min_wage_multiplier > 0),
         CONSTRAINT chk_job_postings_views_positive CHECK (views_count >= 0)
       );
     `);
