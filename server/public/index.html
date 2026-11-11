@@ -1010,7 +1010,79 @@
       alert('✅ ' + input.value + ' adresi bültenimize eklendi!');
       input.value = '';
     });
+
+    // ==================== Error Guardian Modal Handlers ====================
+    function openErrorGuardianModal(status, route, reason) {
+      const modal = document.getElementById('errorGuardianModal');
+      const badge = document.getElementById('errorModalBadge');
+      const title = document.getElementById('errorModalTitle');
+      const icon = document.getElementById('errorModalIcon');
+      const pathEl = document.getElementById('errorModalPath');
+      const reasonEl = document.getElementById('errorModalReason');
+      
+      if (!modal) return;
+
+      badge.innerText = `HATA KODU: ${status || '404'}`;
+      if (status && String(status).startsWith('5')) {
+        badge.style.background = '#FEF2F2';
+        badge.style.color = '#B91C1C';
+        icon.innerText = '⚠️';
+        title.innerText = 'Sunucu İstisnası (5xx)';
+      } else {
+        badge.style.background = '#FEE2E2';
+        badge.style.color = '#DC2626';
+        icon.innerText = '🛡️';
+        title.innerText = 'Sayfa / Kaynak Bulunamadı (404)';
+      }
+      
+      pathEl.innerText = route || window.location.pathname;
+      reasonEl.innerText = reason || 'İstenen kaynak bu sunucuda bulunamadı.';
+      modal.style.display = 'flex';
+    }
+
+    function closeErrorGuardianModal() {
+      const modal = document.getElementById('errorGuardianModal');
+      if (modal) modal.style.display = 'none';
+      if (window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
+    // Auto-detect error parameters in URL on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('error')) {
+        const error = params.get('error');
+        const route = params.get('route') || params.get('path');
+        const reason = params.get('reason');
+        openErrorGuardianModal(error, route, reason);
+      }
+    });
   </script>
+
+  <!-- ==================== Error Guardian In-Site Modal ==================== -->
+  <div class="modal-backdrop" id="errorGuardianModal" style="display: none; position: fixed; inset: 0; background: rgba(10, 22, 40, 0.75); backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
+    <div class="modal-box" style="background: #FFFFFF; border: 2px solid #E2E8F0; border-radius: 20px; padding: 36px 32px; max-width: 520px; width: 100%; box-shadow: 0 25px 60px rgba(0,0,0,0.35); text-align: center; position: relative;">
+      <button onclick="closeErrorGuardianModal()" style="position: absolute; right: 18px; top: 18px; background: #F1F5F9; border: none; font-size: 1.1rem; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; color: #475569; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="Kapat">✕</button>
+      
+      <div id="errorModalIcon" style="font-size: 3.2rem; margin-bottom: 8px;">🛡️</div>
+      <div id="errorModalBadge" style="display: inline-block; background: #FEE2E2; color: #DC2626; font-size: 0.8rem; font-weight: 800; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">HATA KODU: 404</div>
+      <h2 id="errorModalTitle" style="color: #0A1628; font-size: 1.45rem; margin: 0 0 10px 0; font-family: 'Playfair Display', Georgia, serif; font-weight: 800;">Sayfa Bulunamadı</h2>
+      
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #DC2626; border-radius: 8px; padding: 14px 16px; text-align: left; margin: 16px 0 24px 0;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">İstenen Rota / URL</div>
+        <div style="font-family: monospace; font-size: 0.92rem; color: #0F172A; word-break: break-all; margin-bottom: 10px;" id="errorModalPath">/asdasdasd</div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Hata Nedeni (Reason)</div>
+        <div style="color: #991B1B; font-size: 0.88rem; line-height: 1.5; font-weight: 500;" id="errorModalReason">Aradığınız sayfa sitemizde mevcut değil veya taşınmış olabilir.</div>
+      </div>
+      
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <button onclick="closeErrorGuardianModal()" style="background: #0A1628; color: #FFFFFF; border: none; padding: 11px 22px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;">Ana Sayfada Kal</button>
+        <a href="/users" style="background: #F1F5F9; color: #0A1628; text-decoration: none; padding: 11px 18px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">🎓 Mezun Rehberi</a>
+        <a href="/jobs" style="background: #EEF2FF; color: #4F46E5; text-decoration: none; padding: 11px 18px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">💼 İş İlanları</a>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>

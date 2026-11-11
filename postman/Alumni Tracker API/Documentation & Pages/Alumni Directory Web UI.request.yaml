@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/alumni"
+method: GET
+order: 3000

@@ -1,0 +1,5 @@
+$kind: http-request
+description: Server hardware & runtime diagnostics telemetry (CPU, RAM, Uptime, OS)
+url: "{{baseUrl}}/api/health"
+method: GET
+order: 1000

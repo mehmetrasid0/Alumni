@@ -1,0 +1,4 @@
+$kind: collection
+description: Istanbul University — Alumni Tracker RESTful API Postman Test Collection (W3-W4)
+variables:
+  baseUrl: http://localhost:5000

@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/hello/Rasid"
+method: GET
+order: 1000

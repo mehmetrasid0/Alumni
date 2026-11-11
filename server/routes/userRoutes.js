@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
 const multer = require('multer');
 const upload = multer();
@@ -16,6 +17,7 @@ const UserController = require('../controllers/UserController');
 // Home & About Landing Views
 router.get('/', (req, res) => UserController.home(req, res));
 router.get('/about', (req, res) => UserController.about(req, res));
+router.get('/404', (req, res) => res.status(404).sendFile(path.join(__dirname, '..', 'public', '404.html')));
 
 // ============================================================================
 // Web View Layer CRUD Operations for Users

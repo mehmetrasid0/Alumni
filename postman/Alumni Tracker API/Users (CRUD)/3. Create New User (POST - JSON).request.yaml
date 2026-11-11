@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/api/users"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Ali Vural",
+      "email": "ali.vural@alumni.edu",
+      "graduationYear": 2023,
+      "department": "Software Engineering",
+      "company": "SAP",
+      "role": "Backend Developer"
+    }
+order: 3000

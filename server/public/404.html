@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="404 — Sayfa Bulunamadı | Alumni Tracker İstanbul Üniversitesi">
+  <title>404 — Sayfa Bulunamadı | Alumni Tracker</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .error-hero {
+      background: radial-gradient(circle at 85% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+                  linear-gradient(135deg, #07101E 0%, #0D1B2A 50%, #152538 100%);
+      min-height: calc(100vh - 80px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 20px 80px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 3px solid var(--gold-400, #D4AF37);
+    }
+
+    .error-hero::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .error-container {
+      max-width: 680px;
+      width: 100%;
+      background: rgba(13, 27, 42, 0.9);
+      border: 2px solid rgba(212, 175, 55, 0.4);
+      border-radius: 24px;
+      padding: 48px 36px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(212, 175, 55, 0.12);
+      backdrop-filter: blur(12px);
+      position: relative;
+      z-index: 2;
+    }
+
+    .error-code {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 6.5rem;
+      font-weight: 900;
+      line-height: 1;
+      margin: 0 0 10px 0;
+      background: linear-gradient(135deg, #FFF0B3 0%, #D4AF37 50%, #F59E0B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -2px;
+      text-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+    }
+
+    .error-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 18px;
+      background: rgba(220, 38, 38, 0.15);
+      border: 1px solid rgba(220, 38, 38, 0.45);
+      border-radius: 50px;
+      color: #FCA5A5;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .error-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin: 0 0 14px 0;
+    }
+
+    .error-subtitle {
+      color: #CBD5E1;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .error-details-box {
+      background: rgba(7, 16, 30, 0.7);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-left: 4px solid var(--gold-400, #D4AF37);
+      border-radius: 12px;
+      padding: 16px 20px;
+      text-align: left;
+      margin-bottom: 32px;
+    }
+
+    .error-details-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .error-details-path {
+      font-family: monospace;
+      font-size: 0.95rem;
+      color: #F6D06E;
+      word-break: break-all;
+      margin-bottom: 12px;
+    }
+
+    .error-details-reason {
+      color: #E2E8F0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .error-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-home {
+      background: linear-gradient(135deg, #D4AF37, #C59B27);
+      color: #0A1628 !important;
+      padding: 13px 28px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-home:hover {
+      background: linear-gradient(135deg, #F3C94D, #D4AF37);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: #F6D06E !important;
+      padding: 13px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline:hover {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: #D4AF37;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== Navbar ==================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="/" class="navbar-brand">
+        <div class="logo-icon">🎓</div>
+        <span>Alumni<span class="brand-accent">Tracker</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/announcements">Announcements</a></li>
+        <li><a href="/users">Alumni Directory</a></li>
+        <li><a href="/jobs">Jobs</a></li>
+        <li><a href="/applications">Applications</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/api/swagger" target="_blank" class="nav-cta">Swagger API</a></li>
+      </ul>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Menü">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== Generic 404 Hero Section ==================== -->
+  <section class="error-hero">
+    <div class="error-container">
+      <div class="error-badge">
+        <span>⚠️</span> 404 Sayfa Bulunamadı
+      </div>
+      <div class="error-code">404</div>
+      <h1 class="error-title">Aradığınız Sayfa Mevcut Değil</h1>
+      <p class="error-subtitle">
+        Ulaşmaya çalıştığınız sayfa kaldırılmış, taşınmış veya adresi yanlış yazılmış olabilir.
+      </p>
+
+      <div class="error-details-box">
+        <div class="error-details-label">İstenen Rota (Requested Path)</div>
+        <div class="error-details-path" id="displayPath">/</div>
+        <div class="error-details-label">Gerekçe / Durum Açıklaması</div>
+        <div class="error-details-reason" id="displayReason">
+          İstenen uç nokta bu sunucuda bulunamadı. Lütfen URL adresini kontrol edin veya aşağıdaki hızlı bağlantıları kullanın.
+        </div>
+      </div>
+
+      <div class="error-actions">
+        <a href="/" class="btn-home">🏠 Ana Sayfaya Dön</a>
+        <a href="/users" class="btn-outline">🎓 Mezun Rehberi</a>
+        <a href="/jobs" class="btn-outline">💼 İş İlanları</a>
+        <a href="/announcements" class="btn-outline">📢 Duyurular</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Footer ==================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <h3>🎓 AlumniTracker</h3>
+          <p>İstanbul Üniversitesi mezun takip ve yönetim platformu. Mezunlarımızla güçlü bağlar kurarak geleceği birlikte şekillendiriyoruz.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Hızlı Bağlantılar</h4>
+          <a href="/">Ana Sayfa</a>
+          <a href="/announcements">Duyurular</a>
+          <a href="/jobs">Kariyer / İş İlanları</a>
+          <a href="/users">Mezun Dizini</a>
+          <a href="/about">Hakkında</a>
+        </div>
+        <div class="footer-col">
+          <h4>Fakülte & Bölüm</h4>
+          <p style="color: #94A3B8; font-size: 0.85rem; line-height: 1.6; margin: 0;">
+            İstanbul Üniversitesi<br>
+            İktisat Fakültesi<br>
+            Yönetim Bilişim Sistemleri (YBS)<br>
+            Beyazıt Yerleşkesi, 34452 Fatih/İstanbul
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Alumni Tracker — İstanbul Üniversitesi YBS. Tüm hakları saklıdır.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Dynamically display current path and query reason if present
+    document.addEventListener('DOMContentLoaded', () => {
+      const pathEl = document.getElementById('displayPath');
+      const reasonEl = document.getElementById('displayReason');
+      const params = new URLSearchParams(window.location.search);
+
+      const routeParam = params.get('route') || params.get('path');
+      const reasonParam = params.get('reason');
+
+      if (routeParam) {
+        pathEl.innerText = routeParam;
+      } else {
+        pathEl.innerText = window.location.pathname;
+      }
+
+      if (reasonParam) {
+        reasonEl.innerText = reasonParam;
+      }
+
+      // Mobile Navbar Toggle
+      const toggle = document.getElementById('mobileToggle');
+      const navLinks = document.getElementById('navLinks');
+      if (toggle && navLinks) {
+        toggle.addEventListener('click', () => {
+          navLinks.classList.toggle('active');
+        });
+      }
+    });
+  </script>
+</body>
+</html>
+

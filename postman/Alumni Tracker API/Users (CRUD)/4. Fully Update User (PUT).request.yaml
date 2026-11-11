@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/api/users/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Ahmet Yilmaz Updated",
+      "email": "ahmet.updated@alumni.edu",
+      "graduationYear": 2020,
+      "department": "Computer Engineering",
+      "company": "Google Cloud",
+      "role": "Staff Software Engineer"
+    }
+order: 4000

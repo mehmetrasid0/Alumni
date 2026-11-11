@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/swagger.json"
+method: GET
+order: 1000
