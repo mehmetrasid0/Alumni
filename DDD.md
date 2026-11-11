@@ -25,6 +25,7 @@
    - [6.1 Complete PostgreSQL DDL Script](#61-complete-postgresql-ddl-script)
    - [6.2 Indexing Strategy & Performance Optimization](#62-indexing-strategy--performance-optimization)
    - [6.3 Constraints & Invariant Enforcement](#63-constraints--invariant-enforcement)
+   - [6.4 HTTP Observability, Error Persistence & Guardians](#64-http-observability-error-persistence--guardians)
 7. [🔄 In-Memory to Persistent Storage Transition Strategy](#-in-memory-to-persistent-storage-transition-strategy)
 8. [🔐 Data Security, Privacy & KVKK/GDPR Compliance](#-data-security-privacy--kvkkgdpr-compliance)
 9. [💾 Backup, Disaster Recovery & Docker Volume Management](#-backup-disaster-recovery--docker-volume-management)
@@ -674,7 +675,13 @@ graph TD
 | **Ortalama Asgari Ücret Katsayısı (`min_wage_multiplier`)**| Application & DB | `NUMERIC(4,2) NULL`, `CHECK (min_wage_multiplier IS NULL OR min_wage_multiplier > 0)` | Bu pozisyon için ayrılan bütçenin güncel net/brüt asgari ücrete göre ortalama katsayı karşılığıdır (örn. 1.50x, 2.50x, 4.00x katı). |
 | **Süreç Bilgisi (`process_duration`)**| Application & DB | `VARCHAR(100) NULL` | İşe alım, teknik mülakat ve teklif sürecinin tahmini ne kadar süreceğine dair adayları bilgilendiren süreç süresi (örn. *"2-3 hafta"*, *"1 ay"*, *"45 gün"*). |
 
-#### Terminal HTTP Logger Middleware (`server/middleware/logger.js`)
+---
+
+### 6.4 HTTP Observability, Error Persistence & Guardians
+
+To ensure end-to-end reliability, runtime diagnostic transparency, and a graceful user experience during unexpected faults, the application integrates an enterprise-grade middleware pipeline in [`server/server.js`](./server/server.js):
+
+#### 6.4.1 Terminal HTTP Logger Middleware (`server/middleware/logger.js`)
 
 To provide real-time request observability on the terminal, the Express pipeline includes a lightweight custom `loggerMiddleware` that intercepts every HTTP request and writes structured telemetry to `stdout` when the response finishes (`res.on('finish')`):
 
@@ -694,10 +701,10 @@ To provide real-time request observability on the terminal, the Express pipeline
 | **`res-type`** | `res.statusCode` | `201` | HTTP yanıt durum kodu (`200`, `201`, `400`, `404`, `500`). |
 | **`duration`** | `<ms>ms` | `18ms` | İsteğin başlangıcından yanıtın tamamlanmasına kadar geçen süre (milisaniye). |
 
-* **Kalıcı Hata Günlüğü (`logs/error.logs`):**
+* **Kalıcı Hata Günlüğü (`server/logs/error.logs`):**
   Sunucuda meydana gelen tüm `4xx` (İstemci / Bulunamadı hataları) ve `5xx` (Sunucu istisnaları) anında dosya sistemindeki [`logs/error.logs`](./server/logs/error.logs) dosyasına tarih, HTTP metodu, rota, durum kodu, yanıt süresi, istemci IP'si, hata gerekçesi (**reason**) ve stack trace detaylarıyla birlikte kalıcı olarak kaydedilir. Böylece geçmiş hatalar ve anomaliler geriye dönük olarak denetlenebilir.
 
-#### 404 Guardian Middleware (`server/middleware/notFoundGuardian.js`)
+#### 6.4.2 404 Guardian Middleware & Generic 404 Redirection (`server/middleware/notFoundGuardian.js`)
 
 Tanımlanmamış veya yanlış yazılmış rotaları yakalayarak istemciye hatanın kaynağını ve nedenini açıklayan bir gerekçe (**reason**) ile standart 404 yanıtı döndürür:
 
@@ -715,7 +722,7 @@ Tanımlanmamış veya yanlış yazılmış rotaları yakalayarak istemciye hatan
   ```
 * **Web / Tarayıcı Rotaları (Generic 404 Page & Redirection):** Kullanıcıyı düz bir metin veya siyah JSON ekranına düşürmek yerine, tüm geçersiz web istekleri doğrudan bağımsız **Generic 404 Sayfasına (`/404`)** yönlendirilir (`redirect invalid request`). Bu rota, tam teşekküllü kurumsal şablonu (Navbar, Footer, Beyazıt teması, aranan URL ve gerekçe kutusu) içeren [`server/public/404.html`](./server/public/404.html) sayfasını gerçek **HTTP 404 Not Found** durum koduyla sunar. Sayfada "Ana Sayfaya Dön", "Mezun Rehberi", "İş İlanları" ve "Duyurular" hızlı bağlantıları yer alır.
 
-#### 5xx Server Error Guardian Middleware (`server/middleware/serverErrorGuardian.js`)
+#### 6.4.3 5xx Server Error Guardian Middleware (`server/middleware/serverErrorGuardian.js`)
 
 Sunucu tarafında meydana gelen beklenmedik istisnaları (`Unhandled Exceptions`), veritabanı bağlantı kopmalarını (`ECONNREFUSED`), kısıt ihlallerini (`Unique/FK Constraint Violation`) ve runtime hatalarını yakalayan Express hata yakalama ara yazılımıdır (`err, req, res, next`). Hatayı terminale detaylı stack trace ile loglarken istemciye hatanın gerekçesini (**reason**) içeren güvenli bir 5xx yanıtı sunar:
 
