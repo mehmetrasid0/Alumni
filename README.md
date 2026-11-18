@@ -62,6 +62,7 @@ A modern, containerized full-stack web application for tracking and managing uni
 | 📮 **Postman Test Suite** | [`postman/Alumni_Tracker_API.postman_collection.json`](./postman/Alumni_Tracker_API.postman_collection.json) | One-click importable Postman collection containing 14 automated API requests |
 | 🏗️ **MVC Architecture** | [MVC Architecture Specification](#-mvc-architecture-model---view---controller) | Detailed technical breakdown of Model, View, and Controller layers |
 | 🗄️ **Data Design Document (DDD)** | [Data Design Documentation (`DDD.md`)](./DDD.md) | Comprehensive database design: Conceptual (CDM), Logical (LDM), Physical (PDM), Data Dictionary & PostgreSQL DDL |
+| 🎨 **Brand & Design System** | [Brand Identity (`brand.md`)](./brand.md) & [`design.md`](./design.md) | MIS department colors, LinkedIn/Lightcast UI blueprint (`awesome-design-md` 9-section spec) |
 | 🐘 **PostgreSQL Database** | [`database/init.sql`](./database/init.sql) & [`db-init.ps1`](./db-init.ps1) | Live containerized PostgreSQL 15 (`alumni-postgres` :5432), DDL schema, GIN indexes, auto-update triggers & seed data |
 | 🔄 **Database Migrations** | [`database/migrations/`](./database/migrations/) & [`db-migrate.ps1`](./db-migrate.ps1) | Version-controlled schema migrations with ledger tracking and rollback capability |
 | 🌱 **Factory & Seeder Suite** | [`server/database/factories/`](./server/database/factories/) & [`db-seed.ps1`](./db-seed.ps1) | Automated mock data factories, fluent state transformations & database seeding orchestrator |
@@ -559,6 +560,9 @@ alumni-tracker/
     ├── Dockerfile                              # [DevOps] Node.js 18 Alpine container image specification
     ├── docker-compose.yml                      # [DevOps] Multi-container orchestration, port mapping & live volume mount
     ├── README.md                               # [Documentation] Comprehensive project documentation & MVC guide
+    ├── DDD.md                                  # [Documentation] Data Design Document (CDM, LDM, PDM & DDL)
+    ├── brand.md                                # [Documentation] Brand identity, institutional tone & visual tokens
+    ├── design.md                               # [Documentation] 9-section DESIGN.md spec (MIS colors, LinkedIn & Lightcast UI)
     │
     └── server/                                 # [Application Server Root]
         ├── .env                                # [Config] Environment variables (PORT=5000, NODE_ENV=development)
