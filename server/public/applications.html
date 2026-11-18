@@ -11,36 +11,36 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --navy-900: #0A1628;
-      --navy-800: #1E293B;
-      --navy-700: #334155;
-      --gold-500: #F59E0B;
-      --gold-400: #FBBF24;
-      --blue-600: #2563EB;
-      --blue-50: #EFF6FF;
+      --navy-900: #0A0A0A;
+      --navy-800: #1F1D19;
+      --navy-700: #3A3832;
+      --gold-500: #F8E71C;
+      --gold-400: #FFF066;
+      --blue-600: #0284C7;
+      --blue-50: #E0F2FE;
       --purple-600: #7C3AED;
-      --purple-50: #F5F3FF;
-      --emerald-600: #059669;
-      --emerald-50: #ECFDF5;
-      --amber-600: #D97706;
-      --amber-50: #FFFBEB;
+      --purple-50: #F3E8FF;
+      --emerald-600: #0B7A3B;
+      --emerald-50: #DCFCE7;
+      --amber-600: #854D0E;
+      --amber-50: #FEF9C3;
       --rose-600: #DC2626;
-      --rose-50: #FEF2F2;
-      --slate-50: #F8FAFC;
-      --slate-100: #F1F5F9;
-      --slate-200: #E2E8F0;
-      --slate-300: #CBD5E1;
-      --slate-400: #94A3B8;
-      --slate-600: #475569;
-      --slate-800: #1E293B;
+      --rose-50: #FEE2E2;
+      --slate-50: #F7F5EE;
+      --slate-100: #F1EFE6;
+      --slate-200: #DFDCD2;
+      --slate-300: #DFDCD2;
+      --slate-400: #6E6A61;
+      --slate-600: #3A3832;
+      --slate-800: #0A0A0A;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #F8FAFC;
+      background: #F1EFE6;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--slate-800);
+      color: #0A0A0A;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -48,13 +48,14 @@
 
     /* Top Navigation */
     .top-nav {
-      background: var(--navy-900);
-      color: #fff;
-      padding: 16px 32px;
+      background: #2B2924;
+      color: #F1EFE6;
+      padding: 0 32px;
+      height: 74px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 4px 20px rgba(10, 22, 40, 0.15);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -63,41 +64,46 @@
     .top-nav .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
-      color: #fff;
-      font-weight: 700;
-      font-size: 1.25rem;
-      letter-spacing: -0.3px;
+      color: #F1EFE6;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
     }
 
-    .top-nav .brand span { color: var(--gold-500); }
+    .top-nav .brand span { color: #F1EFE6; }
 
     .top-nav .nav-menu {
       display: flex;
-      gap: 20px;
+      gap: 6px;
       align-items: center;
       list-style: none;
     }
 
     .top-nav .nav-menu a {
-      color: #94A3B8;
+      color: rgba(241, 239, 230, 0.76);
       text-decoration: none;
-      font-size: 0.95rem;
+      font-size: 14px;
       font-weight: 500;
-      transition: all 0.2s;
+      padding: 8px 14px;
+      border-radius: 9999px;
+      transition: background 0.2s, color 0.2s;
     }
 
     .top-nav .nav-menu a:hover,
     .top-nav .nav-menu a.active {
-      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      color: #F8E71C;
+      font-weight: 600;
     }
 
     .top-nav .nav-menu .btn-nav {
-      background: var(--gold-500);
-      color: var(--navy-900);
-      padding: 8px 16px;
-      border-radius: 8px;
+      background: #F8E71C;
+      color: #0A0A0A;
+      padding: 8px 18px;
+      border-radius: 9999px;
       font-weight: 600;
     }
 
@@ -687,22 +693,29 @@
 <body>
 
   <!-- Top Navigation -->
-  <header class="top-nav">
-    <a href="/" class="brand">
-      <span>🎓</span> Alumni<span>Tracker</span>
-    </a>
-    <nav>
-      <ul class="nav-menu">
-        <li><a href="/">Home</a></li>
-        <li><a href="/announcements">Announcements</a></li>
-        <li><a href="/users">Alumni Directory</a></li>
-        <li><a href="/jobs">Jobs</a></li>
-        <li><a href="/applications" class="active">Applications</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/api/swagger" target="_blank" class="btn-nav">Swagger ↗</a></li>
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="/" class="navbar-brand">
+        <div class="mis-2x2-mark" aria-hidden="true">
+          <span class="c-blue">M</span><span class="c-green">2</span>
+          <span class="c-yellow">I</span><span class="c-black">S</span>
+        </div>
+        <span>AlumniTracker</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Ana Sayfa</a></li>
+        <li><a href="/users">Mezunlar</a></li>
+        <li><a href="/jobs">Kariyer</a></li>
+        <li><a href="/applications" class="active">Başvurular</a></li>
+        <li><a href="/announcements">Duyurular</a></li>
+        <li><a href="/about">Hakkında</a></li>
+        <li><a href="/api/swagger" target="_blank" class="nav-cta">Swagger API</a></li>
       </ul>
-    </nav>
-  </header>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Menü">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
 
   <!-- Main Content -->
   <main class="dashboard-container">
@@ -710,48 +723,42 @@
     <!-- Dashboard Header -->
     <div class="dash-header">
       <div>
-        <div class="dash-badge">📑 Candidate Application Ledger & Pipeline</div>
-        <h1 class="dash-title">Candidate Applications & Recruitment</h1>
-        <p class="dash-subtitle">Review alumni applications, assess cover letters, track interview progression, and manage recruitment decisions across all career openings.</p>
+        <div class="dash-badge">İstanbul Üniversitesi • İktisat &amp; YBS</div>
+        <h1 class="dash-title">Aday Başvuruları ve Değerlendirme Süreci</h1>
+        <p class="dash-subtitle">Tüm ilanlara yapılan mezun başvurularını, ön yazıları ve mülakat aşamalarını tek panelden yönetin.</p>
       </div>
       <div class="header-actions">
-        <a href="/jobs" class="btn-secondary">
-          <span>💼</span> Browse Career Board
-        </a>
-        <button class="btn-primary" onclick="openSubmitModal()">
-          <span>+</span> Submit Application
+        <a href="/jobs" class="btn-ch-white">Kariyer Panosu</a>
+        <button class="btn-ch-yellow" onclick="openSubmitModal()">
+          <span>+</span> Başvuru Ekle
         </button>
       </div>
     </div>
 
-    <!-- Stats Grid -->
+    <!-- Stats Grid (Typographic KPI Strip) -->
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon" style="background: #EFF6FF; color: #2563EB;">📑</div>
+      <div class="stat-card" style="border-top: 3px solid #5EC2E6;">
         <div>
-          <div class="stat-val" id="statTotal">0</div>
-          <div class="stat-label">Total Applications</div>
+          <div class="stat-val tabular-nums" id="statTotal">0</div>
+          <div class="stat-label">Toplam Başvuru</div>
         </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background: #FEF3C7; color: #D97706;">⏳</div>
+      <div class="stat-card" style="border-top: 3px solid #F8E71C;">
         <div>
-          <div class="stat-val" id="statReview">0</div>
-          <div class="stat-label">Under Review</div>
+          <div class="stat-val tabular-nums" id="statReview">0</div>
+          <div class="stat-label">İncelemede</div>
         </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background: #EEF2FF; color: #4F46E5;">⭐</div>
+      <div class="stat-card" style="border-top: 3px solid #0284C7;">
         <div>
-          <div class="stat-val" id="statShortlisted">0</div>
-          <div class="stat-label">Shortlisted Candidates</div>
+          <div class="stat-val tabular-nums" id="statShortlisted">0</div>
+          <div class="stat-label">Kısa Liste</div>
         </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background: #ECFDF5; color: #059669;">🚀</div>
+      <div class="stat-card" style="border-top: 3px solid #0B7A3B;">
         <div>
-          <div class="stat-val" id="statAccepted">0</div>
-          <div class="stat-label">Accepted / Placed</div>
+          <div class="stat-val tabular-nums" id="statAccepted">0</div>
+          <div class="stat-label">Kabul / Teklif</div>
         </div>
       </div>
     </div>
@@ -760,8 +767,11 @@
     <div class="filters-bar">
       <div class="search-row">
         <div class="search-input-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="Search candidate name, email, target role, or company..." oninput="debounceFilter()">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Aday adı, e-posta, hedef pozisyon veya şirket ara..." oninput="debounceFilter()">
         </div>
         <select id="jobFilter" class="filter-select" onchange="applyFilters()">
           <option value="all">All Career Openings</option>
@@ -1293,6 +1303,12 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+    }
+
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileToggle && navLinks) {
+      mobileToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
     }
   </script>
 </body>

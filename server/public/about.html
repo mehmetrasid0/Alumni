@@ -21,24 +21,12 @@
     }
   </script>
   <style>
-    /* ==================== About Page Specific ==================== */
+    /* ==================== About Page Specific (Clubhouse + MIS School Theme) ==================== */
     .about-hero {
-      background: linear-gradient(160deg, var(--navy-900) 0%, var(--navy-700) 60%, var(--navy-600) 100%);
-      padding: 140px 0 80px;
+      background: #2B2924;
+      padding: 68px 0 52px;
       text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .about-hero::before {
-      content: '';
-      position: absolute;
-      top: -40%;
-      right: -15%;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(200, 169, 81, 0.06) 0%, transparent 70%);
-      border-radius: 50%;
+      border-bottom: 2px solid #0A0A0A;
     }
 
     .about-hero .container {
@@ -47,24 +35,21 @@
     }
 
     .about-hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 3rem;
+      font-size: 36px;
+      font-weight: 800;
       color: #FFFFFF;
-      margin-bottom: 16px;
-      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      letter-spacing: -0.025em;
     }
 
     .about-hero h1 .highlight {
-      background: linear-gradient(135deg, var(--gold-400), var(--gold-300));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #F8E71C;
     }
 
     .about-hero p {
-      color: rgba(255, 255, 255, 0.55);
-      font-size: 1.05rem;
-      max-width: 520px;
+      color: rgba(241, 239, 230, 0.78);
+      font-size: 16px;
+      max-width: 560px;
       margin: 0 auto;
     }
 
@@ -486,16 +471,19 @@
   <nav class="navbar" id="navbar">
     <div class="container">
       <a href="/" class="navbar-brand">
-        <div class="logo-icon">🎓</div>
-        <span>Alumni<span class="brand-accent">Tracker</span></span>
+        <div class="mis-2x2-mark" aria-hidden="true">
+          <span class="c-blue">M</span><span class="c-green">2</span>
+          <span class="c-yellow">I</span><span class="c-black">S</span>
+        </div>
+        <span>AlumniTracker</span>
       </a>
       <ul class="nav-links" id="navLinks">
-        <li><a href="/">Home</a></li>
-        <li><a href="/announcements">Announcements</a></li>
-        <li><a href="/users">Alumni Directory</a></li>
-        <li><a href="/jobs">Jobs</a></li>
-        <li><a href="/applications">Applications</a></li>
-        <li><a href="/about" style="color: #FFFFFF;">About</a></li>
+        <li><a href="/">Ana Sayfa</a></li>
+        <li><a href="/users">Mezunlar</a></li>
+        <li><a href="/jobs">Kariyer</a></li>
+        <li><a href="/applications">Başvurular</a></li>
+        <li><a href="/announcements">Duyurular</a></li>
+        <li><a href="/about" class="active">Hakkında</a></li>
         <li><a href="/api/swagger" target="_blank" class="nav-cta">Swagger API</a></li>
       </ul>
       <button class="mobile-toggle" id="mobileToggle" aria-label="Menü">

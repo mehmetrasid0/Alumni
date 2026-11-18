@@ -8,102 +8,77 @@
   <link rel="stylesheet" href="/css/style.css">
   <style>
     .error-hero {
-      background: radial-gradient(circle at 85% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
-                  linear-gradient(135deg, #07101E 0%, #0D1B2A 50%, #152538 100%);
-      min-height: calc(100vh - 80px);
+      background: #F1EFE6;
+      min-height: calc(100vh - 74px);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 120px 20px 80px;
-      position: relative;
-      overflow: hidden;
-      border-bottom: 3px solid var(--gold-400, #D4AF37);
-    }
-
-    .error-hero::before {
-      content: '';
-      position: absolute;
-      top: -30%;
-      right: -10%;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
-      border-radius: 50%;
+      padding: 48px 20px;
     }
 
     .error-container {
-      max-width: 680px;
+      max-width: 620px;
       width: 100%;
-      background: rgba(13, 27, 42, 0.9);
-      border: 2px solid rgba(212, 175, 55, 0.4);
+      background: #FFFFFF;
+      border: 1.5px solid #0A0A0A;
       border-radius: 24px;
-      padding: 48px 36px;
+      padding: 44px 36px;
       text-align: center;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(212, 175, 55, 0.12);
-      backdrop-filter: blur(12px);
-      position: relative;
-      z-index: 2;
+      box-shadow: 0 8px 24px rgba(43,41,36,0.08);
     }
 
     .error-code {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 6.5rem;
-      font-weight: 900;
-      line-height: 1;
-      margin: 0 0 10px 0;
-      background: linear-gradient(135deg, #FFF0B3 0%, #D4AF37 50%, #F59E0B 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -2px;
-      text-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+      font-variant-numeric: tabular-nums;
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin: 0 0 8px 0;
+      color: #0A0A0A;
     }
 
     .error-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 6px 18px;
-      background: rgba(220, 38, 38, 0.15);
-      border: 1px solid rgba(220, 38, 38, 0.45);
-      border-radius: 50px;
-      color: #FCA5A5;
-      font-size: 0.85rem;
+      gap: 6px;
+      padding: 5px 14px;
+      background: #F8E71C;
+      border: 1px solid #0A0A0A;
+      border-radius: 9999px;
+      color: #0A0A0A;
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .error-title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 2rem;
+      font-size: 24px;
       font-weight: 800;
-      color: #FFFFFF;
-      margin: 0 0 14px 0;
+      color: #0A0A0A;
+      margin: 0 0 10px 0;
     }
 
     .error-subtitle {
-      color: #CBD5E1;
-      font-size: 1.05rem;
-      line-height: 1.6;
-      margin-bottom: 28px;
+      color: #6E6A61;
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 24px;
     }
 
     .error-details-box {
-      background: rgba(7, 16, 30, 0.7);
-      border: 1px solid rgba(212, 175, 55, 0.25);
-      border-left: 4px solid var(--gold-400, #D4AF37);
+      background: #F1EFE6;
+      border: 1px solid #DFDCD2;
+      border-left: 3px solid #0A0A0A;
       border-radius: 12px;
       padding: 16px 20px;
       text-align: left;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
 
     .error-details-label {
-      font-size: 0.75rem;
+      font-size: 11px;
       font-weight: 700;
-      color: #94A3B8;
+      color: #6E6A61;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 4px;
@@ -111,15 +86,15 @@
 
     .error-details-path {
       font-family: monospace;
-      font-size: 0.95rem;
-      color: #F6D06E;
+      font-size: 14px;
+      color: #0A0A0A;
       word-break: break-all;
       margin-bottom: 12px;
     }
 
     .error-details-reason {
-      color: #E2E8F0;
-      font-size: 0.9rem;
+      color: #DC2626;
+      font-size: 14px;
       line-height: 1.5;
     }
 
@@ -131,39 +106,37 @@
     }
 
     .btn-home {
-      background: linear-gradient(135deg, #D4AF37, #C59B27);
-      color: #0A1628 !important;
-      padding: 13px 28px;
-      border-radius: 10px;
+      background: #F8E71C;
+      color: #0A0A0A !important;
+      border: 1.5px solid #0A0A0A;
+      border-bottom-width: 3px;
+      padding: 11px 24px;
+      border-radius: 9999px;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 14.5px;
       text-decoration: none;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+      transition: transform 0.2s ease;
     }
 
     .btn-home:hover {
-      background: linear-gradient(135deg, #F3C94D, #D4AF37);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
+      transform: translateY(-1px);
     }
 
     .btn-outline {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      color: #F6D06E !important;
-      padding: 13px 24px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.95rem;
+      background: #FFFFFF;
+      border: 1.5px solid #0A0A0A;
+      border-bottom-width: 3px;
+      color: #0A0A0A !important;
+      padding: 11px 22px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 14.5px;
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: transform 0.2s ease;
     }
 
     .btn-outline:hover {
-      background: rgba(212, 175, 55, 0.15);
-      border-color: #D4AF37;
-      transform: translateY(-2px);
+      background: #F1EFE6;
     }
   </style>
 </head>
@@ -173,15 +146,19 @@
   <nav class="navbar" id="navbar">
     <div class="container">
       <a href="/" class="navbar-brand">
-        <div class="logo-icon">🎓</div>
-        <span>Alumni<span class="brand-accent">Tracker</span></span>
+        <div class="mis-2x2-mark" aria-hidden="true">
+          <span class="c-blue">M</span><span class="c-green">2</span>
+          <span class="c-yellow">I</span><span class="c-black">S</span>
+        </div>
+        <span>AlumniTracker</span>
       </a>
       <ul class="nav-links" id="navLinks">
-        <li><a href="/announcements">Announcements</a></li>
-        <li><a href="/users">Alumni Directory</a></li>
-        <li><a href="/jobs">Jobs</a></li>
-        <li><a href="/applications">Applications</a></li>
-        <li><a href="/about">About</a></li>
+        <li><a href="/">Ana Sayfa</a></li>
+        <li><a href="/users">Mezunlar</a></li>
+        <li><a href="/jobs">Kariyer</a></li>
+        <li><a href="/applications">Başvurular</a></li>
+        <li><a href="/announcements">Duyurular</a></li>
+        <li><a href="/about">Hakkında</a></li>
         <li><a href="/api/swagger" target="_blank" class="nav-cta">Swagger API</a></li>
       </ul>
       <button class="mobile-toggle" id="mobileToggle" aria-label="Menü">
