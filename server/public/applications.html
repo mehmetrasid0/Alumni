@@ -972,8 +972,22 @@
 
     async function fetchApplications() {
       try {
-        const res = await fetch('/api/applications');
+        const res = await fetch('/api/applications', { credentials: 'same-origin' });
         const json = await res.json();
+        if (res.status === 401) {
+          allApplications = [];
+          updateStats();
+          document.getElementById('applicationsTbody').innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 48px; color: #3D3B36;">
+                <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 8px;">Başvuruları görüntülemek için oturum açmanız gerekiyor</div>
+                <p style="color: #6B675E; font-size: 0.9rem; margin-bottom: 16px;">Aday verileri KVKK ve RBAC yetki kuralları gereği yalnızca yetkili hesaplara açılır.</p>
+                <a href="/login?redirect=/applications" class="btn-primary" style="display: inline-block; padding: 10px 22px; text-decoration: none;">Giriş Yap</a>
+              </td>
+            </tr>
+          `;
+          return;
+        }
         if (json.success && Array.isArray(json.data)) {
           allApplications = json.data;
           renderApplications();
@@ -1035,7 +1049,7 @@
 
       alumniUsers.forEach(u => {
         const name = u.name || u.fullName || u.email;
-        options += `<option value="${u.id}">${name} (${u.email})</option>`;
+        options += `<option value="${u.userId || u.id}">${name} (${u.email})</option>`;
       });
 
       subApplicantSelect.innerHTML = options;
@@ -1117,13 +1131,37 @@
               ${dateStr}
             </td>
             <td style="text-align: right;">
-              <button class="btn-action-review" onclick="openReviewModal('${a.id}')">
-                Review & Evaluate
-              </button>
+              ${(window.__AUTH_STATE__ && (window.__AUTH_STATE__.role === 'admin' || window.__AUTH_STATE__.role === 'coordinator'))
+                ? `<button class="btn-action-review" onclick="openReviewModal('${a.id}')">Değerlendir</button>`
+                : `<button class="btn-action-review" style="background:#FEF2F2; color:#B91C1C; border:1px solid #FCA5A5;" onclick="withdrawMyApplication('${a.id}')">Geri Çek</button>`
+              }
             </td>
           </tr>
         `;
       }).join('');
+    }
+
+    function applyApplicationsRoleUI(auth) {
+      const select = document.getElementById('subApplicantSelect');
+      if (select && auth && auth.user && auth.role !== 'admin') {
+        select.value = auth.user.userId || auth.user.id;
+        select.disabled = true;
+      }
+      if (allApplications.length > 0) renderApplications();
+    }
+    if (window.__AUTH_STATE__) applyApplicationsRoleUI(window.__AUTH_STATE__);
+    document.addEventListener('auth:ready', (e) => applyApplicationsRoleUI(e.detail));
+
+    async function withdrawMyApplication(appId) {
+      if (!confirm('Başvurunuzu geri çekmek istediğinizden emin misiniz?')) return;
+      try {
+        const res = await fetch(`/api/applications/${appId}`, { method: 'DELETE', credentials: 'same-origin' });
+        const json = await res.json();
+        if (!res.ok || !json.success) throw new Error(json.error || 'İşlem başarısız');
+        fetchApplications();
+      } catch (err) {
+        alert(err.message);
+      }
     }
 
     function updateStats() {
@@ -1311,5 +1349,6 @@
       mobileToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
     }
   </script>
+  <script src="/js/auth-nav.js"></script>
 </body>
 </html>

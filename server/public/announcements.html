@@ -477,7 +477,7 @@
           <h1 class="bulletin-title">Bölüm Duyuruları ve Kurumsal Bülten</h1>
           <p class="bulletin-subtitle">Akademik takvim, yıllık mezun buluşmaları, staj çağrıları ve bölüm içi resmi duyuruları yönetin.</p>
         </div>
-        <button class="btn-ch-yellow" id="openCreateModalBtn">+ Yeni Duyuru Yayınla</button>
+        <button class="btn-ch-yellow" id="openCreateModalBtn" style="display:none;">+ Yeni Duyuru Yayınla</button>
       </div>
 
       <!-- Typographic KPI Strip -->
@@ -765,6 +765,11 @@
         return;
       }
 
+      const authState = window.__AUTH_STATE__ || { role: 'guest', user: null };
+      const isAdmin = authState.role === 'admin';
+      const isCoord = authState.role === 'coordinator';
+      const actorUserId = authState.user ? (authState.user.userId || authState.user.id) : null;
+
       tableBody.innerHTML = filtered.map(a => {
         const catKey = (a.category || 'general').toLowerCase();
         const prioKey = (a.priority || 'medium').toLowerCase();
@@ -772,6 +777,7 @@
         const dateFormatted = new Date(a.createdAt).toLocaleDateString('tr-TR', {
           year: 'numeric', month: 'short', day: 'numeric'
         });
+        const canModify = isAdmin || (isCoord && actorUserId && String(a.authorId) === String(actorUserId));
 
         return `
           <tr>
@@ -800,8 +806,8 @@
             <td style="text-align: right;">
               <div class="actions-cell">
                 <a href="/announcements/${a.id}" class="btn-action">Görüntüle</a>
-                <a href="/announcements/${a.id}/edit" class="btn-action">Düzenle</a>
-                <button onclick="handleDelete(${a.id}, '${escapeHtml(a.title)}')" class="btn-action btn-action-delete">Sil</button>
+                ${canModify ? `<a href="/announcements/${a.id}/edit" class="btn-action">Düzenle</a>` : ''}
+                ${canModify ? `<button onclick="handleDelete(${a.id}, '${escapeHtml(a.title)}')" class="btn-action btn-action-delete">Sil</button>` : ''}
               </div>
             </td>
           </tr>
@@ -900,7 +906,16 @@
       }
     }
 
+    function applyAnnouncementRoleUI(auth) {
+      const canPublish = auth && (auth.role === 'admin' || auth.role === 'coordinator');
+      if (openCreateBtn) openCreateBtn.style.display = canPublish ? 'inline-flex' : 'none';
+      if (announcements.length > 0) renderTable();
+    }
+    if (window.__AUTH_STATE__) applyAnnouncementRoleUI(window.__AUTH_STATE__);
+    document.addEventListener('auth:ready', (e) => applyAnnouncementRoleUI(e.detail));
+
     document.addEventListener('DOMContentLoaded', loadAnnouncements);
   </script>
+  <script src="/js/auth-nav.js"></script>
 </body>
 </html>

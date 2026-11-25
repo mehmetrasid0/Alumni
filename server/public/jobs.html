@@ -653,7 +653,7 @@
         <p class="dash-subtitle">Mezunlarımız ve iş ortağı şirketler tarafından paylaşılan güncel iş, staj ve kariyer fırsatları.</p>
       </div>
       <div>
-        <button class="btn-ch-yellow" onclick="openJobModal()">
+        <button class="btn-ch-yellow" id="openCreateJobBtn" onclick="openJobModal()" style="display:none;">
           <span>+</span> Yeni İlan Yayınla
         </button>
       </div>
@@ -937,7 +937,7 @@
       const applySelect = document.getElementById('applyApplicantSelect');
 
       const optionsHtml = alumniUsers.map(u => `
-        <option value="${u.id}">${u.name || u.fullName || u.email} (${u.email})</option>
+        <option value="${u.userId || u.id}">${u.name || u.fullName || u.email} (${u.email})</option>
       `).join('');
 
       applySelect.innerHTML = `<option value="">-- Choose verified applicant --</option>` + optionsHtml;
@@ -1030,9 +1030,12 @@
                 🏢 <b>${escapeHtml(company)}</b>${dept} • ${dateStr}
               </div>
               <div class="card-actions">
-                <a href="/api/jobs/${j.id}/applications" target="_blank" class="btn-details" title="View applications for this job in JSON">📑 Candidates</a>
+                ${(window.__AUTH_STATE__ && (window.__AUTH_STATE__.role === 'admin' || window.__AUTH_STATE__.role === 'coordinator'))
+                  ? `<a href="/jobs/${j.id}/applications" class="btn-details" title="View applications for this job">Adaylar</a>`
+                  : `<a href="/jobs/${j.id}" class="btn-details">Detaylar</a>`
+                }
                 <button class="btn-apply" onclick="openApplyModal('${j.id}', '${escapeHtml(j.title).replace(/'/g, "\\'")}', '${escapeHtml(company).replace(/'/g, "\\'")}')">
-                  Apply Now ↗
+                  Başvur ↗
                 </button>
               </div>
             </div>
@@ -1069,13 +1072,36 @@
       renderJobs();
     }
 
-    // Apply Modal Handlers
+    // Apply Modal Handlers (Role & Auth Aware)
     function openApplyModal(jobId, title, company) {
+      const auth = window.__AUTH_STATE__;
+      if (!auth || !auth.authenticated || !auth.user) {
+        window.location.href = '/login?redirect=/jobs';
+        return;
+      }
+
       document.getElementById('applyJobId').value = jobId;
       document.getElementById('applyModalTitle').innerText = title;
       document.getElementById('applyModalCompany').innerText = company;
+
+      const select = document.getElementById('applyApplicantSelect');
+      const actorId = auth.user.userId || auth.user.id;
+      if (select && actorId) {
+        select.value = actorId;
+        select.disabled = (auth.role !== 'admin');
+      }
+
       document.getElementById('applyModal').classList.add('open');
     }
+
+    function applyJobsRoleUI(auth) {
+      const createBtn = document.getElementById('openCreateJobBtn');
+      const canPostJob = auth && (auth.role === 'admin' || auth.role === 'coordinator');
+      if (createBtn) createBtn.style.display = canPostJob ? 'inline-flex' : 'none';
+      if (allJobs.length > 0) renderJobs();
+    }
+    if (window.__AUTH_STATE__) applyJobsRoleUI(window.__AUTH_STATE__);
+    document.addEventListener('auth:ready', (e) => applyJobsRoleUI(e.detail));
 
     function closeApplyModal() {
       document.getElementById('applyModal').classList.remove('open');
@@ -1187,5 +1213,6 @@
       mobileToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
     }
   </script>
+  <script src="/js/auth-nav.js"></script>
 </body>
 </html>

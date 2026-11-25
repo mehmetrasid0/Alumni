@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Alumni Tracker — Kullanıcıya Özel Çalışma Alanı, Profil Düzenleme ve Kişisel Başvuru Takibi">
+  <title>Kişisel Alanım | Alumni Tracker — İÜ İktisat & YBS</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .profile-hero {
+      background: var(--espresso);
+      color: var(--paper);
+      padding: 40px 0 36px;
+      border-bottom: 1.5px solid var(--ink);
+    }
+
+    .profile-hero-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .profile-ident {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .profile-avatar {
+      width: 78px;
+      height: 78px;
+      border-radius: 20px;
+      object-fit: cover;
+      border: 2px solid var(--mis-yellow);
+      background: #1F1D19;
+    }
+
+    .role-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .role-badge.admin { background: var(--mis-yellow); color: var(--ink); }
+    .role-badge.coordinator { background: var(--mis-blue); color: var(--ink); }
+    .role-badge.alumni { background: var(--mis-green); color: #FFFFFF; }
+
+    .founder-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.12);
+      color: var(--mis-yellow);
+      border: 1px solid rgba(248,231,28,0.4);
+    }
+
+    .profile-main {
+      padding: 36px 0 80px;
+    }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .card-box {
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .card-box h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .fg { margin-bottom: 12px; }
+    .fg.full { grid-column: 1 / -1; }
+
+    .fg label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 5px;
+    }
+
+    .fc {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--hairline);
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+      background: #FAF9F5;
+    }
+
+    .fc:focus { outline: none; border-color: var(--ink); background: #FFFFFF; }
+
+    .list-item {
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      background: #FDFCF9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .list-item:last-child { margin-bottom: 0; }
+
+    .pill-mini {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: #EEF2FF;
+      color: #3730A3;
+    }
+
+    .btn-mini {
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--hairline);
+      background: #FFFFFF;
+      color: var(--ink);
+      font-family: inherit;
+      text-decoration: none;
+    }
+
+    .btn-mini.primary { background: var(--mis-yellow); border-color: var(--ink); font-weight: 700; }
+    .btn-mini.danger { border-color: #FCA5A5; color: #B91C1C; background: #FEF2F2; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--espresso);
+      color: #FFFFFF;
+      border: 1px solid var(--mis-yellow);
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      display: none;
+      z-index: 1000;
+    }
+
+    .toast.show { display: block; }
+
+    @media (max-width: 920px) {
+      .workspace-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== Unified Top Navigation ==================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="/" class="navbar-brand">
+        <div class="mis-2x2-mark" aria-hidden="true">
+          <span class="c-blue">M</span><span class="c-green">2</span>
+          <span class="c-yellow">I</span><span class="c-black">S</span>
+        </div>
+        <span>AlumniTracker</span>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Ana Sayfa</a></li>
+      </ul>
+
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Menü">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== Personal Header ==================== -->
+  <header class="profile-hero">
+    <div class="container">
+      <div class="profile-hero-inner">
+        <div class="profile-ident">
+          <img id="heroAvatar" class="profile-avatar" src="/img/avatars/avatar-1.jpg" alt="Kullanıcı">
+          <div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+              <span class="role-badge alumni" id="heroRoleBadge">—</span>
+              <span class="founder-badge" id="heroSpecialBadge" style="display:none;">Platform Kurucusu</span>
+              <span style="font-size:12px; color:rgba(241,239,230,0.7);" id="heroStudentId"></span>
+            </div>
+            <h1 id="heroName" style="font-size:28px; color:#FFFFFF; font-weight:800; line-height:1.15;">Kişisel Çalışma Alanı</h1>
+            <p id="heroSub" style="font-size:14px; color:rgba(241,239,230,0.78); margin-top:4px;">Yalnızca oturum sahibi kullanıcıya özel kişisel veriler ve yetki modülleri</p>
+          </div>
+        </div>
+        <div id="heroActions" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== Workspace Content ==================== -->
+  <main class="profile-main">
+    <div class="container">
+      <div class="workspace-grid">
+
+        <!-- LEFT: Private Self-Profile Editor -->
+        <div>
+          <section class="card-box">
+            <h2>Kişisel Profil Bilgilerim</h2>
+            <p class="card-sub">Yalnızca hesap sahibi (veya yönetici) bu alanları güncelleyebilir.</p>
+
+            <form id="selfProfileForm" onsubmit="saveSelfProfile(event)">
+              <div class="form-grid">
+                <div class="fg full">
+                  <label>Ad Soyad</label>
+                  <input class="fc" id="fName" name="name" required>
+                </div>
+                <div class="fg full">
+                  <label>E-posta Adresi</label>
+                  <input class="fc" id="fEmail" name="email" type="email" required>
+                </div>
+                <div class="fg">
+                  <label>Bölüm</label>
+                  <input class="fc" id="fDepartment" name="department">
+                </div>
+                <div class="fg">
+                  <label>Mezuniyet Yılı</label>
+                  <input class="fc" id="fYear" name="graduationYear" type="number" min="1980" max="2032">
+                </div>
+                <div class="fg">
+                  <label>Şirket / Kurum</label>
+                  <input class="fc" id="fCompany" name="company">
+                </div>
+                <div class="fg">
+                  <label>Unvan / Pozisyon</label>
+                  <input class="fc" id="fJobTitle" name="role">
+                </div>
+                <div class="fg full">
+                  <label>Yetkinlikler (virgülle ayırın)</label>
+                  <input class="fc" id="fSkills" name="skills" placeholder="Node.js, SQL, Product Management">
+                </div>
+              </div>
+              <button type="submit" class="btn-ch-yellow" id="saveProfileBtn" style="width:100%; margin-top:8px;">Değişiklikleri Kaydet</button>
+            </form>
+          </section>
+        </div>
+
+        <!-- RIGHT: User & Role Specific Modules -->
+        <div>
+
+          <!-- Special Privilege Module for Admin / Founder -->
+          <section class="card-box" id="adminSpecialBox" style="display:none; border:1.5px solid var(--ink); background:#FFFDF2;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+              <h2 style="margin:0;">Yönetici / Kurucu Özel Denetim Özeti</h2>
+              <a href="/admin" class="btn-mini primary">Tam Yönetim Paneline Git</a>
+            </div>
+            <p class="card-sub" id="adminSpecialDesc">Sistem geneli rol, duyuru ve tarih denetimi yalnızca yönetici hesabına açıktır.</p>
+            <div id="adminMetricsRow" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+          </section>
+
+          <!-- Special Coordinator / Author Module -->
+          <section class="card-box" id="staffSpecialBox" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+              <h2 style="margin:0;">Yayınladığım Duyurular</h2>
+              <div style="display:flex; gap:8px;">
+                <a href="/announcements/create" class="btn-mini primary">+ Duyuru Yaz</a>
+                <a href="/jobs/create" class="btn-mini">+ İlan Ekle</a>
+              </div>
+            </div>
+            <p class="card-sub">Yalnızca sizin hesabınızla oluşturulmuş kampüs ve kariyer duyuruları.</p>
+            <div id="myAnnouncementsList">Yükleniyor...</div>
+          </section>
+
+          <!-- Personal Applications Module -->
+          <section class="card-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+              <h2 style="margin:0;">Kişisel İş Başvurularım</h2>
+              <a href="/jobs" class="btn-mini">İlanlara Göz At</a>
+            </div>
+            <p class="card-sub">Yalnızca kendi hesabınıza ait başvuruları görüntüler ve geri çekebilirsiniz.</p>
+            <div id="myApplicationsList">Yükleniyor...</div>
+          </section>
+
+          <!-- Skill-Matched Career Recommendations for This User -->
+          <section class="card-box">
+            <h2>Yetenek ve Bölümünüze Özel İlan Önerileri</h2>
+            <p class="card-sub">Profilinizdeki bölüm ve yetkinlik etiketlerine göre size özel filtrelenen açık pozisyonlar.</p>
+            <div id="recommendedJobsList">Yükleniyor...</div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let currentUser = null;
+
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileToggle && navLinks) {
+      mobileToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3200);
+    }
+
+    function pickAvatar(name) {
+      const femaleNames = ['elif', 'zeynep', 'ayşe', 'ayse', 'fatma', 'merve', 'selin', 'ece', 'deniz', 'esra'];
+      const first = (name || '').trim().split(/\s+/)[0].toLowerCase();
+      return femaleNames.includes(first) ? '/img/avatars/avatar-2.jpg' : '/img/avatars/avatar-1.jpg';
+    }
+
+    async function loadProfileWorkspace() {
+      const meRes = await fetch('/api/users/me', { credentials: 'same-origin' });
+      if (meRes.status === 401) {
+        window.location.href = '/login?redirect=/profile';
+        return;
+      }
+
+      const meJson = await meRes.json();
+      if (!meJson.success || !meJson.data) return;
+
+      currentUser = meJson.data;
+      const role = String(currentUser.userRole || 'alumni').toLowerCase();
+
+      // Hero header
+      document.getElementById('heroAvatar').src = pickAvatar(currentUser.name);
+      document.getElementById('heroName').textContent = currentUser.name || currentUser.email;
+      document.getElementById('heroSub').textContent = `${currentUser.role || 'Mezun'} @ ${currentUser.company || 'İstanbul Üniversitesi'} • ${currentUser.email}`;
+      document.getElementById('heroStudentId').textContent = currentUser.studentId ? `Öğrenci No: ${currentUser.studentId}` : '';
+
+      const badge = document.getElementById('heroRoleBadge');
+      badge.textContent = role;
+      badge.className = `role-badge ${role}`;
+
+      if (currentUser.email === 'mehmetrasid19@gmail.com') {
+        document.getElementById('heroSpecialBadge').style.display = 'inline-block';
+        document.getElementById('adminSpecialDesc').textContent =
+          'Platform Kurucusu (mehmetrasid19@gmail.com) hesabıyla tam sistem, RBAC ve veri/tarih kontrol yetkisine sahipsiniz.';
+      }
+
+      document.getElementById('heroActions').innerHTML = `
+        <a href="/users/${currentUser.id}" class="btn-ch-white">Herkese Açık Kartım</a>
+        ${role === 'admin' ? '<a href="/admin" class="btn-ch-yellow">Yönetim Paneli</a>' : ''}
+      `;
+
+      // Populate editable form
+      document.getElementById('fName').value = currentUser.name || '';
+      document.getElementById('fEmail').value = currentUser.email || '';
+      document.getElementById('fDepartment').value = currentUser.department || '';
+      document.getElementById('fYear').value = currentUser.graduationYear || '';
+      document.getElementById('fCompany').value = currentUser.company || '';
+      document.getElementById('fJobTitle').value = currentUser.role || '';
+      document.getElementById('fSkills').value = (currentUser.skills || []).join(', ');
+
+      // Role-specific sections
+      if (role === 'admin') {
+        document.getElementById('adminSpecialBox').style.display = 'block';
+        loadAdminOverview();
+      }
+      if (role === 'admin' || role === 'coordinator') {
+        document.getElementById('staffSpecialBox').style.display = 'block';
+        loadMyAnnouncements();
+      }
+
+      await Promise.all([loadMyApplications(), loadRecommendedJobs()]);
+    }
+
+    async function saveSelfProfile(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+      const btn = document.getElementById('saveProfileBtn');
+      btn.disabled = true;
+      btn.textContent = 'Kaydediliyor...';
+
+      const skills = document.getElementById('fSkills').value
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      try {
+        const res = await fetch(`/api/users/${currentUser.userId}`, {
+          method: 'PATCH',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('fName').value.trim(),
+            email: document.getElementById('fEmail').value.trim(),
+            department: document.getElementById('fDepartment').value.trim(),
+            graduationYear: document.getElementById('fYear').value ? parseInt(document.getElementById('fYear').value, 10) : null,
+            company: document.getElementById('fCompany').value.trim(),
+            role: document.getElementById('fJobTitle').value.trim(),
+            skills
+          })
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+          throw new Error(json.error || 'Profil güncellenemedi');
+        }
+        currentUser = json.data;
+        showToast('Kişisel profil bilgileriniz güncellendi.');
+        await loadRecommendedJobs();
+        if (typeof window.initAuthNavbarRefresh === 'function') window.initAuthNavbarRefresh();
+      } catch (err) {
+        showToast('Hata: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Değişiklikleri Kaydet';
+      }
+    }
+
+    async function loadAdminOverview() {
+      try {
+        const res = await fetch('/api/admin/overview', { credentials: 'same-origin' });
+        const json = await res.json();
+        if (!res.ok || !json.success) return;
+        const d = json.data;
+        document.getElementById('adminMetricsRow').innerHTML = `
+          <span class="pill-mini">Üye: ${d.users.total}</span>
+          <span class="pill-mini">Admin: ${d.users.admins}</span>
+          <span class="pill-mini">Koordinatör: ${d.users.coordinators}</span>
+          <span class="pill-mini">Duyuru: ${d.announcements.total}</span>
+          <span class="pill-mini">İlan: ${d.jobs.total}</span>
+          <span class="pill-mini">Başvuru: ${d.applications.total}</span>
+        `;
+      } catch (e) {}
+    }
+
+    async function loadMyAnnouncements() {
+      const box = document.getElementById('myAnnouncementsList');
+      try {
+        const res = await fetch(`/api/users/${currentUser.userId}/announcements`, { credentials: 'same-origin' });
+        const json = await res.json();
+        const items = json.data || [];
+        if (items.length === 0) {
+          box.innerHTML = '<div style="color:var(--muted); font-size:13.5px;">Henüz hesabınızla oluşturulmuş bir duyuru bulunmuyor.</div>';
+          return;
+        }
+        box.innerHTML = items.map(a => `
+          <div class="list-item">
+            <div>
+              <strong>${escapeHtml(a.title)}</strong><br>
+              <span style="font-size:12px; color:var(--muted);">${escapeHtml(a.category)} • ${escapeHtml(a.status)}</span>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <a href="/announcements/${a.id}" class="btn-mini">Görüntüle</a>
+              <a href="/announcements/${a.id}/edit" class="btn-mini">Düzenle</a>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        box.innerHTML = '<div style="color:#B91C1C; font-size:13px;">Duyurular yüklenemedi.</div>';
+      }
+    }
+
+    async function loadMyApplications() {
+      const box = document.getElementById('myApplicationsList');
+      try {
+        const res = await fetch(`/api/users/${currentUser.userId}/applications`, { credentials: 'same-origin' });
+        const json = await res.json();
+        const items = json.data || [];
+        if (items.length === 0) {
+          box.innerHTML = '<div style="color:var(--muted); font-size:13.5px;">Henüz aktif bir iş başvurunuz bulunmuyor.</div>';
+          return;
+        }
+        box.innerHTML = items.map(a => `
+          <div class="list-item">
+            <div>
+              <strong>${escapeHtml(a.jobTitle || 'İlan')}</strong><br>
+              <span style="font-size:12px; color:var(--muted);">${escapeHtml(a.companyName || '')} • ${new Date(a.appliedAt).toLocaleDateString('tr-TR')}</span>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span class="pill-mini">${escapeHtml(a.status)}</span>
+              <button type="button" class="btn-mini danger" onclick="withdrawApplication('${a.id}')">Geri Çek</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        box.innerHTML = '<div style="color:#B91C1C; font-size:13px;">Başvurular yüklenemedi.</div>';
+      }
+    }
+
+    async function withdrawApplication(appId) {
+      if (!confirm('Bu başvuruyu geri çekmek istiyor musunuz?')) return;
+      try {
+        const res = await fetch(`/api/applications/${appId}`, { method: 'DELETE', credentials: 'same-origin' });
+        const json = await res.json();
+        if (!res.ok || !json.success) throw new Error(json.error || 'İşlem başarısız');
+        showToast('Başvurunuz geri çekildi.');
+        await loadMyApplications();
+      } catch (err) {
+        showToast('Hata: ' + err.message);
+      }
+    }
+
+    async function loadRecommendedJobs() {
+      const box = document.getElementById('recommendedJobsList');
+      try {
+        const res = await fetch('/api/jobs');
+        const json = await res.json();
+        const jobs = (json.data || []).filter(j => j.status === 'active');
+        const mySkills = (currentUser.skills || []).map(s => String(s).toLowerCase());
+        const myDept = (currentUser.department || '').toLowerCase();
+
+        const scored = jobs.map(j => {
+          const jSkills = (j.skills || []).map(s => String(s).toLowerCase());
+          const skillHits = jSkills.filter(s => mySkills.some(ms => ms.includes(s) || s.includes(ms)));
+          const deptHit = j.department && myDept && j.department.toLowerCase().includes(myDept.split('(')[0].trim());
+          return { job: j, score: skillHits.length * 2 + (deptHit ? 1 : 0), hits: skillHits.length };
+        }).sort((a, b) => b.score - a.score).slice(0, 4);
+
+        if (scored.length === 0) {
+          box.innerHTML = '<div style="color:var(--muted); font-size:13.5px;">Şu anda açık ilan bulunmuyor.</div>';
+          return;
+        }
+
+        box.innerHTML = scored.map(item => {
+          const j = item.job;
+          return `
+            <div class="list-item">
+              <div>
+                <strong>${escapeHtml(j.title)}</strong><br>
+                <span style="font-size:12px; color:var(--muted);">${escapeHtml(j.companyName)} • ${escapeHtml(j.location)} (${escapeHtml(j.workMode || 'Hybrid')})</span>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                ${item.hits > 0 ? `<span class="pill-mini" style="background:#DCFCE7; color:#0B7A3B;">${item.hits} eşleşen yetkinlik</span>` : ''}
+                <a href="/jobs/${j.id}" class="btn-mini primary">İncele</a>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        box.innerHTML = '<div style="color:#B91C1C; font-size:13px;">İlan önerileri yüklenemedi.</div>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProfileWorkspace);
+  </script>
+  <script src="/js/auth-nav.js"></script>
+</body>
+</html>

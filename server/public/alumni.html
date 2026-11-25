@@ -684,9 +684,12 @@
             <option value="">Tüm Yıllar</option>
           </select>
         </div>
-        <button class="btn-add" id="btnAdd" onclick="openModal()">
-          <span>＋</span> Yeni Mezun Ekle
-        </button>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <a href="/profile" id="btnMyProfile" class="btn-add" style="display:none; background:#FFFFFF; color:#0A0A0A; border:1px solid #DFDCD2; text-decoration:none;">Profilim</a>
+          <button class="btn-add" id="btnAdd" onclick="openModal()" style="display:none;">
+            <span>＋</span> Yeni Mezun Ekle
+          </button>
+        </div>
       </div>
 
       <!-- Alumni Grid -->
@@ -1000,8 +1003,19 @@
       const banner = document.getElementById('fileProtocolBanner');
       if (banner) banner.style.display = 'block';
     }
+    // Role-based UI visibility (admin-only Add button; signed-in Personal Workspace shortcut)
+    function applyAlumniRoleUI(auth) {
+      const btnAdd = document.getElementById('btnAdd');
+      const btnProf = document.getElementById('btnMyProfile');
+      if (btnAdd) btnAdd.style.display = (auth && auth.role === 'admin') ? 'inline-flex' : 'none';
+      if (btnProf) btnProf.style.display = (auth && auth.authenticated) ? 'inline-flex' : 'none';
+    }
+    if (window.__AUTH_STATE__) applyAlumniRoleUI(window.__AUTH_STATE__);
+    document.addEventListener('auth:ready', (e) => applyAlumniRoleUI(e.detail));
+
     fetchUsers();
   </script>
+  <script src="/js/auth-nav.js"></script>
 
 </body>
 
