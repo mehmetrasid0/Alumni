@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Alumni Tracker — İstanbul Üniversitesi İktisat Fakültesi & YBS Mezun Kayıt Sayfası">
+  <title>Kayıt Ol | Alumni Tracker — İÜ İktisat & YBS</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .register-main {
+      padding: 48px 0 80px;
+      min-height: calc(100vh - 74px);
+    }
+
+    .register-shell {
+      display: grid;
+      grid-template-columns: 0.9fr 1.3fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* Left Institutional Espresso Panel */
+    .register-aside {
+      background: var(--espresso);
+      color: var(--paper);
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1.5px solid var(--ink);
+      position: sticky;
+      top: 98px;
+    }
+
+    .aside-photo {
+      position: relative;
+      height: 210px;
+      overflow: hidden;
+    }
+
+    .aside-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .aside-photo-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(43,41,36,0.1) 0%, rgba(43,41,36,0.92) 100%);
+    }
+
+    .aside-body {
+      padding: 24px 28px 30px;
+    }
+
+    .aside-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--mis-yellow);
+      margin-bottom: 10px;
+    }
+
+    .aside-body h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .aside-body p {
+      font-size: 14.5px;
+      color: rgba(241, 239, 230, 0.8);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .aside-role-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .aside-role-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .aside-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    .aside-role-item strong {
+      display: block;
+      font-size: 13.5px;
+      color: #FFFFFF;
+    }
+
+    .aside-role-item span {
+      font-size: 12.5px;
+      color: rgba(241, 239, 230, 0.72);
+    }
+
+    /* Right Form Card */
+    .register-card {
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 24px;
+      padding: 36px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .form-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      padding-bottom: 10px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-section-title span.step-tag {
+      background: var(--paper);
+      color: var(--ink);
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .form-group label .req {
+      color: #DC2626;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--ink);
+      background: #FAF9F5;
+      outline: none;
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    .form-control:focus {
+      background: #FFFFFF;
+      border-color: var(--ink);
+    }
+
+    .toggle-pass-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px 6px;
+    }
+
+    .toggle-pass-btn:hover {
+      color: var(--ink);
+    }
+
+    /* Role Selector Cards */
+    .role-selector-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .role-option {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .role-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .role-option-box {
+      border: 1.5px solid var(--hairline);
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: #FAF9F5;
+      transition: all var(--transition);
+      height: 100%;
+    }
+
+    .role-option input:checked + .role-option-box {
+      border-color: var(--ink);
+      background: var(--mis-yellow-soft);
+      box-shadow: 0 2px 0 var(--ink);
+    }
+
+    .role-option-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 3px;
+    }
+
+    .role-option-desc {
+      font-size: 12px;
+      color: var(--body);
+      line-height: 1.4;
+    }
+
+    /* Feedback Banners */
+    .form-alert {
+      display: none;
+      padding: 13px 16px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      border: 1px solid;
+    }
+
+    .form-alert.error {
+      display: block;
+      background: #FEE2E2;
+      border-color: #FCA5A5;
+      color: #991B1B;
+    }
+
+    .submit-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .submit-note {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    /* Success Confirmation Card */
+    .success-card {
+      display: none;
+      text-align: center;
+      padding: 16px 8px;
+    }
+
+    .success-card.visible {
+      display: block;
+    }
+
+    .success-badge {
+      display: inline-block;
+      background: var(--mis-green-soft);
+      color: var(--mis-green);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      margin-bottom: 16px;
+    }
+
+    .success-profile-box {
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: 18px;
+      padding: 22px;
+      margin: 22px 0;
+      text-align: left;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .success-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px 16px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--body);
+    }
+
+    @media (max-width: 960px) {
+      .register-shell { grid-template-columns: 1fr; }
+      .register-aside { position: static; }
+    }
+
+    @media (max-width: 640px) {
+      .form-grid-2, .role-selector-grid, .success-meta-grid { grid-template-columns: 1fr; }
+      .register-card { padding: 24px 20px; }
+      .success-profile-box { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== Unified Top Navigation ==================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="/" class="navbar-brand">
+        <div class="mis-2x2-mark" aria-hidden="true">
+          <span class="c-blue">M</span><span class="c-green">2</span>
+          <span class="c-yellow">I</span><span class="c-black">S</span>
+        </div>
+        <span>AlumniTracker</span>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Ana Sayfa</a></li>
+        <li><a href="/users">Mezunlar</a></li>
+        <li><a href="/jobs">Kariyer</a></li>
+        <li><a href="/applications">Başvurular</a></li>
+        <li><a href="/announcements">Duyurular</a></li>
+        <li><a href="/about">Hakkında</a></li>
+        <li><a href="/register" class="nav-cta">Kayıt Ol</a></li>
+      </ul>
+
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Menü">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== Main Content ==================== -->
+  <main class="register-main">
+    <div class="container">
+      <div class="register-shell">
+
+        <!-- Left Editorial Info Card -->
+        <aside class="register-aside">
+          <div class="aside-photo">
+            <img src="/img/campus/iktisat-gate.jpg" alt="İstanbul Üniversitesi İktisat Fakültesi Girişi">
+            <div class="aside-photo-scrim"></div>
+          </div>
+          <div class="aside-body">
+            <div class="aside-eyebrow">İstanbul Üniversitesi • İktisat Fakültesi • YBS</div>
+            <h1>Mezun ve Kariyer Ağına Katılın</h1>
+            <p>Profilinizi oluşturarak İstanbul Üniversitesi mezun dizininde yer alın, kariyer ilanlarına başvurun ve bölüm topluluğuyla bağlantıda kalın.</p>
+
+            <div class="aside-role-list">
+              <div class="aside-role-item">
+                <span class="aside-dot" style="background: var(--mis-blue);"></span>
+                <div>
+                  <strong>Mezun / Aday (Alumni)</strong>
+                  <span>Mezun profilinizi düzenleyin, açık pozisyonları inceleyin ve doğrudan başvuru yapın.</span>
+                </div>
+              </div>
+              <div class="aside-role-item">
+                <span class="aside-dot" style="background: var(--mis-green);"></span>
+                <div>
+                  <strong>Bölüm / Kariyer Koordinatörü</strong>
+                  <span>Yeni iş ilanları yayınlayın, aday başvurularını değerlendirin ve bölüm duyuruları paylaşın.</span>
+                </div>
+              </div>
+              <div class="aside-role-item">
+                <span class="aside-dot" style="background: var(--mis-yellow);"></span>
+                <div>
+                  <strong>PostgreSQL Kalıcı Güvenlik</strong>
+                  <span>Şifreniz bcrypt (pgcrypto) ile şifrelenerek saklanır; asla düz metin olarak tutulmaz.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right Form Card -->
+        <section class="register-card" style="padding: 36px;">
+          <div id="registerFormWrap">
+            <div style="margin-bottom: 24px;">
+              <h2 style="font-size: 24px; font-weight: 800; color: var(--ink); margin-bottom: 4px;">Yeni Hesap Oluştur</h2>
+              <p style="font-size: 14px; color: var(--muted);">Zorunlu alanları (<span style="color: #DC2626;">*</span>) doldurarak kaydınızı tamamlayın.</p>
+            </div>
+
+            <div class="form-alert" id="formAlert" role="alert"></div>
+
+            <form id="registerForm" novalidate>
+              <!-- Step 1: Account & Authorization -->
+              <div class="form-section-title">
+                <span>Hesap ve Yetkilendirme Bilgileri</span>
+                <span class="step-tag">Adım 1 / 2</span>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="fullName">Ad Soyad <span class="req">*</span></label>
+                  <input type="text" id="fullName" name="name" class="form-control" required placeholder="Örn: Ahmet Kaya">
+                </div>
+                <div class="form-group">
+                  <label for="email">E-posta Adresi <span class="req">*</span></label>
+                  <input type="email" id="email" name="email" class="form-control" required placeholder="ahmet.kaya@alumni.edu">
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="password">Şifre (En az 6 karakter) <span class="req">*</span></label>
+                  <div class="input-wrap">
+                    <input type="password" id="password" name="password" class="form-control" required minlength="6" placeholder="••••••••" style="padding-right: 68px;">
+                    <button type="button" class="toggle-pass-btn" onclick="togglePass('password', this)">Göster</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="confirmPassword">Şifre Tekrar <span class="req">*</span></label>
+                  <div class="input-wrap">
+                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required minlength="6" placeholder="••••••••" style="padding-right: 68px;">
+                    <button type="button" class="toggle-pass-btn" onclick="togglePass('confirmPassword', this)">Göster</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Sistem Rolü <span class="req">*</span></label>
+                <div class="role-selector-grid">
+                  <label class="role-option">
+                    <input type="radio" name="userRole" value="alumni" checked>
+                    <div class="role-option-box">
+                      <div class="role-option-title">Mezun / Aday (Alumni)</div>
+                      <div class="role-option-desc">Mezun dizininde yer al ve iş ilanlarına başvur.</div>
+                    </div>
+                  </label>
+                  <label class="role-option">
+                    <input type="radio" name="userRole" value="coordinator">
+                    <div class="role-option-box">
+                      <div class="role-option-title">Kariyer Koordinatörü</div>
+                      <div class="role-option-desc">İlan yayınla ve aday başvurularını incele.</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Step 2: Academic & Career -->
+              <div class="form-section-title" style="margin-top: 28px;">
+                <span>Akademik ve Kariyer Profili</span>
+                <span class="step-tag">Adım 2 / 2</span>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="department">Bölüm <span class="req">*</span></label>
+                  <select id="department" name="department" class="form-control" required>
+                    <option value="Management Information Systems (YBS)">Yönetim Bilişim Sistemleri (YBS)</option>
+                    <option value="Economics">İktisat</option>
+                    <option value="Business Administration">İşletme</option>
+                    <option value="Computer Engineering">Bilgisayar Mühendisliği</option>
+                    <option value="Industrial Engineering">Endüstri Mühendisliği</option>
+                    <option value="Public Finance">Maliye</option>
+                    <option value="International Relations">Siyaset Bilimi ve Uluslararası İlişkiler</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="graduationYear">Mezuniyet Yılı <span class="req">*</span></label>
+                  <input type="number" id="graduationYear" name="graduationYear" class="form-control tabular-nums" min="1950" max="2035" value="2025" required>
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="degree">Akademik Derece</label>
+                  <select id="degree" name="degree" class="form-control">
+                    <option value="Bachelor">Lisans (Bachelor)</option>
+                    <option value="Master">Yüksek Lisans (Master)</option>
+                    <option value="PhD">Doktora (PhD)</option>
+                    <option value="Associate">Ön Lisans (Associate)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="studentId">Öğrenci Numarası (Opsiyonel)</label>
+                  <input type="text" id="studentId" name="studentId" class="form-control tabular-nums" placeholder="Boş bırakılırsa otomatik atanır">
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="company">Mevcut Şirket / Kurum</label>
+                  <input type="text" id="company" name="company" class="form-control" placeholder="Örn: Trendyol, Getir, Turkcell">
+                </div>
+                <div class="form-group">
+                  <label for="roleTitle">Pozisyon / Unvan</label>
+                  <input type="text" id="roleTitle" name="role" class="form-control" placeholder="Örn: Backend Developer, İş Analisti">
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="city">Şehir</label>
+                  <input type="text" id="city" name="city" class="form-control" value="İstanbul" placeholder="İstanbul, Ankara, Londra">
+                </div>
+                <div class="form-group">
+                  <label for="skills">Yetkinlikler (Virgülle ayırın)</label>
+                  <input type="text" id="skills" name="skills" class="form-control" placeholder="SQL, Node.js, Power BI, Python">
+                </div>
+              </div>
+
+              <div class="submit-bar">
+                <span class="submit-note">Kayıt olarak <a href="/users" style="text-decoration: underline; font-weight: 600;">Mezun Dizini</a> görüntülenebilirliğini onaylarsınız.</span>
+                <button type="submit" id="submitBtn" class="btn-ch-yellow">Kaydı Tamamla</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Success Confirmation View -->
+          <div class="success-card" id="registerSuccess">
+            <span class="success-badge">Kayıt Başarıyla Tamamlandı</span>
+            <h2 style="font-size: 24px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Aramıza Hoş Geldiniz</h2>
+            <p style="font-size: 14px; color: var(--muted);">Kullanıcı hesabınız ve mezun profiliniz PostgreSQL veritabanına kalıcı olarak kaydedildi.</p>
+
+            <div class="success-profile-box">
+              <img id="resAvatar" class="squircle-avatar lg" src="/img/avatars/avatar-1.jpg" alt="Profil">
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                  <strong id="resName" style="font-size: 18px; color: var(--ink);">—</strong>
+                  <span id="resRoleBadge" style="font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; background: var(--mis-yellow); border: 1px solid var(--ink);">alumni</span>
+                </div>
+                <div id="resJobLine" style="font-size: 13.5px; color: var(--mis-blue-700); font-weight: 600; margin-top: 2px;">—</div>
+                <div class="success-meta-grid">
+                  <div><strong>E-posta:</strong> <span id="resEmail">—</span></div>
+                  <div><strong>Bölüm:</strong> <span id="resDept">—</span></div>
+                  <div><strong>Mezuniyet:</strong> <span id="resYear" class="tabular-nums">—</span></div>
+                  <div><strong>Öğrenci No:</strong> <span id="resStudentId" class="tabular-nums">—</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+              <a id="resDirectoryLink" href="/users" class="btn-ch-yellow">Mezun Rehberinde Gör</a>
+              <button type="button" class="btn-ch-white" onclick="resetRegistration()">Yeni Kayıt Oluştur</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== Footer ==================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <div class="mis-2x2-mark" aria-hidden="true">
+              <span class="c-blue">M</span><span class="c-green">2</span>
+              <span class="c-yellow">I</span><span class="c-black">S</span>
+            </div>
+            <h4 style="margin: 0;">AlumniTracker</h4>
+          </div>
+          <p>İstanbul Üniversitesi İktisat Fakültesi — Yönetim Bilişim Sistemleri (YBS) mezun takip ve kariyer platformu.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <a href="/users">Mezun Rehberi</a>
+          <a href="/jobs">Kariyer İlanları</a>
+          <a href="/applications">Başvuru Takibi</a>
+          <a href="/announcements">Duyurular</a>
+        </div>
+        <div class="footer-col">
+          <h4>Üniversite</h4>
+          <a href="/about">Bölüm Hakkında</a>
+          <a href="/register">Yeni Mezun Kaydı</a>
+        </div>
+        <div class="footer-col">
+          <h4>Geliştirici</h4>
+          <a href="/api/swagger" target="_blank">Swagger OpenAPI</a>
+          <a href="/api/health" target="_blank">Sistem Sağlığı</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Alumni Tracker — İstanbul Üniversitesi İktisat Fakültesi YBS</span>
+        <span>Web Programming Course Project</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== Scripts ==================== -->
+  <script>
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileToggle && navLinks) {
+      mobileToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+    }
+
+    function togglePass(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.textContent = 'Gizle';
+      } else {
+        inp.type = 'password';
+        btn.textContent = 'Göster';
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('formAlert');
+      el.textContent = msg;
+      el.className = 'form-alert error';
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function clearError() {
+      const el = document.getElementById('formAlert');
+      el.className = 'form-alert';
+      el.textContent = '';
+    }
+
+    function pickPortrait(name) {
+      const femaleNames = ['elif', 'zeynep', 'ayşe', 'ayse', 'fatma', 'merve', 'selin', 'ece', 'deniz', 'esra', 'busra', 'büşra', 'gamze', 'pelin'];
+      const first = (name || '').trim().split(/\s+/)[0].toLowerCase();
+      return femaleNames.includes(first) ? '/img/avatars/avatar-2.jpg' : '/img/avatars/avatar-1.jpg';
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const userRole = document.querySelector('input[name="userRole"]:checked').value;
+      const department = document.getElementById('department').value;
+      const graduationYear = document.getElementById('graduationYear').value;
+      const degree = document.getElementById('degree').value;
+      const studentId = document.getElementById('studentId').value.trim();
+      const company = document.getElementById('company').value.trim();
+      const role = document.getElementById('roleTitle').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const skills = document.getElementById('skills').value.trim();
+
+      if (!fullName || fullName.length < 2) {
+        return showError('Lütfen geçerli bir ad soyad giriniz.');
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return showError('Lütfen geçerli bir e-posta adresi giriniz.');
+      }
+      if (!password || password.length < 6) {
+        return showError('Şifre en az 6 karakter uzunluğunda olmalıdır.');
+      }
+      if (password !== confirmPassword) {
+        return showError('Girdiğiniz şifreler birbiriyle eşleşmiyor.');
+      }
+
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Kaydediliyor...';
+
+      const payload = {
+        name: fullName,
+        email,
+        password,
+        userRole,
+        department,
+        graduationYear: Number(graduationYear),
+        degree,
+        company: company || null,
+        role: role || 'Mezun',
+        city: city || 'İstanbul',
+        skills
+      };
+      if (studentId) payload.studentId = studentId;
+
+      try {
+        const res = await fetch('/api/users/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          showError(data.error || 'Kayıt işlemi sırasında bir hata oluştu.');
+          return;
+        }
+
+        const user = data.data;
+        document.getElementById('resAvatar').src = pickPortrait(user.name);
+        document.getElementById('resName').textContent = user.name;
+        document.getElementById('resRoleBadge').textContent = user.userRole || userRole;
+        document.getElementById('resJobLine').textContent = `${user.role || 'Mezun'} @ ${user.company || 'İstanbul Üniversitesi Ağı'}`;
+        document.getElementById('resEmail').textContent = user.email;
+        document.getElementById('resDept').textContent = user.department || department;
+        document.getElementById('resYear').textContent = user.graduationYear || graduationYear;
+        document.getElementById('resStudentId').textContent = user.studentId || '—';
+        document.getElementById('resDirectoryLink').href = `/users?q=${encodeURIComponent(user.email)}`;
+
+        document.getElementById('registerFormWrap').style.display = 'none';
+        document.getElementById('registerSuccess').classList.add('visible');
+      } catch (err) {
+        showError('Sunucuya bağlanılamadı: ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Kaydı Tamamla';
+      }
+    });
+
+    function resetRegistration() {
+      document.getElementById('registerForm').reset();
+      clearError();
+      document.getElementById('registerSuccess').classList.remove('visible');
+      document.getElementById('registerFormWrap').style.display = 'block';
+    }
+  </script>
+  <script src="/js/auth-nav.js"></script>
+</body>
+</html>

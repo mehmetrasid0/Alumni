@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Alumni Tracker — İstanbul Üniversitesi İktisat Fakültesi & YBS Giriş ve Oturum Yönetimi">
+  <title>Giriş Yap | Alumni Tracker — İÜ İktisat & YBS</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .login-main {
+      padding: 48px 0 80px;
+      min-height: calc(100vh - 74px);
+      display: flex;
+      align-items: center;
+    }
+
+    .login-shell {
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      gap: 32px;
+      align-items: stretch;
+    }
+
+    /* Left Institutional Panel */
+    .login-aside {
+      background: var(--espresso);
+      color: var(--paper);
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1.5px solid var(--ink);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .aside-photo {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+    }
+
+    .aside-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .aside-photo-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(43,41,36,0.12) 0%, rgba(43,41,36,0.92) 100%);
+    }
+
+    .aside-body {
+      padding: 28px 32px 32px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .aside-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--mis-yellow);
+      margin-bottom: 10px;
+    }
+
+    .aside-body h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1.18;
+      margin-bottom: 12px;
+    }
+
+    .aside-body p {
+      font-size: 14.5px;
+      color: rgba(241, 239, 230, 0.8);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .fixture-box {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+
+    .fixture-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--mis-blue);
+      margin-bottom: 10px;
+    }
+
+    .fixture-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 12.5px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .fixture-row:last-child { border-bottom: none; }
+
+    .fixture-fill-btn {
+      background: rgba(248, 231, 28, 0.14);
+      color: var(--mis-yellow);
+      border: 1px solid rgba(248, 231, 28, 0.35);
+      border-radius: 9999px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .fixture-fill-btn:hover {
+      background: var(--mis-yellow);
+      color: var(--ink);
+    }
+
+    /* Right Login Card */
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 24px;
+      padding: 40px 36px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-group { margin-bottom: 18px; }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14.5px;
+      color: var(--ink);
+      background: #FAF9F5;
+      outline: none;
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    .form-control:focus {
+      background: #FFFFFF;
+      border-color: var(--ink);
+    }
+
+    .toggle-pass-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px 6px;
+    }
+
+    .form-alert {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-bottom: 18px;
+      border: 1px solid;
+    }
+
+    .form-alert.error {
+      display: block;
+      background: #FEE2E2;
+      border-color: #FCA5A5;
+      color: #991B1B;
+    }
+
+    .form-alert.info {
+      display: block;
+      background: #DCFCE7;
+      border-color: #86EFAC;
+      color: #0B7A3B;
+    }
+
+    .remember-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      font-size: 13.5px;
+    }
+
+    .remember-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: var(--body);
+      font-weight: 500;
+    }
+
+    /* Active Session Box */
+    .active-session-box {
+      display: none;
+    }
+
+    .active-session-box.visible {
+      display: block;
+    }
+
+    .session-card {
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: 18px;
+      padding: 22px;
+      margin: 20px 0 24px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .login-shell { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .login-card { padding: 28px 20px; }
+      .session-card { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== Unified Top Navigation ==================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="/" class="navbar-brand">
+        <div class="mis-2x2-mark" aria-hidden="true">
+          <span class="c-blue">M</span><span class="c-green">2</span>
+          <span class="c-yellow">I</span><span class="c-black">S</span>
+        </div>
+        <span>AlumniTracker</span>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Ana Sayfa</a></li>
+        <li><a href="/users">Mezunlar</a></li>
+        <li><a href="/jobs">Kariyer</a></li>
+        <li><a href="/applications">Başvurular</a></li>
+        <li><a href="/announcements">Duyurular</a></li>
+        <li><a href="/about">Hakkında</a></li>
+        <li><a href="/register" class="nav-cta">Kayıt Ol</a></li>
+      </ul>
+
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Menü">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== Main Content ==================== -->
+  <main class="login-main">
+    <div class="container">
+      <div class="login-shell">
+
+        <!-- Left Espresso Panel -->
+        <aside class="login-aside">
+          <div class="aside-photo">
+            <img src="/img/campus/campus-2013.jpg" alt="İstanbul Üniversitesi Beyazıt Kampüsü">
+            <div class="aside-photo-scrim"></div>
+          </div>
+          <div class="aside-body">
+            <div>
+              <div class="aside-eyebrow">İstanbul Üniversitesi • İktisat Fakültesi • YBS</div>
+              <h1>Mezun Oturumunuzu Açın</h1>
+              <p>Rol tabanlı yetkilendirme (RBAC) ile korunan HttpOnly imzalı oturumunuzu başlatarak mezun rehberini, kariyer ilanlarını ve başvurularınızı yönetin.</p>
+            </div>
+
+            <div class="fixture-box">
+              <div class="fixture-title">Örnek Test Hesapları</div>
+              <div class="fixture-row">
+                <div>
+                  <strong style="color: #fff;">mehmetrasid19@gmail.com</strong>
+                  <span style="color: rgba(241,239,230,0.68);"> (admin — Yönetici)</span>
+                </div>
+                <button type="button" class="fixture-fill-btn" onclick="fillDemo('mehmetrasid19@gmail.com', 'RasidAdmin2026!')">Doldur</button>
+              </div>
+              <div class="fixture-row">
+                <div>
+                  <strong style="color: #fff;">admin@alumni.edu</strong>
+                  <span style="color: rgba(241,239,230,0.68);"> (admin)</span>
+                </div>
+                <button type="button" class="fixture-fill-btn" onclick="fillDemo('admin@alumni.edu', 'AdminPassword2026!')">Doldur</button>
+              </div>
+              <div class="fixture-row">
+                <div>
+                  <strong style="color: #fff;">ahmet@alumni.edu</strong>
+                  <span style="color: rgba(241,239,230,0.68);"> (alumni)</span>
+                </div>
+                <button type="button" class="fixture-fill-btn" onclick="fillDemo('ahmet@alumni.edu', 'AlumniPass123!')">Doldur</button>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right Login / Active Session Card -->
+        <section class="login-card">
+          <div class="form-alert" id="loginAlert" role="alert"></div>
+
+          <!-- Form View (When Signed Out) -->
+          <div id="loginFormWrap">
+            <h2 style="font-size: 24px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Hesabınıza Giriş Yapın</h2>
+            <p style="font-size: 14px; color: var(--muted); margin-bottom: 24px;">Henüz hesabınız yok mu? <a href="/register" style="color: var(--mis-blue-700); font-weight: 700; text-decoration: underline;">Kayıt Olun</a></p>
+
+            <form id="loginForm" novalidate>
+              <div class="form-group">
+                <label for="email">E-posta Adresi</label>
+                <input type="email" id="email" name="email" class="form-control" required placeholder="ad.soyad@alumni.edu">
+              </div>
+
+              <div class="form-group">
+                <label for="password">Şifre</label>
+                <div class="input-wrap">
+                  <input type="password" id="password" name="password" class="form-control" required placeholder="••••••••" style="padding-right: 68px;">
+                  <button type="button" class="toggle-pass-btn" onclick="togglePass()">Göster</button>
+                </div>
+              </div>
+
+              <div class="remember-row">
+                <label class="remember-check">
+                  <input type="checkbox" id="remember" name="remember" style="width: 16px; height: 16px;">
+                  <span>Oturumu 7 gün açık tut</span>
+                </label>
+              </div>
+
+              <button type="submit" id="loginSubmitBtn" class="btn-ch-yellow" style="width: 100%; padding: 13px 24px;">
+                Giriş Yap
+              </button>
+            </form>
+          </div>
+
+          <!-- Active Session View (When Signed In) -->
+          <div class="active-session-box" id="activeSessionBox">
+            <span style="display: inline-block; background: var(--mis-green-soft); color: var(--mis-green); font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; margin-bottom: 12px;">
+              Aktif Oturum Açık
+            </span>
+            <h2 style="font-size: 24px; font-weight: 800; color: var(--ink);">Hoş Geldiniz</h2>
+            <p style="font-size: 14px; color: var(--muted);">İmzalı HttpOnly oturumunuz aktif. Aşağıdan platform modüllerine geçebilir veya güvenle çıkış yapabilirsiniz.</p>
+
+            <div class="session-card">
+              <img id="sessAvatar" class="squircle-avatar lg" src="/img/avatars/avatar-1.jpg" alt="Profil">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <strong id="sessName" style="font-size: 18px; color: var(--ink);">—</strong>
+                  <span id="sessRole" style="font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; background: var(--mis-yellow); border: 1px solid var(--ink);">alumni</span>
+                </div>
+                <div id="sessEmail" style="font-size: 13.5px; color: var(--muted); margin-top: 2px;">—</div>
+                <div id="sessTitle" style="font-size: 13px; color: var(--mis-blue-700); font-weight: 600; margin-top: 4px;">—</div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <a href="/admin" id="sessAdminBtn" class="btn-ch-yellow" style="display: none;">Yönetim Paneli</a>
+              <a href="/users" class="btn-ch-yellow">Mezun Rehberi</a>
+              <a href="/jobs" class="btn-ch-white">Kariyer Panosu</a>
+              <button type="button" id="logoutBtn" class="btn-ch-white" style="border-color: #DC2626; color: #B91C1C;">Çıkış Yap</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== Footer ==================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <div class="mis-2x2-mark" aria-hidden="true">
+              <span class="c-blue">M</span><span class="c-green">2</span>
+              <span class="c-yellow">I</span><span class="c-black">S</span>
+            </div>
+            <h4 style="margin: 0;">AlumniTracker</h4>
+          </div>
+          <p>İstanbul Üniversitesi İktisat Fakültesi — Yönetim Bilişim Sistemleri (YBS) mezun takip ve kariyer platformu.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <a href="/users">Mezun Rehberi</a>
+          <a href="/jobs">Kariyer İlanları</a>
+          <a href="/applications">Başvuru Takibi</a>
+          <a href="/announcements">Duyurular</a>
+        </div>
+        <div class="footer-col">
+          <h4>Hesap</h4>
+          <a href="/login">Giriş Yap</a>
+          <a href="/register">Kayıt Ol</a>
+          <a href="/logout">Oturumu Kapat</a>
+        </div>
+        <div class="footer-col">
+          <h4>Geliştirici</h4>
+          <a href="/api/swagger" target="_blank">Swagger OpenAPI</a>
+          <a href="/api/health" target="_blank">Sistem Sağlığı</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Alumni Tracker — İstanbul Üniversitesi İktisat Fakültesi YBS</span>
+        <span>Web Programming Course Project</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== Scripts ==================== -->
+  <script>
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileToggle && navLinks) {
+      mobileToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+    }
+
+    function togglePass() {
+      const inp = document.getElementById('password');
+      const btn = document.querySelector('.toggle-pass-btn');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.textContent = 'Gizle';
+      } else {
+        inp.type = 'password';
+        btn.textContent = 'Göster';
+      }
+    }
+
+    function fillDemo(email, password) {
+      document.getElementById('email').value = email;
+      document.getElementById('password').value = password;
+    }
+
+    function showAlert(msg, type) {
+      const el = document.getElementById('loginAlert');
+      el.textContent = msg;
+      el.className = 'form-alert ' + type;
+    }
+
+    function clearAlert() {
+      const el = document.getElementById('loginAlert');
+      el.className = 'form-alert';
+      el.textContent = '';
+    }
+
+    function pickPortrait(name) {
+      const femaleNames = ['elif', 'zeynep', 'ayşe', 'ayse', 'fatma', 'merve', 'selin', 'ece', 'deniz', 'esra'];
+      const first = (name || '').trim().split(/\s+/)[0].toLowerCase();
+      return femaleNames.includes(first) ? '/img/avatars/avatar-2.jpg' : '/img/avatars/avatar-1.jpg';
+    }
+
+    function renderActiveSession(user) {
+      document.getElementById('sessAvatar').src = pickPortrait(user.name);
+      document.getElementById('sessName').textContent = user.name || user.email;
+      document.getElementById('sessRole').textContent = user.userRole || 'alumni';
+      document.getElementById('sessEmail').textContent = user.email;
+      document.getElementById('sessTitle').textContent = `${user.role || 'Mezun'} @ ${user.company || 'İstanbul Üniversitesi'}`;
+      const adminBtn = document.getElementById('sessAdminBtn');
+      if (adminBtn) {
+        adminBtn.style.display = user.userRole === 'admin' ? 'inline-flex' : 'none';
+      }
+      document.getElementById('loginFormWrap').style.display = 'none';
+      document.getElementById('activeSessionBox').classList.add('visible');
+    }
+
+    async function checkExistingSession() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('loggedOut') === '1') {
+        showAlert('Oturumunuz güvenli bir şekilde sonlandırıldı.', 'info');
+      }
+
+      try {
+        const res = await fetch('/api/users/me', { credentials: 'same-origin' });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            clearAlert();
+            renderActiveSession(json.data);
+          }
+        }
+      } catch (e) {}
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearAlert();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const remember = document.getElementById('remember').checked;
+
+      if (!email || !password) {
+        return showAlert('Lütfen e-posta adresinizi ve şifrenizi giriniz.', 'error');
+      }
+
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Giriş Yapılıyor...';
+
+      try {
+        const res = await fetch('/api/users/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ email, password, remember })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          showAlert(data.error || 'E-posta veya şifre hatalı.', 'error');
+          return;
+        }
+
+        renderActiveSession(data.data);
+        if (typeof window.initAuthNavbarRefresh === 'function') {
+          window.initAuthNavbarRefresh();
+        }
+      } catch (err) {
+        showAlert('Sunucuya bağlanılamadı: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Giriş Yap';
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await fetch('/api/users/logout', { method: 'POST', credentials: 'same-origin' });
+      window.location.href = '/login?loggedOut=1';
+    });
+
+    document.addEventListener('DOMContentLoaded', checkExistingSession);
+  </script>
+  <script src="/js/auth-nav.js"></script>
+</body>
+</html>

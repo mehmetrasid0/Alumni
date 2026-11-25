@@ -177,14 +177,14 @@ class UserModel {
     if (isUUID) {
       sql = `
         SELECT 
-          p.id AS profile_id, p.id, p.user_id, p.student_id, p.full_name,
+          p.id AS profile_id, p.id, u.id AS user_id, p.student_id, p.full_name,
           p.department, p.graduation_year, p.degree, p.current_company,
           p.job_title, p.city, p.country, p.linkedin_url, p.phone, p.bio,
           p.skills, p.created_at AS profile_created_at, p.updated_at,
           u.email, u.role AS user_role
-        FROM alumni_profiles p
-        JOIN users u ON p.user_id = u.id
-        WHERE p.id = $1 OR p.user_id = $1
+        FROM users u
+        LEFT JOIN alumni_profiles p ON p.user_id = u.id
+        WHERE p.id = $1 OR u.id = $1
         LIMIT 1
       `;
       params = [strId];
@@ -235,6 +235,33 @@ class UserModel {
   }
 
   /**
+   * Verify login credentials against PostgreSQL bcrypt password hash (pgcrypto).
+   * @param {string} email
+   * @param {string} password
+   * @returns {Promise<Object|null>} Formatted user DTO if valid, otherwise null
+   */
+  async verifyCredentials(email, password) {
+    if (!email || !password) return null;
+    const normalized = String(email).trim().toLowerCase();
+
+    const sql = `
+      SELECT 
+        p.id AS profile_id, p.id, u.id AS user_id, p.student_id, p.full_name,
+        p.department, p.graduation_year, p.degree, p.current_company,
+        p.job_title, p.city, p.country, p.linkedin_url, p.phone, p.bio,
+        p.skills, p.created_at AS profile_created_at, p.updated_at,
+        u.email, u.role AS user_role
+      FROM users u
+      LEFT JOIN alumni_profiles p ON p.user_id = u.id
+      WHERE LOWER(u.email) = $1
+        AND u.password_hash = crypt($2, u.password_hash)
+      LIMIT 1
+    `;
+    const res = await db.query(sql, [normalized, String(password)]);
+    return res.rows.length > 0 ? formatUser(res.rows[0]) : null;
+  }
+
+  /**
    * Return the total count of alumni profiles currently stored.
    * @param {Object} [filters={}]
    * @returns {Promise<number>}
@@ -262,6 +289,8 @@ class UserModel {
 
     const name = userData.name || userData.fullName || userData.full_name;
     const email = userData.email;
+    const password = userData.password;
+    const requestedUserRole = (userData.userRole || userData.user_role || 'alumni').toString().trim().toLowerCase();
     const graduationYear = userData.graduationYear || userData.graduation_year;
     const department = userData.department;
     const company = userData.company || userData.currentCompany || userData.current_company;
@@ -276,7 +305,21 @@ class UserModel {
       throw err;
     }
 
+    if (password !== undefined && String(password).length > 0 && String(password).length < 6) {
+      const err = new Error('Password must be at least 6 characters long');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    const allowedRoles = ['alumni', 'coordinator', 'admin'];
+    if (!allowedRoles.includes(requestedUserRole)) {
+      const err = new Error("Invalid account role. Allowed roles: 'alumni', 'coordinator', 'admin'");
+      err.statusCode = 400;
+      throw err;
+    }
+
     const trimmedEmail = String(email).trim().toLowerCase();
+    const rawPassword = password && String(password).length >= 6 ? String(password) : 'AlumniPass123!';
 
     // Verify email uniqueness
     const existing = await this.findByEmail(trimmedEmail);
@@ -294,9 +337,9 @@ class UserModel {
       // 1. Insert into users
       const userRes = await client.query(
         `INSERT INTO users (email, password_hash, role)
-         VALUES ($1, crypt('AlumniPass123!', gen_salt('bf', 10)), 'alumni')
+         VALUES ($1, crypt($2, gen_salt('bf', 10)), $3)
          RETURNING id, email, role, created_at`,
-        [trimmedEmail]
+        [trimmedEmail, rawPassword, requestedUserRole]
       );
       const userId = userRes.rows[0].id;
 
