@@ -17,7 +17,16 @@ class ApiAnnouncementController {
    */
   async getAll(req, res) {
     try {
-      const announcements = await Announcement.findAll(req.query);
+      const filters = { ...req.query };
+      const actorRole = req.authUser ? String(req.authUser.userRole || '').toLowerCase() : null;
+      const isStaff = actorRole === 'admin' || actorRole === 'coordinator';
+
+      // Enforce public-read scoping (DDD.md Section 8.2): guests & alumni only read published notices
+      if (!isStaff) {
+        filters.status = 'published';
+      }
+
+      const announcements = await Announcement.findAll(filters);
       return res.status(200).json({
         success: true,
         count: announcements.length,
@@ -46,6 +55,15 @@ class ApiAnnouncementController {
         });
       }
 
+      const actorRole = req.authUser ? String(req.authUser.userRole || '').toLowerCase() : null;
+      const isStaff = actorRole === 'admin' || actorRole === 'coordinator';
+      if (announcement.status !== 'published' && !isStaff) {
+        return res.status(403).json({
+          success: false,
+          error: 'Draft or archived announcements are restricted to staff and administrators'
+        });
+      }
+
       return res.status(200).json({
         success: true,
         data: announcement
@@ -64,7 +82,15 @@ class ApiAnnouncementController {
    */
   async create(req, res) {
     try {
-      const newAnnouncement = await Announcement.create(req.body);
+      const payload = { ...req.body };
+      if (req.authUser && req.authUser.id) {
+        const actorRole = String(req.authUser.userRole || '').toLowerCase();
+        if (actorRole !== 'admin' || !payload.authorId) {
+          payload.authorId = req.authUser.id;
+        }
+      }
+
+      const newAnnouncement = await Announcement.create(payload);
       return res.status(201).json({
         success: true,
         message: 'Announcement created successfully',

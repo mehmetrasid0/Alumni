@@ -34,38 +34,52 @@ const router = express.Router({ mergeParams: true });
 const multer = require('multer');
 const upload = multer();
 const ApiApplicationController = require('../controllers/ApiApplicationController');
+const {
+  requireAuth,
+  requireStaff,
+  requireOwnership,
+  resolveParamUserOwner,
+  resolveApplicationOwner
+} = require('../middleware/authMiddleware');
 
-// 1. [READ ALL / INDEX]
-// Direct: GET /api/applications
-// Nested Job: GET /api/jobs/:jobId/applications
-// Nested User: GET /api/users/:userId/applications
-router.get('/', (req, res) => ApiApplicationController.getAll(req, res));
+const checkNestedUserScope = requireOwnership(resolveParamUserOwner, {
+  bypassRoles: ['admin', 'coordinator'],
+  resourceLabel: 'user applications'
+});
 
-// 2. [READ ONE / SHOW]
-// Direct: GET /api/applications/:id
-// Nested Job: GET /api/jobs/:jobId/applications/:id
-// Nested User: GET /api/users/:userId/applications/:id
-router.get('/:id', (req, res) => ApiApplicationController.getById(req, res));
+function enforceNestedUserScope(req, res, next) {
+  if (req.params.userId) {
+    return checkNestedUserScope(req, res, next);
+  }
+  return next();
+}
 
-// 3. [CREATE / SUBMIT]
-// Direct: POST /api/applications
-// Nested Job: POST /api/jobs/:jobId/applications
-router.post('/', upload.none(), (req, res) => ApiApplicationController.create(req, res));
+// 1. [READ ALL / INDEX] - Requires auth (alumni scoped to own in controller; nested :userId guarded)
+router.get('/', requireAuth, enforceNestedUserScope, (req, res) => ApiApplicationController.getAll(req, res));
 
-// 4. [UPDATE / PUT]
-// Direct: PUT /api/applications/:id
-// Nested Job: PUT /api/jobs/:jobId/applications/:id
-router.put('/:id', upload.none(), (req, res) => ApiApplicationController.update(req, res));
+// 2. [READ ONE / SHOW] - Owner, Coordinator, or Admin
+router.get(
+  '/:id',
+  requireAuth,
+  requireOwnership(resolveApplicationOwner, { bypassRoles: ['admin', 'coordinator'], resourceLabel: 'application' }),
+  (req, res) => ApiApplicationController.getById(req, res)
+);
 
-// 5. [PATCH / PARTIAL UPDATE]
-// Direct: PATCH /api/applications/:id
-// Nested Job: PATCH /api/jobs/:jobId/applications/:id
-router.patch('/:id', upload.none(), (req, res) => ApiApplicationController.patch(req, res));
+// 3. [CREATE / SUBMIT] - Requires auth; identity bound in controller for non-admins
+router.post('/', requireAuth, enforceNestedUserScope, upload.none(), (req, res) => ApiApplicationController.create(req, res));
 
-// 6. [DELETE / WITHDRAW]
-// Direct: DELETE /api/applications/:id
-// Nested Job: DELETE /api/jobs/:jobId/applications/:id
-// Nested User: DELETE /api/users/:userId/applications/:id
-router.delete('/:id', (req, res) => ApiApplicationController.delete(req, res));
+// 4. [UPDATE / PUT] - Coordinator & Admin status/notes review
+router.put('/:id', requireAuth, requireStaff, upload.none(), (req, res) => ApiApplicationController.update(req, res));
+
+// 5. [PATCH / PARTIAL UPDATE] - Coordinator & Admin
+router.patch('/:id', requireAuth, requireStaff, upload.none(), (req, res) => ApiApplicationController.patch(req, res));
+
+// 6. [DELETE / WITHDRAW] - Applicant Owner or Admin
+router.delete(
+  '/:id',
+  requireAuth,
+  requireOwnership(resolveApplicationOwner, { bypassRoles: ['admin'], resourceLabel: 'application' }),
+  (req, res) => ApiApplicationController.delete(req, res)
+);
 
 module.exports = router;

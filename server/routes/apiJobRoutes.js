@@ -17,34 +17,28 @@ const router = express.Router({ mergeParams: true });
 const multer = require('multer');
 const upload = multer();
 const ApiJobController = require('../controllers/ApiJobController');
+const { requireAuth, requireAdmin, requireStaff } = require('../middleware/authMiddleware');
 
-// 1. [READ ALL / INDEX]
-// GET /api/jobs - List all active jobs (supports filtering query params)
+// 1. [READ ALL / INDEX] - Public career feed
 router.get('/', (req, res) => ApiJobController.getAll(req, res));
 
-// 2. [READ ONE / SHOW]
-// GET /api/jobs/:id - Get specific job details
+// 2. [READ ONE / SHOW] - Public single job detail
 router.get('/:id', (req, res) => ApiJobController.getById(req, res));
 
-// 3. [CREATE / STORE]
-// POST /api/jobs - Create job vacancy
-router.post('/', upload.none(), (req, res) => ApiJobController.create(req, res));
+// 3. [CREATE / STORE] - Coordinator & Admin
+router.post('/', requireAuth, requireStaff, upload.none(), (req, res) => ApiJobController.create(req, res));
 
-// 4. [UPDATE / PUT]
-// PUT /api/jobs/:id - Fully update job
-router.put('/:id', upload.none(), (req, res) => ApiJobController.update(req, res));
+// 4. [UPDATE / PUT] - Coordinator & Admin
+router.put('/:id', requireAuth, requireStaff, upload.none(), (req, res) => ApiJobController.update(req, res));
 
-// 5. [PATCH / PARTIAL UPDATE]
-// PATCH /api/jobs/:id - Partially update job
-router.patch('/:id', upload.none(), (req, res) => ApiJobController.patch(req, res));
+// 5. [PATCH / PARTIAL UPDATE] - Coordinator & Admin
+router.patch('/:id', requireAuth, requireStaff, upload.none(), (req, res) => ApiJobController.patch(req, res));
 
-// 6. [DELETE / DESTROY]
-// DELETE /api/jobs/:id - Delete job
-router.delete('/:id', (req, res) => ApiJobController.delete(req, res));
+// 6. [DELETE / DESTROY] - Admin only
+router.delete('/:id', requireAuth, requireAdmin, (req, res) => ApiJobController.delete(req, res));
 
-// 7. [ACTION SUB-ROUTE]
-// POST /api/jobs/:id/apply - Apply for job directly
-router.post('/:id/apply', upload.none(), (req, res) => ApiJobController.apply(req, res));
+// 7. [ACTION SUB-ROUTE] - Authenticated users
+router.post('/:id/apply', requireAuth, upload.none(), (req, res) => ApiJobController.apply(req, res));
 
 // ============================================================================
 // Nested Sub-resource Routes (Model Relationships)

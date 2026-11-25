@@ -31,16 +31,24 @@
 
 const Application = require('../models/Application');
 const JobPosting = require('../models/JobPosting');
+const User = require('../models/User');
 
 class ApiApplicationController {
   /**
    * [GET /api/applications] or [GET /api/jobs/:jobId/applications] or [GET /api/users/:userId/applications]
-   * [CRUD: READ ALL] List applications with dynamic route parameter scoping.
+   * [CRUD: READ ALL] List applications with dynamic route parameter scoping & RBAC isolation.
    */
   async getAll(req, res) {
     try {
       const jobId = req.params.jobId || req.query.jobId;
-      const applicantId = req.params.userId || req.query.applicantId || req.query.userId;
+      let applicantId = req.params.userId || req.query.applicantId || req.query.userId;
+
+      if (req.authUser) {
+        const actorRole = String(req.authUser.userRole || '').toLowerCase();
+        if (actorRole === 'alumni') {
+          applicantId = req.authUser.id;
+        }
+      }
 
       const filters = {
         ...req.query,
@@ -124,7 +132,34 @@ class ApiApplicationController {
   async create(req, res) {
     try {
       const jobId = req.params.jobId || req.body.jobId || req.body.job_id;
-      const applicantId = req.params.userId || req.body.applicantId || req.body.applicant_id || req.body.userId;
+      let applicantId = req.params.userId || req.body.applicantId || req.body.applicant_id || req.body.userId;
+
+      if (req.authUser && req.authUser.id) {
+        const actorRole = String(req.authUser.userRole || '').toLowerCase();
+        const actorIds = [String(req.authUser.id), req.authUser.profileId ? String(req.authUser.profileId) : null].filter(Boolean);
+
+        if (actorRole !== 'admin') {
+          if (applicantId && !actorIds.includes(String(applicantId))) {
+            res.locals.errorReason = 'Forbidden: cannot submit job application for another user.';
+            return res.status(403).json({
+              success: false,
+              error: 'Forbidden',
+              message: 'You can only submit job applications under your own account.'
+            });
+          }
+          applicantId = req.authUser.id;
+        } else if (!applicantId) {
+          applicantId = req.authUser.id;
+        }
+      }
+
+      // Normalize profileId -> users.id FK when needed
+      if (applicantId) {
+        const matchedUser = await User.findById(applicantId);
+        if (matchedUser && matchedUser.userId) {
+          applicantId = matchedUser.userId;
+        }
+      }
 
       if (!jobId || !applicantId) {
         return res.status(400).json({

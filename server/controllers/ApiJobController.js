@@ -191,8 +191,8 @@ class ApiJobController {
         });
       }
 
-      const applicantName = req.body.name || req.body.fullName || 'Anonymous Alumnus';
-      const applicantEmail = req.body.email;
+      const applicantName = req.body.name || req.body.fullName || (req.authUser && req.authUser.name) || 'Anonymous Alumnus';
+      const applicantEmail = req.body.email || (req.authUser && req.authUser.email);
       const resumeUrl = req.body.resumeUrl || req.body.resume_url || null;
 
       if (!applicantEmail) {

@@ -3,6 +3,14 @@ const router = express.Router();
 const multer = require('multer');
 const upload = multer();
 const ApiUserController = require('../controllers/ApiUserController');
+const {
+  requireAuth,
+  requireAdmin,
+  requireStaff,
+  requireOwnership,
+  preventRoleEscalation,
+  resolveParamUserOwner
+} = require('../middleware/authMiddleware');
 
 /**
  * ============================================================================
@@ -13,23 +21,39 @@ const ApiUserController = require('../controllers/ApiUserController');
  * ============================================================================
  */
 
-// GET /api/users - Retrieve all users (supports optional filtering query params)
-router.get('/', (req, res) => ApiUserController.getAll(req, res));
+// Authentication & Session Endpoints (Public / Session-Aware)
+router.post('/register', upload.none(), (req, res) => ApiUserController.register(req, res));
+router.post('/login', upload.none(), (req, res) => ApiUserController.login(req, res));
+router.post('/logout', (req, res) => ApiUserController.logout(req, res));
+router.get('/me', (req, res) => ApiUserController.me(req, res));
+router.get('/navigation', (req, res) => ApiUserController.navigation(req, res));
 
-// GET /api/users/:id - Retrieve single user by ID
+// Public Directory Reads
+router.get('/', (req, res) => ApiUserController.getAll(req, res));
 router.get('/:id', (req, res) => ApiUserController.getById(req, res));
 
-// POST /api/users - Create new user (supports json, multipart/form-data, urlencoded)
-router.post('/', upload.none(), (req, res) => ApiUserController.create(req, res));
+// Protected User Mutations (Admin & Profile Owner)
+router.post('/', requireAuth, requireAdmin, upload.none(), (req, res) => ApiUserController.create(req, res));
 
-// PUT /api/users/:id - Fully update existing user
-router.put('/:id', upload.none(), (req, res) => ApiUserController.update(req, res));
+router.put(
+  '/:id',
+  requireAuth,
+  requireOwnership(resolveParamUserOwner, { bypassRoles: ['admin'], resourceLabel: 'user profile' }),
+  upload.none(),
+  preventRoleEscalation,
+  (req, res) => ApiUserController.update(req, res)
+);
 
-// PATCH /api/users/:id - Partially update existing user
-router.patch('/:id', upload.none(), (req, res) => ApiUserController.patch(req, res));
+router.patch(
+  '/:id',
+  requireAuth,
+  requireOwnership(resolveParamUserOwner, { bypassRoles: ['admin'], resourceLabel: 'user profile' }),
+  upload.none(),
+  preventRoleEscalation,
+  (req, res) => ApiUserController.patch(req, res)
+);
 
-// DELETE /api/users/:id - Delete user by ID
-router.delete('/:id', (req, res) => ApiUserController.delete(req, res));
+router.delete('/:id', requireAuth, requireAdmin, (req, res) => ApiUserController.delete(req, res));
 
 // ============================================================================
 // Nested Sub-resource Routes (Model Relationships)
@@ -41,10 +65,17 @@ router.get('/:userId/announcements', (req, res) => {
   req.query.authorId = req.params.userId;
   return ApiAnnouncementController.getAll(req, res);
 });
-router.post('/:userId/announcements', upload.none(), (req, res) => {
-  req.body.authorId = req.params.userId;
-  return ApiAnnouncementController.create(req, res);
-});
+router.post(
+  '/:userId/announcements',
+  requireAuth,
+  requireStaff,
+  requireOwnership(resolveParamUserOwner, { bypassRoles: ['admin'], resourceLabel: 'author namespace' }),
+  upload.none(),
+  (req, res) => {
+    req.body.authorId = req.params.userId;
+    return ApiAnnouncementController.create(req, res);
+  }
+);
 
 // 3. Nested Profile: /api/users/:userId/profile (User 1:1 AlumniProfile)
 router.get('/:userId/profile', (req, res) => {

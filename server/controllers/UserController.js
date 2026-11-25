@@ -185,61 +185,73 @@ class UserController {
         `);
       }
 
+      const actor = req.authUser || null;
+      const isSelf = Boolean(actor && String(actor.id) === String(user.userId));
+      const isAdmin = Boolean(actor && String(actor.userRole).toLowerCase() === 'admin');
+      const canEdit = isSelf || isAdmin;
+
+      const actionsHtml = (canEdit || isAdmin)
+        ? `
+            <div style="display: flex; gap: 12px; border-top: 1px solid #DFDCD2; padding-top: 24px; flex-wrap: wrap;">
+              ${isSelf ? `<a href="/profile" style="flex: 1; text-align: center; padding: 12px; background: #F8E71C; color: #0A0A0A; text-decoration: none; border-radius: 9999px; font-weight: 700; font-size: 0.95rem; border: 1.5px solid #0A0A0A;">Kişisel Alanıma Git (/profile)</a>` : ''}
+              ${canEdit ? `<a href="/users/${user.id}/edit" style="flex: 1; text-align: center; padding: 12px; background: #2B2924; color: #F8E71C; text-decoration: none; border-radius: 9999px; font-weight: 700; font-size: 0.95rem;">Profili Düzenle</a>` : ''}
+              ${isAdmin ? `<form action="/users/${user.id}/delete" method="POST" style="flex: 1; margin: 0;" onsubmit="return confirm('Bu kaydı silmek istediğinizden emin misiniz?');"><button type="submit" style="width: 100%; padding: 12px; background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; border-radius: 9999px; font-weight: 700; font-size: 0.95rem; cursor: pointer;">Kaydı Sil</button></form>` : ''}
+            </div>
+          `
+        : `
+            <div style="border-top: 1px solid #DFDCD2; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; color: #6E6A61; font-size: 0.9rem;">
+              <span>Herkese açık mezun profili görüntüleniyor.</span>
+              ${actor ? `<a href="/profile" style="color: #0A0A0A; font-weight: 700; text-decoration: underline;">Kendi Profilime Git</a>` : `<a href="/login" style="color: #0A0A0A; font-weight: 700; text-decoration: underline;">Düzenlemek için Giriş Yap</a>`}
+            </div>
+          `;
+
       return res.status(200).send(`
         <!DOCTYPE html>
-        <html lang="en">
+        <html lang="tr">
         <head>
           <meta charset="UTF-8">
-          <title>${user.name} — Alumni Profile</title>
+          <title>${user.name} — Mezun Profili</title>
           <link rel="stylesheet" href="/css/style.css">
         </head>
-        <body style="padding: 40px 20px; font-family: 'Inter', sans-serif; background: #F8FAFC;">
-          <div style="max-width: 620px; margin: 0 auto; background: white; border-radius: 20px; padding: 36px; box-shadow: 0 10px 30px rgba(10, 22, 40, 0.08); border: 1px solid #E2E8F0;">
+        <body style="padding: 40px 20px; font-family: 'Inter', sans-serif; background: #F1EFE6;">
+          <div style="max-width: 640px; margin: 0 auto; background: white; border-radius: 22px; padding: 36px; box-shadow: 0 8px 24px rgba(43, 41, 36, 0.08); border: 1px solid #DFDCD2;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-              <a href="/users" style="text-decoration: none; color: #0A1628; font-weight: 600; font-size: 0.95rem;">← Back to Directory</a>
-              <span style="background: #FEF3C7; color: #92400E; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 700;">ID #${user.id}</span>
+              <a href="/users" style="text-decoration: none; color: #2B2924; font-weight: 600; font-size: 0.95rem;">← Mezun Rehberine Dön</a>
+              <span style="background: ${isSelf ? '#DCFCE7' : '#FEF9C3'}; color: ${isSelf ? '#0B7A3B' : '#854D0E'}; padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 700;">
+                ${isSelf ? 'Sizin Profiliniz' : `Herkese Açık Profil (${user.userRole || 'alumni'})`}
+              </span>
             </div>
 
             <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px;">
-              <div style="width: 70px; height: 70px; border-radius: 18px; background: linear-gradient(135deg, #0A1628, #1E3A8A); color: #D4AF37; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700;">
+              <div style="width: 70px; height: 70px; border-radius: 18px; background: #2B2924; color: #F8E71C; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700;">
                 ${user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
               </div>
               <div>
-                <h1 style="color: #0A1628; font-size: 1.8rem; margin: 0 0 6px 0;">${user.name}</h1>
-                <p style="color: #D4AF37; font-weight: 700; font-size: 1.05rem; margin: 0;">${user.role || 'Alumni'} @ ${user.company || 'Not Specified'}</p>
+                <h1 style="color: #0A0A0A; font-size: 1.8rem; margin: 0 0 6px 0;">${user.name}</h1>
+                <p style="color: #0284C7; font-weight: 700; font-size: 1.05rem; margin: 0;">${user.role || 'Mezun'} @ ${user.company || 'Belirtilmemiş'}</p>
               </div>
             </div>
 
-            <hr style="border: 0; border-top: 1px solid #E2E8F0; margin-bottom: 24px;">
+            <hr style="border: 0; border-top: 1px solid #DFDCD2; margin-bottom: 24px;">
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 30px;">
-              <div style="background: #F8FAFC; padding: 16px; border-radius: 12px;">
-                <div style="font-size: 0.8rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Department</div>
-                <div style="font-size: 1rem; color: #0A1628; font-weight: 600; margin-top: 4px;">${user.department || 'N/A'}</div>
+              <div style="background: #FAF9F5; padding: 16px; border-radius: 14px; border: 1px solid #EAE7DD;">
+                <div style="font-size: 0.78rem; color: #6E6A61; font-weight: 700; text-transform: uppercase;">Bölüm</div>
+                <div style="font-size: 1rem; color: #0A0A0A; font-weight: 600; margin-top: 4px;">${user.department || 'N/A'}</div>
               </div>
-              <div style="background: #F8FAFC; padding: 16px; border-radius: 12px;">
-                <div style="font-size: 0.8rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Graduation Year</div>
-                <div style="font-size: 1rem; color: #0A1628; font-weight: 600; margin-top: 4px;">${user.graduationYear || 'N/A'}</div>
+              <div style="background: #FAF9F5; padding: 16px; border-radius: 14px; border: 1px solid #EAE7DD;">
+                <div style="font-size: 0.78rem; color: #6E6A61; font-weight: 700; text-transform: uppercase;">Mezuniyet Yılı</div>
+                <div style="font-size: 1rem; color: #0A0A0A; font-weight: 600; margin-top: 4px;">${user.graduationYear || 'N/A'}</div>
               </div>
-              <div style="background: #F8FAFC; padding: 16px; border-radius: 12px; grid-column: span 2;">
-                <div style="font-size: 0.8rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Email Address</div>
+              <div style="background: #FAF9F5; padding: 16px; border-radius: 14px; border: 1px solid #EAE7DD; grid-column: span 2;">
+                <div style="font-size: 0.78rem; color: #6E6A61; font-weight: 700; text-transform: uppercase;">E-posta</div>
                 <div style="font-size: 1rem; margin-top: 4px;">
-                  <a href="mailto:${user.email}" style="color: #1E3A8A; font-weight: 600; text-decoration: none;">${user.email}</a>
+                  <a href="mailto:${user.email}" style="color: #0284C7; font-weight: 600; text-decoration: none;">${user.email}</a>
                 </div>
               </div>
             </div>
 
-            <!-- Action Controls (Edit & Delete) -->
-            <div style="display: flex; gap: 12px; border-top: 1px solid #E2E8F0; padding-top: 24px;">
-              <a href="/users/${user.id}/edit" style="flex: 1; text-align: center; padding: 12px; background: #0A1628; color: #D4AF37; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 0.95rem;">
-                ✏️ Edit Alumnus
-              </a>
-              <form action="/users/${user.id}/delete" method="POST" style="flex: 1; margin: 0;" onsubmit="return confirm('Are you sure you want to delete ${user.name}?');">
-                <button type="submit" style="width: 100%; padding: 12px; background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer;">
-                  🗑️ Delete Alumnus
-                </button>
-              </form>
-            </div>
+            ${actionsHtml}
           </div>
         </body>
         </html>
