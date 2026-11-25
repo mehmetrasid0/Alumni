@@ -13,14 +13,14 @@ A modern, containerized full-stack web application for tracking and managing uni
 - **🔍 Advanced Search & Directory**:
   - Filter alumni by graduation year, department, company, or location.
   - Dynamic results with real-time client-side search.
-- **🔐 Authentication & Authorization**:
-  - JWT-based secure registration and login (Planned).
-  - Role-based access control (Admin / Alumni).
-- **📊 Admin Dashboard**:
-  - Manage all alumni records, view statistics, and generate reports.
-  - User role management and verification workflows.
-- **💼 Profile Management**:
-  - Alumni can update their own profile and employment information.
+- **🔐 Authentication, RBAC & Session Security**:
+  - Signed `HttpOnly; SameSite=Lax` cookie (`alumni_session`, HMAC-SHA256) and `Authorization: Bearer <token>` authentication with PostgreSQL `pgcrypto` password verification.
+  - Three-tier Role-Based Access Control (`alumni`, `coordinator`, `admin`), ownership guards (`requireOwnership`), and self-registration privilege boundaries (`/register`, `/login`, `/logout`).
+- **📊 Admin Control Panel & Date Manipulation (`/admin`)**:
+  - Live PostgreSQL overview KPIs, RBAC role assignment (`alumni` / `coordinator` / `admin`), full record & timestamp/deadline manipulation, and `server/logs/error.logs` security auditing.
+- **🧭 Dynamic Role Navigation & User-Specific Workspaces (`/profile`)**:
+  - Role-aware top navigation (`GET /api/users/navigation` + `auth-nav.js`) for `guest`, `alumni`, `coordinator`, and `admin`.
+  - Protected personal workspace (`/profile`) featuring self-profile editing, own application management, skill-matched job recommendations, and founder/staff modules.
 
 ### Planned Features
 - [ ] Event management for alumni reunions
@@ -50,8 +50,11 @@ A modern, containerized full-stack web application for tracking and managing uni
 
 | Verification Item | Direct Link / Resource | Description |
 | :--- | :--- | :--- |
-| ⭐ **This Week (W7)** | [Week 7 — Job Domain Rules, Middleware Suite & Error Guardians](#-week-7-w7--november-11-2026-this-week--current-week-) | Modernized Job rules, Terminal Logger, Error File Persistence, 404/5xx Guardians & Generic 404 UI |
-| 🛡️ **HTTP Middleware Suite** | [Middleware Specification](#-enterprise-http-middleware-suite--guardians) | Terminal Logger `<time> <method> <route> <res-type> <duration>`, 404/5xx Guardians & `logs/error.logs` |
+| ⭐ **This Week (W8)** | [Authentication, RBAC, Admin Panel & User-Specific Pages](#-authentication-authorization-rbac--role-specific-pages) | Signed `HttpOnly` sessions, `requireAuth`/`requireRole`/`requireOwnership`, `/admin`, `/profile`, dynamic nav |
+| 🔐 **Login & Register UI** | [`http://localhost:5000/login`](http://localhost:5000/login) / [`/register`](http://localhost:5000/register) | Public signup (blocks self-admin), signed session login, and logout flow |
+| 👤 **Personal Workspace** | [`http://localhost:5000/profile`](http://localhost:5000/profile) | Auth-protected personal hub: own profile editor, my applications, skill-matched jobs |
+| ⚙️ **Admin Control Center** | [`http://localhost:5000/admin`](http://localhost:5000/admin) | Admin-only RBAC role assignment, record/date manipulation & `logs/error.logs` audit |
+| 🛡️ **HTTP Middleware Suite** | [Middleware Specification](#-enterprise-http-middleware-suite--resilience-guardians) | Terminal Logger `<time> <method> <route> <res-type> <duration>`, 404/5xx Guardians & `logs/error.logs` |
 | 🚫 **Generic 404 Error Page** | [`http://localhost:5000/404`](http://localhost:5000/404) | Branded responsive error screen preventing raw JSON in browser with dynamic route & reason |
 | 💼 **Career Board (Jobs UI)** | [`http://localhost:5000/jobs`](http://localhost:5000/jobs) | Multi-mode job vacancies, dynamic filtering, candidate application modal & live metrics |
 | 📑 **Application Ledger UI** | [`http://localhost:5000/applications`](http://localhost:5000/applications) | Candidate evaluation pipeline, resume inspection, interview progression & decisions |
@@ -83,7 +86,8 @@ This project is developed in weekly milestones throughout the academic semester.
 | **W4** | Oct 07, 2026 | MVC Architecture Formalization, File Map, Postman Test Suite & Blueprint | `88f15e5` | ✅ Completed |
 | **W5** | Oct 14, 2026 | PostgreSQL Persistence, Migrations Runner, Job Postings DDL & Seeders | `e6c4160`, `f0dcf3e` | ✅ Completed |
 | **W6** | Oct 21 – 28, 2026 | Decoupled M:N Career Architecture, Candidate Applications Table & Portals | `ac3b67f`, `73e7483`, `65495eb` | ✅ Completed |
-| **W7** | **Nov 11, 2026** | **Job Domain Rules, Enterprise HTTP Middleware Suite, Error File Logging & Generic 404** | `8ba2d59`, `b47d136`, `bef6a51` | 🚀 **This Week (Active)** |
+| **W7** | Nov 11 – 18, 2026 | Job Domain Rules, Enterprise HTTP Middleware Suite, Error File Logging & Unified Design System | `8ba2d59`, `b47d136`, `bef6a51`, `6e253eb` | ✅ Completed |
+| **W8** | **Nov 25, 2026** | **Authentication (`login`/`register`/`logout`), RBAC Middleware, Admin Panel (`/admin`), Dynamic Role Nav & User Workspace (`/profile`)** | *Pending push* | 🚀 **This Week (Active)** |
 
 ---
 
@@ -813,6 +817,54 @@ Handles unhandled exceptions, database query failures, and constraint violations
 
 ---
 
+## 🔐 Authentication, Authorization (RBAC) & Role-Specific Pages
+
+Alumni Tracker implements end-to-end authentication, three-tier Role-Based Access Control (`alumni`, `coordinator`, `admin`), ownership scoping, a dedicated Admin Panel (`/admin`), role-based dynamic navigation, and user-specific personal workspaces (`/profile`).
+
+```mermaid
+flowchart LR
+    REQ["HTTP Request"] --> SESS["attachAuthSession<br/>(alumni_session cookie or Bearer token)"]
+    SESS --> AUTH["requireAuth<br/>(401 JSON or 302 /login)"]
+    AUTH --> ROLE["requireRole / requireStaff / requireAdmin<br/>(403 Forbidden if disallowed)"]
+    ROLE --> OWN["requireOwnership + preventRoleEscalation<br/>(Match userId/authorId/applicantId or admin bypass)"]
+    OWN --> CTRL["Controller & PostgreSQL<br/>(pgcrypto crypt & parameterized queries)"]
+```
+
+### 1. Session & Credential Security (`server/middleware/authSession.js`, `User.js`)
+* **Password Hashing:** `User.create()` hashes credentials with PostgreSQL `pgcrypto` (`crypt($2, gen_salt('bf', 10))`). `User.verifyCredentials()` verifies login attempts directly via `u.password_hash = crypt($2, u.password_hash)`.
+* **Dual Transport Tokens:** `attachAuthSession` validates HMAC-SHA256 signed tokens (`SESSION_SECRET || JWT_SECRET`) supplied via either:
+  * `alumni_session` cookie (`HttpOnly; Path=/; SameSite=Lax`, 24h TTL or 7d when `remember` is checked), or
+  * `Authorization: Bearer <token>` header (returned in JSON by `POST /api/users/login` and `POST /api/users/register`).
+* **Self-Registration Policy:** `POST /api/users/register` (`GET /register`) allows `alumni` and `coordinator` signups while explicitly rejecting self-assigned `admin` creation with `HTTP 403`.
+* **Logout Flows:** `POST /api/users/logout` clears the cookie (`Max-Age=0`) via JSON; `GET /logout` clears the cookie and redirects (`302`) to `/login?loggedOut=1`.
+
+### 2. RBAC & Ownership Middleware Guards (`server/middleware/authMiddleware.js`)
+| Middleware / Helper | Responsibility | Unauthorized / Forbidden Behavior |
+| :--- | :--- | :--- |
+| **`requireAuth`** | Enforces valid authenticated session (`req.authUser`) | API: `401 Unauthorized` JSON · Browser: `302` redirect to `/login?redirect=<path>` |
+| **`requireRole(...roles)`** | Verifies `users.role` (`requireAdmin`, `requireStaff`) | `403 Forbidden` (logged via `res.locals.errorReason` to `server/logs/error.logs`) |
+| **`requireOwnership(resolver, opts)`** | Enforces owner identity (`resolveParamUserOwner`, `resolveAnnouncementOwner`, `resolveApplicationOwner`) with configurable role bypass (`['admin']`) | `404 Not Found` if target missing · `403 Forbidden` on cross-user access |
+| **`preventRoleEscalation`** | Blocks non-admin attempts to mutate `userRole` / `user_role` on `PUT`/`PATCH /api/users/:id` while preserving professional `jobTitle` edits | `403 Forbidden` |
+| **`getNavigationByRole(user)`** | Produces menu links scoped to `guest`, `alumni`, `coordinator`, or `admin` | Powers `GET /api/users/navigation` and [`auth-nav.js`](./server/public/js/auth-nav.js) |
+
+### 3. Role Matrix & Public vs. User-Specific Pages
+| Page / Feature | Guest | `alumni` | `coordinator` | `admin` | Scope Notes |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **Public Pages** (`/`, `/users`, `/jobs`, `/announcements`, `/about`) | Read | Read | Read | Read | Draft announcements hidden from guests/`alumni`; `+ Yeni`, `Düzenle`, `Sil` controls dynamically hidden unless authorized |
+| **Single Profile View** (`/users/:id`) | Read Public | Edit Own | Edit Own | Edit + Delete Any | Own `Düzenle` & `/profile` shortcut shown only to owner/`admin`; `Kaydı Sil` shown only to `admin` |
+| **Personal Workspace** (`/profile`, `/me`) | Redirect `/login` | Own Profile, My Applications, Matched Jobs | + My Authored Bulletins | + Founder/Admin Audit & `/admin` Link | Protected by `requireAuth`; matches user's skills & department to active jobs |
+| **Application Ledger** (`/applications`) | Login Prompt (`401`) | Own Applications + Withdraw | Review All Candidates | Full Control | `alumni` can only read/withdraw own applications |
+| **Admin Control Center** (`/admin`) | Redirect `/login` | `403` | `403` | Full RBAC, Data & Date Manipulation + Error Logs | Protected by `requireAuth + requireAdmin` (`AdminController.js`) |
+
+### 4. Seeded / Provisioned Test Accounts
+| Account Email | Password | System Role (`users.role`) | Notes |
+| :--- | :--- | :---: | :--- |
+| `mehmetrasid19@gmail.com` | `RasidAdmin2026!` | `admin` | Platform Administrator / Founder workspace |
+| `admin@alumni.edu` | `AdminPassword2026!` | `admin` | Seeded Institutional Alumni Office Admin |
+| `ahmet@alumni.edu` | `AlumniPass123!` | `alumni` | Seeded Alumni account (own applications & profile access) |
+
+---
+
 ## 🗄️ Database Architecture & Schema (PostgreSQL — Selected Model)
 
 ### 🏆 Database Architecture Selection: Why PostgreSQL? (Evaluation vs. MongoDB & MySQL)
@@ -940,6 +992,19 @@ To interactively explore, test, and view schemas for all API endpoints, use **Sw
 | :--- | :--- | :--- |
 | `GET` | `/api/health` | Comprehensive server diagnostics telemetry (CPU, memory, OS, runtime info) |
 
+### Authentication, Sessions & Admin APIs
+| Method | Endpoint | Access / Guard | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/users/register` | Public (`admin` blocked `403`) | Self-registration with `pgcrypto` password hashing & session cookie |
+| `POST` | `/api/users/login` | Public | Verify credentials (`crypt`), issue `alumni_session` cookie & Bearer token |
+| `POST` | `/api/users/logout` | Public | Clear `alumni_session` cookie (`Max-Age=0`) |
+| `GET` | `/api/users/me` | Authenticated | Return current user DTO & role-scoped navigation menu |
+| `GET` | `/api/users/navigation` | Public (Session-Aware) | Return role-specific navbar links (`guest`, `alumni`, `coordinator`, `admin`) |
+| `GET` | `/api/admin/overview` | `requireAuth + requireAdmin` | Real-time aggregate counts across users, announcements, jobs & applications |
+| `PATCH` | `/api/admin/users/:id/role` | `requireAuth + requireAdmin` | Assign `alumni`, `coordinator`, or `admin` role in PostgreSQL |
+| `PATCH` | `/api/admin/dates/:resource/:id` | `requireAuth + requireAdmin` | Admin manipulation of timestamps/deadlines (`announcements`, `jobs`, `applications`, `users`) |
+| `GET` | `/api/admin/logs` | `requireAuth + requireAdmin` | Read latest 50 security & HTTP error entries from `server/logs/error.logs` |
+
 ### Users (CRUD)
 | Method | Endpoint | Description | Accepted Formats |
 | :--- | :--- | :--- | :--- |
@@ -1042,12 +1107,17 @@ To interactively explore, test, and view schemas for all API endpoints, use **Sw
 | `GET` | `/hello/:name` | Returns greeting message: `Hello,{name}!` |
 | `GET` | `/sum/:num1/:num2` | Returns sum of two numbers |
 
-### Pages (View Layer)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/` | Home / Landing page (`index.html`) |
-| `GET` | `/about` | About page (`about.html`) |
-| `GET` | `/alumni` | Alumni directory & management UI (`alumni.html`) |
+### Pages & Workspaces (View Layer)
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | Public | Home / Landing page (`index.html`) |
+| `GET` | `/about` | Public | About page (`about.html`) |
+| `GET` | `/alumni` (`/users`) | Public | Alumni directory & role-aware actions (`alumni.html`) |
+| `GET` | `/register` | Public | User registration form (`register.html`) |
+| `GET` | `/login` | Public | Login & active session view (`login.html`) |
+| `GET` | `/logout` | Public | Clears `alumni_session` cookie and redirects to `/login?loggedOut=1` |
+| `GET` | `/profile` (`/me`) | `requireAuth` | Personal user workspace (`profile.html`) |
+| `GET` | `/admin` | `requireAuth + requireAdmin` | Admin Control Center (`admin.html`) |
 | `GET` | `/jobs` | Career Board & Job Opportunities (`/jobs`) |
 | `GET` | `/announcements` | Announcement Management Interface (`announcements.html`) |
 | `GET` | `/api/swagger` | Interactive Swagger UI portal |
@@ -1289,11 +1359,14 @@ npm run dev
   - 404 Guardian Middleware (`server/middleware/notFoundGuardian.js`) with API JSON reasons and browser `/404` redirection.
   - 5xx Server Error Guardian Middleware (`server/middleware/serverErrorGuardian.js`) with exception handling and fallback modal.
   - Branded Generic 404 Error Page (`server/public/404.html`) and In-Site Error Guardian Modal (`server/public/index.html`).
-- [ ] **Phase 8 (W8): Advanced Analytics, Export Suite (CSV/PDF) & Cloud Deployment**
-  - Event management and reunion module.
+- [x] **Phase 8 (W8 - Current): Authentication, RBAC Middleware, Admin Panel & Role-Specific UI** *(Completed ⭐)*
+  - Registration (`/register`), login (`/login`), and logout (`/logout`) with signed `HttpOnly` session cookies, Bearer token support, and PostgreSQL `pgcrypto` credential checks.
+  - Reusable Express authorization guards (`requireAuth`, `requireRole`, `requireAdmin`, `requireStaff`, `requireOwnership`, `preventRoleEscalation`).
+  - Admin Control Center (`/admin`) for RBAC role assignment, entity & date/deadline manipulation, and `server/logs/error.logs` inspection.
+  - Dynamic role-based top navigation (`GET /api/users/navigation`, `auth-nav.js`) and protected Personal Workspace (`/profile`).
+- [ ] **Phase 9 (W9): Analytics Export (CSV/PDF) & Cloud Deployment**
   - Export alumni and applicant records (CSV and PDF formats).
-  - Admin analytics dashboard and verification workflows.
-  - Production Docker builds and automated CI/CD deployment to cloud hosting.
+  - Automated CI/CD deployment and production HTTPS configuration.
 
 ---
 

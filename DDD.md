@@ -27,7 +27,12 @@
    - [6.3 Constraints & Invariant Enforcement](#63-constraints--invariant-enforcement)
    - [6.4 HTTP Observability, Error Persistence & Guardians](#64-http-observability-error-persistence--guardians)
 7. [🔄 In-Memory to Persistent Storage Transition Strategy](#-in-memory-to-persistent-storage-transition-strategy)
-8. [🔐 Data Security, Privacy & KVKK/GDPR Compliance](#-data-security-privacy--kvkkgdpr-compliance)
+8. [🔐 Authorization, User Roles (RBAC) & Data Security](#-authorization-user-roles-rbac--data-security)
+   - [8.1 System User Roles (`users.role`)](#81-system-user-roles-usersrole)
+   - [8.2 Resource Permission & Authorization Matrix](#82-resource-permission--authorization-matrix)
+   - [8.3 Authorization Pipeline & Ownership Scoping](#83-authorization-pipeline--ownership-scoping)
+   - [8.4 Current Enforcement vs. Target Route Guards](#84-current-enforcement-vs-target-route-guards)
+   - [8.5 Data Security, Privacy & KVKK/GDPR Compliance](#85-data-security-privacy--kvkkgdpr-compliance)
 9. [💾 Backup, Disaster Recovery & Docker Volume Management](#-backup-disaster-recovery--docker-volume-management)
 10. [🔗 Integration Matrix: Codebase & API Mapping](#-integration-matrix-codebase--api-mapping)
 11. [🌱 Factory & Seeder Data Provisioning Architecture](#-factory--seeder-data-provisioning-architecture)
@@ -777,13 +782,102 @@ graph LR
 
 ---
 
-## 🔐 Data Security, Privacy & KVKK/GDPR Compliance
+## 🔐 Authorization, User Roles (RBAC) & Data Security
 
-1. **Credential Segregation:** Passwords are never stored in plaintext. They are hashed using **`bcrypt`** with a minimum work factor of 10 (`saltRounds = 10`) before storage in `users.password_hash`.
-2. **PII Protection & Public Scoping:** The `users` table and `alumni_profiles` table are physically decoupled. Public directory queries (`GET /api/users`) project only non-sensitive alumni attributes, omitting password hashes and private contact numbers.
-3. **Career Posting Authorization & Scoping:** Job opportunities can only be authored and managed by verified alumni accounts, company coordinators, or administrators (`poster_id`). Mutation endpoints (`PUT`, `DELETE`) require ownership verification matching the active authenticated session.
-4. **SQL Injection Immunity:** All database interactions are executed using parameterized SQL queries (`$1, $2, $3...` in `pg`) or ORM query builders (Prisma), preventing SQL injection vectors entirely.
-5. **Least-Privilege Database Role:** The Express web application connects using an unprivileged database user (`alumni_app`) that has only `SELECT`, `INSERT`, `UPDATE`, and `DELETE` grants, with no permissions to `DROP` tables or alter schemas.
+The **Alumni Tracker** platform implements a **three-tier Role-Based Access Control (RBAC)** domain model anchored in `users.role` (`database/init.sql`, `001_create_initial_schema.js`) and projected across application models (`User.js`, `Announcement.js`, `UserFactory.js`, `UserSeeder.js`).
+
+### 8.1 System User Roles (`users.role`)
+
+Database integrity is strictly guarded at the PostgreSQL layer via the `chk_users_role` constraint:
+
+```sql
+role VARCHAR(50) NOT NULL DEFAULT 'alumni',
+CONSTRAINT chk_users_role CHECK (role IN ('alumni', 'admin', 'coordinator'))
+```
+
+| Role (`users.role`) | Default | Intended Principal | Core Domain Authority | Reference Fixture / Usage |
+| :--- | :---: | :--- | :--- | :--- |
+| **`alumni`** | ✅ Yes | Verified University Graduates & Job Seekers | Read alumni directory & career board; manage own `alumni_profiles` record; submit, inspect, and withdraw own `applications`. | `UserFactory.alumni()`, `ApplicationSeeder` (`WHERE role = 'alumni'`) |
+| **`coordinator`** | ❌ No | YBS / Faculty Career Coordinators & Employer Liaisons | All `alumni` read privileges; create/update/close `job_postings`; review candidate `applications` and advance recruitment statuses; author departmental `announcements`. | `UserFactory.coordinator()` |
+| **`admin`** | ❌ No | Alumni Office & Platform Administrators | Full unrestricted CRUD across `users`, `alumni_profiles`, `announcements`, `job_postings`, and `applications`; role assignment (`users.role`); bulletin pinning/archiving; system health & `error.logs` audit. | `UserSeeder` (`admin@alumni.edu`), `Announcement.js` default author lookup |
+
+> **Field Separation Note (`User.js` DTO):** In `server/models/User.js`, the system authorization role stored in `users.role` is exposed explicitly as **`userRole`** (`'alumni' | 'coordinator' | 'admin'`), keeping it cleanly separated from the alumnus's professional employment title (`alumni_profiles.job_title`, mapped as `role` for directory display).
+
+---
+
+### 8.2 Resource Permission & Authorization Matrix
+
+Access rules combine **Role Permissions** with **Record Ownership** across all core domain entities:
+
+| Domain Resource / Endpoint | Anonymous / Guest | `alumni` | `coordinator` | `admin` | Ownership & Scoping Rule |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **Public Pages** (`/`, `/about`, `/404`) | Read | Read | Read | Read | Publicly accessible |
+| **`users` Account** (`/api/users`) | List Public Directory (`GET`) | Read Directory; Self Profile (`PUT`/`PATCH` Own) | Read Directory; Self Profile (`PUT`/`PATCH` Own) | Full CRUD + Role Change (`users.role`) + Delete | Password hashes (`password_hash`) are never returned in any response |
+| **`alumni_profiles`** (`1:1` with `users`) | Read Public Fields | Create / Edit **Own** (`profile.user_id = actor.id`) | Read All; Edit **Own** | Full CRUD (Any Profile) | Ownership matched via `alumni_profiles.user_id` |
+| **`announcements`** (`/api/announcements`) | Read `status = 'published'` | Read `status = 'published'` | Create / Edit **Own**; View Drafts | Full CRUD + Pin (`pinned = TRUE`) + Archive | Authorship tracked via `author_id REFERENCES users(id) ON DELETE RESTRICT` |
+| **`job_postings`** (`/api/jobs`) | Read `status = 'active'` | Read `status = 'active'` | Create / Update / Close (`PUT`, `PATCH`) | Full CRUD + Delete (`DELETE`) | Decoupled career catalog; deletions cascade to `applications` |
+| **`applications`** (`/api/applications`) | ❌ Denied | Submit (`POST`); Read/Withdraw (`GET`/`DELETE`) **Own** Only | Read Applications for Managed Jobs; Update `status` & `notes` | Full CRUD (All Applications) | Candidate scope: `applications.applicant_id = actor.id`; duplicate prevention via `uq_applications_job_applicant` |
+| **Diagnostics & Audit** (`/api/health`, `server/logs/error.logs`) | ❌ Denied (Target) | ❌ Denied | ❌ Denied | Read & Audit | Operational telemetry and persistent error logs restricted to administrators |
+
+---
+
+### 8.3 Authorization Pipeline & Ownership Scoping
+
+In the Express request lifecycle, authorization guards sit downstream of HTTP telemetry (`loggerMiddleware`) and upstream of MVC controllers, ensuring unauthorized (`401`) or forbidden (`403`) attempts are blocked and automatically persisted to `server/logs/error.logs`.
+
+```mermaid
+flowchart TD
+    REQ["Incoming HTTP Request"] --> LOG["1. loggerMiddleware<br/>(Terminal Telemetry + Error Ledger)"]
+    LOG --> SESS["2. attachAuthSession<br/>(Verify Cookie or Bearer Token -> req.authUser)"]
+    SESS --> AUTHN["3. requireAuth<br/>(Verify Authenticated Principal)"]
+    AUTHN -->|Invalid / Missing Token on Protected Route| R401["401 Unauthorized or Redirect /login<br/>(Logged to server/logs/error.logs)"]
+    AUTHN -->|Authenticated Principal + userRole| RBAC["4. requireRole / requireOwnership<br/>Check users.role & Ownership FK"]
+    RBAC -->|Insufficient Role or Foreign Resource| R403["403 Forbidden<br/>(Logged to server/logs/error.logs)"]
+    RBAC -->|Authorized| CTRL["5. MVC Controller & Model<br/>(Parameterized SQL $1..$N)"]
+
+    subgraph SCOPING ["Database Relational Scoping"]
+        S1["alumni_profiles.user_id = users.id"]
+        S2["announcements.author_id = users.id"]
+        S3["applications.applicant_id = users.id"]
+        S4["Nested Routes: /api/users/:userId/* & /api/jobs/:jobId/*"]
+    end
+
+    CTRL -.-> SCOPING
+```
+
+---
+
+### 8.4 Current Enforcement vs. Target Route Guards
+
+To maintain exact fidelity between documentation and the runtime codebase:
+
+* **Currently Enforced in Codebase & Database:**
+  1. **PostgreSQL Role Invariant (`chk_users_role`):** Strictly rejects any `users.role` value outside `('alumni', 'admin', 'coordinator')` at insert/update time (`database/init.sql`, `001_create_initial_schema.js`).
+  2. **Role-Segmented Seeding & Factories:** `UserSeeder.js` provisions the core `'admin'` principal (`admin@alumni.edu`), `UserFactory.js` provides `.admin()`, `.coordinator()`, and `.alumni()` state builders, and `ApplicationSeeder.js` restricts candidate submissions to `WHERE role = 'alumni'`.
+  3. **Author Attribution (`Announcement.js`):** Defaults newly authored bulletins to the `'admin'` user (`SELECT id FROM users WHERE role = 'admin' OR email = 'admin@alumni.edu'`) and protects author history via `ON DELETE RESTRICT`.
+  4. **Credential Stripping (`User.js`):** `formatUser()` projects only non-sensitive profile attributes and `userRole`, completely omitting `users.password_hash`.
+  5. **Nested Resource Isolation (`mergeParams: true`):** Sub-routers (`apiApplicationRoutes.js`) scope queries by `:userId` and `:jobId` (`GET /api/users/:userId/applications`, `GET /api/jobs/:jobId/applications`).
+  6. **Authentication, Registration & Signed Cookie Sessions (`authSession.js`, `ApiUserController.js`, `userRoutes.js`):**
+     * **Registration Guard:** `POST /api/users/register` (`GET /register` / `register.html`) hashes passwords via PostgreSQL `pgcrypto` (`crypt($2, gen_salt('bf', 10))`), permits `alumni` and `coordinator` signups, explicitly rejects self-assigned `admin` registration with `HTTP 403`, and issues a session cookie on success.
+     * **Login & Credential Verification:** `POST /api/users/login` (`GET /login` / `login.html`) verifies credentials with `User.verifyCredentials()` (`u.password_hash = crypt($2, u.password_hash)`), returning `HTTP 401` on invalid credentials or issuing an HMAC-SHA256 signed `HttpOnly; SameSite=Lax` cookie (`alumni_session`) and Bearer `token` on success.
+     * **Session Hydration & Logout:** `attachAuthSession` (`server/middleware/authSession.js`) verifies either the `alumni_session` cookie or an `Authorization: Bearer <token>` header on every request and hydrates `req.authUser` (`id`, `profileId`, `email`, `userRole`, `name`) for `GET /api/users/me` and the shared navbar client (`server/public/js/auth-nav.js`). `POST /api/users/logout` (JSON API) and `GET /logout` (clears cookie and redirects `302` to `/login?loggedOut=1`) terminate the active session.
+  7. **RBAC & Ownership Auth Middleware (`server/middleware/authMiddleware.js`):**
+     * **`requireAuth`:** Rejects unauthenticated API requests with `401 Unauthorized` JSON (logged via `res.locals.errorReason` into `server/logs/error.logs`) and redirects unauthenticated browser form/view navigations to `/login?redirect=<path>`.
+     * **`requireRole(...roles)` / `requireAdmin` / `requireStaff`:** Enforces `users.role` permissions (`'admin'`, `'coordinator'`, `'alumni'`) across API and Web mutation endpoints (`403 Forbidden` when role is insufficient).
+     * **`requireOwnership(resolver, options)`:** Enforces relational ownership matching (`resolveParamUserOwner`, `resolveAnnouncementOwner`, `resolveApplicationOwner`) with configurable role bypasses (`['admin']` or `['admin', 'coordinator']`), returning `404` when the target resource does not exist and `403 Forbidden` on cross-user access.
+     * **`preventRoleEscalation` & Controller Scoping:** Blocks non-admin callers from mutating `userRole` via profile updates (`PUT`/`PATCH /api/users/:id`), hides non-published announcement drafts from guests/`alumni`, and scopes `GET /api/applications` and `POST /api/applications` to `req.authUser.id` for `alumni` accounts.
+* **Optional Operational Hardening:**
+  * Diagnostic telemetry endpoints (`/api/health`) remain accessible for footer/monitoring checks and can be wrapped with `requireAdmin` when deploying behind a public gateway.
+
+---
+
+### 8.5 Data Security, Privacy & KVKK/GDPR Compliance
+
+1. **Credential Segregation:** Passwords are never stored in plaintext. They are hashed using **`bcrypt`** with a work factor of 10 (`saltRounds = 10` / `gen_salt('bf', 10)`) before storage in `users.password_hash`.
+2. **PII Protection & Public Scoping:** The `users` table and `alumni_profiles` table are physically decoupled. Directory queries (`GET /api/users`) never project `password_hash`, and administrative error logs omit sensitive request bodies.
+3. **Candidate Privacy (`applications`):** Candidate cover letters, resume URLs (`resume_url`), and recruiter evaluation notes (`notes`) are scoped to applicant identity (`applicant_id`) and target vacancy (`job_id`), preventing cross-candidate leakage.
+4. **SQL Injection Immunity:** All database queries across models (`User.js`, `Announcement.js`, `JobPosting.js`, `Application.js`) execute parameterized SQL placeholders (`$1, $2, $3...` via `pg`), preventing SQL injection vectors.
+5. **Least-Privilege Database Role:** Production connections restrict the application pool to `SELECT`, `INSERT`, `UPDATE`, and `DELETE` privileges on application tables, preventing DDL schema tampering (`DROP`, `ALTER`).
 
 ---
 
@@ -893,6 +987,20 @@ Direct routes expose top-level RESTful collections and web views without requiri
 
 | Endpoint | HTTP Method | MVC Controller Handler | Resource Semantics | Executed PostgreSQL Action |
 | :--- | :---: | :--- | :--- | :--- |
+| `/register` | `GET` | `userRoutes` (Static View) | Public Registration Interface | Serves `server/public/register.html` |
+| `/login` | `GET` | `userRoutes` (Static View) | Login & Active Session View | Serves `server/public/login.html` |
+| `/profile` (`/me`) | `GET` | `userRoutes` (`requireAuth`) | User-Specific Personal Workspace | Serves `server/public/profile.html` (self editor, own applications, matched jobs, author notices) |
+| `/logout` | `GET` | `userRoutes` + `clearSessionCookie` | Web Session Termination | Clears `alumni_session` cookie & `302` redirects to `/login?loggedOut=1` |
+| `/api/users/register` | `POST` | `ApiUserController.register` | Self-Service Registration (`alumni`/`coordinator`) | Checks duplicate email, hashes via `crypt($2, gen_salt('bf', 10))`, inserts `users` & `alumni_profiles`, issues `alumni_session` |
+| `/api/users/login` | `POST` | `ApiUserController.login` | Authenticate Credentials | `SELECT u.*, p.* FROM users u LEFT JOIN alumni_profiles p ... WHERE LOWER(u.email) = LOWER($1) AND u.password_hash = crypt($2, u.password_hash)` |
+| `/api/users/logout` | `POST` | `ApiUserController.logout` | API Session Termination | Clears signed `HttpOnly` `alumni_session` cookie (`Max-Age=0`) |
+| `/api/users/me` | `GET` | `ApiUserController.me` | Current Authenticated Principal | Verifies `alumni_session` cookie (`req.authUser`) and returns `User.findById(req.authUser.userId)` |
+| `/api/users/navigation` | `GET` | `ApiUserController.navigation` | Role-Aware Navigation Menu | Resolves active `users.role` (`guest`, `alumni`, `coordinator`, `admin`) and returns role-scoped links |
+| `/admin` | `GET` | `adminRoutes` (`requireAuth + requireAdmin`) | Platform Administration Panel | Serves `server/public/admin.html` |
+| `/api/admin/overview` | `GET` | `AdminController.overview` | RBAC & Entity Telemetry Summary | Aggregates `COUNT(*) FILTER (WHERE ...)` across `users`, `announcements`, `job_postings`, `applications` |
+| `/api/admin/users/:id/role` | `PATCH` | `AdminController.updateUserRole` | Assign System RBAC Role | `UPDATE users SET role = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2` |
+| `/api/admin/dates/:resource/:id` | `PATCH` | `AdminController.updateRecordDates` | Admin Date & Field Manipulation | Parameterized `UPDATE` on `created_at` / `deadline` / `applied_at` / `graduation_year` across core tables |
+| `/api/admin/logs` | `GET` | `AdminController.getErrorLogs` | Security & Error Audit Trail | Streams trailing entries from `server/logs/error.logs` |
 | `/api/users` | `GET` | `ApiUserController.getAll` | Global Alumni Directory | `SELECT p.*, u.email, u.role FROM alumni_profiles p JOIN users u ON p.user_id = u.id ORDER BY p.graduation_year DESC` |
 | `/api/users/:id` | `GET` | `ApiUserController.getById` | Single Alumnus Entity | `SELECT p.*, u.email FROM alumni_profiles p JOIN users u ON p.user_id = u.id WHERE p.id = $1 OR p.student_id = $1` |
 | `/api/users` | `POST` | `ApiUserController.create` | Register New Alumnus | `BEGIN; INSERT INTO users ...; INSERT INTO alumni_profiles ...; COMMIT;` |
