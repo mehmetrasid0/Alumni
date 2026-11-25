@@ -7,6 +7,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
 // Import Middleware
 const loggerMiddleware = require('./middleware/logger');
+const { attachAuthSession } = require('./middleware/authSession');
 const notFoundGuardian = require('./middleware/notFoundGuardian');
 const serverErrorGuardian = require('./middleware/serverErrorGuardian');
 
@@ -19,6 +20,7 @@ const jobRoutes = require('./routes/jobRoutes');
 const apiJobRoutes = require('./routes/apiJobRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const apiApplicationRoutes = require('./routes/apiApplicationRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -28,6 +30,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(loggerMiddleware);
+app.use(attachAuthSession);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -63,6 +66,7 @@ app.use('/', userRoutes);
 app.use('/', announcementRoutes);
 app.use('/', jobRoutes);
 app.use('/', applicationRoutes);
+app.use('/', adminRoutes);
 
 // GET /hello/:name → Returns greeting message
 app.get('/hello/:name', (req, res) => {

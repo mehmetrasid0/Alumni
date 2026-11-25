@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Alumni Tracker — Sistem Yönetimi, RBAC Rol Atama ve Veri/Tarih Kontrol Paneli">
+  <title>Yönetim Paneli | Alumni Tracker — İÜ İktisat & YBS</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .admin-hero {
+      background: var(--espresso);
+      color: var(--paper);
+      padding: 40px 0 36px;
+      border-bottom: 1.5px solid var(--ink);
+    }
+
+    .admin-hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .admin-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--mis-yellow);
+      margin-bottom: 8px;
+    }
+
+    .admin-hero h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1.15;
+      margin-bottom: 6px;
+    }
+
+    .admin-hero p {
+      font-size: 14.5px;
+      color: rgba(241, 239, 230, 0.78);
+      max-width: 680px;
+    }
+
+    .admin-actor-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    .kpi-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+
+    .kpi-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: rgba(241, 239, 230, 0.68);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin: 4px 0 2px;
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--mis-blue);
+    }
+
+    .admin-main {
+      padding: 32px 0 80px;
+    }
+
+    .tabs-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+      border-bottom: 1px solid var(--hairline);
+      padding-bottom: 14px;
+    }
+
+    .tab-btn {
+      background: var(--surface);
+      color: var(--body);
+      border: 1px solid var(--hairline);
+      border-radius: 9999px;
+      padding: 9px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+
+    .tab-btn:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    .tab-btn.active {
+      background: var(--espresso);
+      color: #FFFFFF;
+      border-color: var(--ink);
+    }
+
+    .panel-card {
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 20px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .panel-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--hairline);
+      background: #FAF9F5;
+    }
+
+    .panel-toolbar h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .search-mini {
+      padding: 8px 14px;
+      border: 1.5px solid var(--hairline);
+      border-radius: 9999px;
+      font-size: 13px;
+      font-family: inherit;
+      min-width: 240px;
+      background: #FFFFFF;
+    }
+
+    .search-mini:focus {
+      outline: none;
+      border-color: var(--ink);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table.admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    table.admin-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--hairline);
+      background: #FDFCF9;
+      white-space: nowrap;
+    }
+
+    table.admin-table td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+      color: var(--body);
+    }
+
+    table.admin-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.admin-table tr:hover td {
+      background: #FAF9F4;
+    }
+
+    .role-select {
+      padding: 6px 10px;
+      border: 1.5px solid var(--hairline);
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      background: #FFFFFF;
+      font-family: inherit;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-admin { background: var(--mis-yellow-soft); color: #854D0E; border: 1px solid #CA8A04; }
+    .badge-coordinator { background: #E0F2FE; color: #0369A1; border: 1px solid #7DD3FC; }
+    .badge-alumni { background: var(--mis-green-soft); color: var(--mis-green); border: 1px solid #86EFAC; }
+    .badge-draft { background: #F3F4F6; color: #4B5563; border: 1px solid #D1D5DB; }
+
+    .btn-sm {
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--hairline);
+      background: #FFFFFF;
+      color: var(--ink);
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .btn-sm:hover { border-color: var(--ink); background: var(--paper); }
+    .btn-sm.primary { background: var(--mis-yellow); border-color: var(--ink); color: var(--ink); font-weight: 700; }
+    .btn-sm.danger { border-color: #FCA5A5; color: #B91C1C; background: #FEF2F2; }
+    .btn-sm.danger:hover { background: #FEE2E2; }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.56);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal-card {
+      background: var(--surface);
+      border: 1.5px solid var(--ink);
+      border-radius: 22px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .modal-header h3 { font-size: 20px; font-weight: 800; color: var(--ink); }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field-group { margin-bottom: 14px; }
+    .field-group.full { grid-column: 1 / -1; }
+
+    .field-group label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 5px;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--hairline);
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+      background: #FAF9F5;
+    }
+
+    .field-input:focus {
+      outline: none;
+      border-color: var(--ink);
+      background: #FFFFFF;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--espresso);
+      color: #FFFFFF;
+      border: 1px solid var(--mis-yellow);
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      display: none;
+      z-index: 1200;
+    }
+
+    .toast.show { display: block; }
+
+    .log-entry {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-light);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      color: var(--body);
+    }
+
+    @media (max-width: 1024px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .field-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== Unified Top Navigation ==================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="/" class="navbar-brand">
+        <div class="mis-2x2-mark" aria-hidden="true">
+          <span class="c-blue">M</span><span class="c-green">2</span>
+          <span class="c-yellow">I</span><span class="c-black">S</span>
+        </div>
+        <span>AlumniTracker</span>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Ana Sayfa</a></li>
+        <li><a href="/users">Mezunlar</a></li>
+        <li><a href="/jobs">Kariyer</a></li>
+        <li><a href="/applications">Başvurular</a></li>
+        <li><a href="/announcements">Duyurular</a></li>
+        <li><a href="/about">Hakkında</a></li>
+        <li><a href="/api/swagger" target="_blank" class="nav-cta">Swagger API</a></li>
+      </ul>
+
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Menü">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== Espresso Admin Header ==================== -->
+  <header class="admin-hero">
+    <div class="container">
+      <div class="admin-hero-top">
+        <div>
+          <div class="admin-eyebrow">İstanbul Üniversitesi YBS • Sistem Yönetimi</div>
+          <h1>Yönetim ve Veri Kontrol Merkezi</h1>
+          <p>Kullanıcı rollerini (RBAC) yönetin, mezun profillerini, duyuruları, ilan son başvuru tarihlerini ve kayıt zaman damgalarını doğrudan PostgreSQL üzerinde düzenleyin.</p>
+        </div>
+        <div class="admin-actor-chip" id="actorBadge">
+          <div>
+            <div style="font-weight: 700; color: #FFFFFF;" id="actorName">Yükleniyor...</div>
+            <div style="font-size: 11.5px; color: var(--mis-yellow);" id="actorEmail">—</div>
+          </div>
+          <button type="button" class="btn-sm primary" onclick="loadAllData()">Verileri Yenile</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Toplam Hesap</div>
+          <div class="kpi-value" id="kpiUsers">—</div>
+          <div class="kpi-sub" id="kpiUsersSub">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Yetkili Kadro</div>
+          <div class="kpi-value" id="kpiAdmins">—</div>
+          <div class="kpi-sub" id="kpiAdminsSub">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Duyurular</div>
+          <div class="kpi-value" id="kpiAnnouncements">—</div>
+          <div class="kpi-sub" id="kpiAnnouncementsSub">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">İş İlanları</div>
+          <div class="kpi-value" id="kpiJobs">—</div>
+          <div class="kpi-sub" id="kpiJobsSub">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Başvurular</div>
+          <div class="kpi-value" id="kpiApps">—</div>
+          <div class="kpi-sub" id="kpiAppsSub">—</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== Main Tabs Workspace ==================== -->
+  <main class="admin-main">
+    <div class="container">
+      <div class="tabs-bar" role="tablist">
+        <button type="button" class="tab-btn active" onclick="switchTab('users', this)">Kullanıcılar &amp; Roller</button>
+        <button type="button" class="tab-btn" onclick="switchTab('announcements', this)">Duyurular &amp; Tarihler</button>
+        <button type="button" class="tab-btn" onclick="switchTab('jobs', this)">İlanlar &amp; Son Başvuru</button>
+        <button type="button" class="tab-btn" onclick="switchTab('applications', this)">Başvurular &amp; Süreç</button>
+        <button type="button" class="tab-btn" onclick="switchTab('logs', this)">Güvenlik &amp; Hata Günlüğü</button>
+      </div>
+
+      <!-- TAB 1: USERS -->
+      <section class="tab-pane active" id="tab-users">
+        <div class="panel-card">
+          <div class="panel-toolbar">
+            <h2>Hesaplar, RBAC Rol Atama ve Kayıt Tarihleri</h2>
+            <input type="text" class="search-mini" id="userSearch" placeholder="Ad, e-posta veya bölüm ara..." oninput="renderUsersTable()">
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Ad Soyad / E-posta</th>
+                  <th>Bölüm &amp; Şirket</th>
+                  <th>Mezuniyet Yılı</th>
+                  <th>Kayıt Tarihi</th>
+                  <th>Sistem Rolü</th>
+                  <th>İşlemler</th>
+                </tr>
+              </thead>
+              <tbody id="usersTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: ANNOUNCEMENTS -->
+      <section class="tab-pane" id="tab-announcements">
+        <div class="panel-card">
+          <div class="panel-toolbar">
+            <h2>Duyurular ve Yayın Tarihi Manipülasyonu</h2>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <input type="text" class="search-mini" id="annSearch" placeholder="Duyuru başlığı veya kategori ara..." oninput="renderAnnouncementsTable()">
+              <button type="button" class="btn-sm primary" onclick="openCreateAnnouncementModal()">+ Yeni Duyuru</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Başlık</th>
+                  <th>Kategori &amp; Öncelik</th>
+                  <th>Durum</th>
+                  <th>Yayın / Oluşturma Tarihi</th>
+                  <th>İşlemler</th>
+                </tr>
+              </thead>
+              <tbody id="annTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: JOBS -->
+      <section class="tab-pane" id="tab-jobs">
+        <div class="panel-card">
+          <div class="panel-toolbar">
+            <h2>Kariyer İlanları ve Son Başvuru Tarihleri</h2>
+            <input type="text" class="search-mini" id="jobSearch" placeholder="Pozisyon veya şirket ara..." oninput="renderJobsTable()">
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Pozisyon &amp; Şirket</th>
+                  <th>Durum</th>
+                  <th>Son Başvuru (Deadline)</th>
+                  <th>Yayın Tarihi</th>
+                  <th>İşlemler</th>
+                </tr>
+              </thead>
+              <tbody id="jobsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: APPLICATIONS -->
+      <section class="tab-pane" id="tab-applications">
+        <div class="panel-card">
+          <div class="panel-toolbar">
+            <h2>Aday Başvuruları ve Başvuru Tarihi Yönetimi</h2>
+            <input type="text" class="search-mini" id="appSearch" placeholder="Aday veya ilan ara..." oninput="renderAppsTable()">
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Aday</th>
+                  <th>İlan &amp; Şirket</th>
+                  <th>Durum</th>
+                  <th>Başvuru Tarihi</th>
+                  <th>İşlemler</th>
+                </tr>
+              </thead>
+              <tbody id="appsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: LOGS -->
+      <section class="tab-pane" id="tab-logs">
+        <div class="panel-card">
+          <div class="panel-toolbar">
+            <h2>HTTP Güvenlik ve Hata Günlüğü (logs/error.logs)</h2>
+            <button type="button" class="btn-sm" onclick="loadLogs()">Günlüğü Yenile</button>
+          </div>
+          <div id="logsContainer" style="max-height: 540px; overflow-y: auto;"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==================== Edit Modal ==================== -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">Kaydı Düzenle</h3>
+        <button type="button" class="btn-sm" onclick="closeModal()">Kapat</button>
+      </div>
+      <form id="modalForm" onsubmit="submitModalForm(event)">
+        <div class="field-grid" id="modalFields"></div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+          <button type="button" class="btn-sm" onclick="closeModal()">İptal</button>
+          <button type="submit" class="btn-sm primary" id="modalSubmitBtn">Değişiklikleri Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const state = {
+      users: [],
+      announcements: [],
+      jobs: [],
+      applications: [],
+      modalContext: null
+    };
+
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileToggle && navLinks) {
+      mobileToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function formatDisplayDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return String(iso);
+      return d.toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    function toDateTimeLocal(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '';
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function toDateInput(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '';
+      return d.toISOString().split('T')[0];
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3200);
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`tab-${name}`).classList.add('active');
+      if (name === 'logs') loadLogs();
+    }
+
+    async function apiFetch(url, options = {}) {
+      const res = await fetch(url, {
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+        ...options
+      });
+      if (res.status === 401) {
+        window.location.href = '/login?redirect=/admin';
+        return null;
+      }
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || data.message || `HTTP ${res.status}`);
+      }
+      return data;
+    }
+
+    async function loadAllData() {
+      try {
+        const [ov, users, anns, jobs, apps] = await Promise.all([
+          apiFetch('/api/admin/overview'),
+          apiFetch('/api/users'),
+          apiFetch('/api/announcements'),
+          apiFetch('/api/jobs'),
+          apiFetch('/api/applications')
+        ]);
+        if (!ov) return;
+
+        document.getElementById('actorName').textContent = ov.actor.name || ov.actor.email;
+        document.getElementById('actorEmail').textContent = `${ov.actor.email} (${ov.actor.userRole})`;
+
+        const d = ov.data;
+        document.getElementById('kpiUsers').textContent = d.users.total;
+        document.getElementById('kpiUsersSub').textContent = `${d.users.alumni} mezun`;
+        document.getElementById('kpiAdmins').textContent = d.users.admins + d.users.coordinators;
+        document.getElementById('kpiAdminsSub').textContent = `${d.users.admins} admin / ${d.users.coordinators} koordinator`;
+        document.getElementById('kpiAnnouncements').textContent = d.announcements.total;
+        document.getElementById('kpiAnnouncementsSub').textContent = `${d.announcements.published} yayında / ${d.announcements.drafts} taslak`;
+        document.getElementById('kpiJobs').textContent = d.jobs.total;
+        document.getElementById('kpiJobsSub').textContent = `${d.jobs.active} aktif / ${d.jobs.closed} kapalı`;
+        document.getElementById('kpiApps').textContent = d.applications.total;
+        document.getElementById('kpiAppsSub').textContent = `${d.applications.submitted} yeni başvuru`;
+
+        state.users = users.data || [];
+        state.announcements = anns.data || [];
+        state.jobs = jobs.data || [];
+        state.applications = apps.data || [];
+
+        renderUsersTable();
+        renderAnnouncementsTable();
+        renderJobsTable();
+        renderAppsTable();
+      } catch (err) {
+        showToast('Hata: ' + err.message);
+      }
+    }
+
+    function renderUsersTable() {
+      const q = (document.getElementById('userSearch').value || '').trim().toLowerCase();
+      const rows = state.users.filter(u =>
+        !q ||
+        (u.name || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q) ||
+        (u.department || '').toLowerCase().includes(q)
+      );
+
+      document.getElementById('usersTbody').innerHTML = rows.map(u => {
+        const uid = u.userId || u.id;
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHtml(u.name)}</strong><br>
+              <span style="font-size:12px; color:var(--muted);">${escapeHtml(u.email)}</span>
+            </td>
+            <td>
+              ${escapeHtml(u.department || '—')}<br>
+              <span style="font-size:12px; color:var(--muted);">${escapeHtml(u.company || '—')}</span>
+            </td>
+            <td>${escapeHtml(u.graduationYear || '—')}</td>
+            <td>${formatDisplayDate(u.createdAt)}</td>
+            <td>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <select class="role-select" id="role-${uid}">
+                  <option value="alumni" ${u.userRole === 'alumni' ? 'selected' : ''}>alumni</option>
+                  <option value="coordinator" ${u.userRole === 'coordinator' ? 'selected' : ''}>coordinator</option>
+                  <option value="admin" ${u.userRole === 'admin' ? 'selected' : ''}>admin</option>
+                </select>
+                <button type="button" class="btn-sm primary" onclick="saveUserRole('${uid}')">Ata</button>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex; gap:6px;">
+                <button type="button" class="btn-sm" onclick="openEditUserModal('${uid}')">Düzenle / Tarih</button>
+                <button type="button" class="btn-sm danger" onclick="deleteRecord('users', '${uid}', '${escapeHtml(u.email)}')">Sil</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderAnnouncementsTable() {
+      const q = (document.getElementById('annSearch').value || '').trim().toLowerCase();
+      const rows = state.announcements.filter(a =>
+        !q || (a.title || '').toLowerCase().includes(q) || (a.category || '').toLowerCase().includes(q)
+      );
+
+      document.getElementById('annTbody').innerHTML = rows.map(a => `
+        <tr>
+          <td>
+            <strong>${escapeHtml(a.title)}</strong>
+            ${a.pinned ? '<span class="badge badge-admin" style="margin-left:6px;">Sabit</span>' : ''}<br>
+            <span style="font-size:12px; color:var(--muted);">${escapeHtml(a.author || 'Admin')}</span>
+          </td>
+          <td>${escapeHtml(a.category)} / <strong>${escapeHtml(a.priority)}</strong></td>
+          <td><span class="badge ${a.status === 'published' ? 'badge-alumni' : 'badge-draft'}">${escapeHtml(a.status)}</span></td>
+          <td>${formatDisplayDate(a.createdAt)}</td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn-sm" onclick="openEditAnnouncementModal(${a.id})">Düzenle / Tarih</button>
+              <button type="button" class="btn-sm danger" onclick="deleteRecord('announcements', '${a.id}', '${escapeHtml(a.title)}')">Sil</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderJobsTable() {
+      const q = (document.getElementById('jobSearch').value || '').trim().toLowerCase();
+      const rows = state.jobs.filter(j =>
+        !q || (j.title || '').toLowerCase().includes(q) || (j.companyName || '').toLowerCase().includes(q)
+      );
+
+      document.getElementById('jobsTbody').innerHTML = rows.map(j => `
+        <tr>
+          <td>
+            <strong>${escapeHtml(j.title)}</strong><br>
+            <span style="font-size:12px; color:var(--muted);">${escapeHtml(j.companyName)} • ${escapeHtml(j.location)}</span>
+          </td>
+          <td><span class="badge ${j.status === 'active' ? 'badge-alumni' : 'badge-draft'}">${escapeHtml(j.status)}</span></td>
+          <td>${escapeHtml(j.deadline || 'Belirtilmemiş')}</td>
+          <td>${formatDisplayDate(j.createdAt)}</td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn-sm" onclick="openEditJobModal('${j.id}')">Düzenle / Tarih</button>
+              <button type="button" class="btn-sm danger" onclick="deleteRecord('jobs', '${j.id}', '${escapeHtml(j.title)}')">Sil</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAppsTable() {
+      const q = (document.getElementById('appSearch').value || '').trim().toLowerCase();
+      const rows = state.applications.filter(a =>
+        !q ||
+        (a.applicantName || '').toLowerCase().includes(q) ||
+        (a.jobTitle || '').toLowerCase().includes(q) ||
+        (a.companyName || '').toLowerCase().includes(q)
+      );
+
+      document.getElementById('appsTbody').innerHTML = rows.map(a => `
+        <tr>
+          <td>
+            <strong>${escapeHtml(a.applicantName)}</strong><br>
+            <span style="font-size:12px; color:var(--muted);">${escapeHtml(a.applicantEmail || '')}</span>
+          </td>
+          <td>
+            <strong>${escapeHtml(a.jobTitle || '—')}</strong><br>
+            <span style="font-size:12px; color:var(--muted);">${escapeHtml(a.companyName || '')}</span>
+          </td>
+          <td><span class="badge badge-coordinator">${escapeHtml(a.status)}</span></td>
+          <td>${formatDisplayDate(a.appliedAt)}</td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn-sm" onclick="openEditAppModal('${a.id}')">Düzenle / Tarih</button>
+              <button type="button" class="btn-sm danger" onclick="deleteRecord('applications', '${a.id}', 'Başvuru')">Sil</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function saveUserRole(userId) {
+      const role = document.getElementById(`role-${userId}`).value;
+      try {
+        const res = await apiFetch(`/api/admin/users/${userId}/role`, {
+          method: 'PATCH',
+          body: JSON.stringify({ userRole: role })
+        });
+        showToast(res.message);
+        await loadAllData();
+        if (typeof window.initAuthNavbarRefresh === 'function') window.initAuthNavbarRefresh();
+      } catch (err) {
+        showToast('Rol güncellenemedi: ' + err.message);
+      }
+    }
+
+    async function deleteRecord(resource, id, label) {
+      if (!confirm(`"${label}" kaydını kalıcı olarak silmek istediğinizden emin misiniz?`)) return;
+      try {
+        await apiFetch(`/api/${resource}/${id}`, { method: 'DELETE' });
+        showToast('Kayıt silindi.');
+        await loadAllData();
+      } catch (err) {
+        showToast('Silme hatası: ' + err.message);
+      }
+    }
+
+    function openEditUserModal(userId) {
+      const u = state.users.find(x => (x.userId || x.id) === userId);
+      if (!u) return;
+      state.modalContext = { type: 'user', id: userId };
+      document.getElementById('modalTitle').textContent = 'Kullanıcı Verisi & Tarih Düzenle';
+      document.getElementById('modalFields').innerHTML = `
+        <div class="field-group"><label>Ad Soyad</label><input class="field-input" name="name" value="${escapeHtml(u.name)}" required></div>
+        <div class="field-group"><label>E-posta</label><input class="field-input" name="email" type="email" value="${escapeHtml(u.email)}" required></div>
+        <div class="field-group"><label>Bölüm</label><input class="field-input" name="department" value="${escapeHtml(u.department || '')}"></div>
+        <div class="field-group"><label>Şirket</label><input class="field-input" name="company" value="${escapeHtml(u.company || '')}"></div>
+        <div class="field-group"><label>Pozisyon</label><input class="field-input" name="role" value="${escapeHtml(u.role || '')}"></div>
+        <div class="field-group"><label>Mezuniyet Yılı</label><input class="field-input" name="graduationYear" type="number" value="${escapeHtml(u.graduationYear || 2024)}"></div>
+        <div class="field-group full"><label>Kayıt Tarihi (created_at)</label><input class="field-input" name="createdAt" type="datetime-local" value="${toDateTimeLocal(u.createdAt)}"></div>
+      `;
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function openCreateAnnouncementModal() {
+      state.modalContext = { type: 'announcement_create' };
+      document.getElementById('modalTitle').textContent = 'Yeni Duyuru Oluştur';
+      document.getElementById('modalFields').innerHTML = `
+        <div class="field-group full"><label>Başlık</label><input class="field-input" name="title" required></div>
+        <div class="field-group"><label>Kategori</label><input class="field-input" name="category" value="General"></div>
+        <div class="field-group"><label>Durum</label>
+          <select class="field-input" name="status"><option value="published">published</option><option value="draft">draft</option><option value="archived">archived</option></select>
+        </div>
+        <div class="field-group"><label>Öncelik</label>
+          <select class="field-input" name="priority"><option value="medium">medium</option><option value="high">high</option><option value="urgent">urgent</option><option value="low">low</option></select>
+        </div>
+        <div class="field-group"><label>Yayın Tarihi (opsiyonel)</label><input class="field-input" name="createdAt" type="datetime-local"></div>
+        <div class="field-group full"><label>İçerik</label><textarea class="field-input" name="content" rows="4" required></textarea></div>
+      `;
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function openEditAnnouncementModal(id) {
+      const a = state.announcements.find(x => x.id === id);
+      if (!a) return;
+      state.modalContext = { type: 'announcement', id };
+      document.getElementById('modalTitle').textContent = 'Duyuru & Tarih Düzenle';
+      document.getElementById('modalFields').innerHTML = `
+        <div class="field-group full"><label>Başlık</label><input class="field-input" name="title" value="${escapeHtml(a.title)}" required></div>
+        <div class="field-group"><label>Kategori</label><input class="field-input" name="category" value="${escapeHtml(a.category)}"></div>
+        <div class="field-group"><label>Durum</label>
+          <select class="field-input" name="status">
+            <option value="published" ${a.status === 'published' ? 'selected' : ''}>published</option>
+            <option value="draft" ${a.status === 'draft' ? 'selected' : ''}>draft</option>
+            <option value="archived" ${a.status === 'archived' ? 'selected' : ''}>archived</option>
+          </select>
+        </div>
+        <div class="field-group"><label>Öncelik</label>
+          <select class="field-input" name="priority">
+            <option value="low" ${a.priority === 'low' ? 'selected' : ''}>low</option>
+            <option value="medium" ${a.priority === 'medium' ? 'selected' : ''}>medium</option>
+            <option value="high" ${a.priority === 'high' ? 'selected' : ''}>high</option>
+            <option value="urgent" ${a.priority === 'urgent' ? 'selected' : ''}>urgent</option>
+          </select>
+        </div>
+        <div class="field-group"><label>Yayın Tarihi (created_at)</label><input class="field-input" name="createdAt" type="datetime-local" value="${toDateTimeLocal(a.createdAt)}"></div>
+        <div class="field-group full"><label>İçerik</label><textarea class="field-input" name="content" rows="4" required>${escapeHtml(a.content)}</textarea></div>
+      `;
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function openEditJobModal(id) {
+      const j = state.jobs.find(x => x.id === id);
+      if (!j) return;
+      state.modalContext = { type: 'job', id };
+      document.getElementById('modalTitle').textContent = 'İlan & Tarih Düzenle';
+      document.getElementById('modalFields').innerHTML = `
+        <div class="field-group full"><label>Pozisyon Adı</label><input class="field-input" name="title" value="${escapeHtml(j.title)}" required></div>
+        <div class="field-group"><label>Şirket</label><input class="field-input" name="companyName" value="${escapeHtml(j.companyName)}" required></div>
+        <div class="field-group"><label>Konum</label><input class="field-input" name="location" value="${escapeHtml(j.location || '')}"></div>
+        <div class="field-group"><label>Durum</label>
+          <select class="field-input" name="status">
+            <option value="active" ${j.status === 'active' ? 'selected' : ''}>active</option>
+            <option value="closed" ${j.status === 'closed' ? 'selected' : ''}>closed</option>
+          </select>
+        </div>
+        <div class="field-group"><label>Son Başvuru (deadline)</label><input class="field-input" name="deadline" type="date" value="${toDateInput(j.deadline)}"></div>
+        <div class="field-group full"><label>Yayın Tarihi (created_at)</label><input class="field-input" name="createdAt" type="datetime-local" value="${toDateTimeLocal(j.createdAt)}"></div>
+      `;
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function openEditAppModal(id) {
+      const a = state.applications.find(x => x.id === id);
+      if (!a) return;
+      state.modalContext = { type: 'application', id };
+      document.getElementById('modalTitle').textContent = 'Başvuru & Tarih Düzenle';
+      document.getElementById('modalFields').innerHTML = `
+        <div class="field-group"><label>Başvuru Durumu</label>
+          <select class="field-input" name="status">
+            <option value="submitted" ${a.status === 'submitted' ? 'selected' : ''}>submitted</option>
+            <option value="under_review" ${a.status === 'under_review' ? 'selected' : ''}>under_review</option>
+            <option value="interview" ${a.status === 'interview' ? 'selected' : ''}>interview</option>
+            <option value="accepted" ${a.status === 'accepted' ? 'selected' : ''}>accepted</option>
+            <option value="rejected" ${a.status === 'rejected' ? 'selected' : ''}>rejected</option>
+          </select>
+        </div>
+        <div class="field-group"><label>Başvuru Tarihi (applied_at)</label><input class="field-input" name="appliedAt" type="datetime-local" value="${toDateTimeLocal(a.appliedAt)}"></div>
+        <div class="field-group full"><label>Değerlendirme Notları</label><textarea class="field-input" name="notes" rows="3">${escapeHtml(a.notes || '')}</textarea></div>
+      `;
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').classList.remove('open');
+      state.modalContext = null;
+    }
+
+    async function submitModalForm(e) {
+      e.preventDefault();
+      const ctx = state.modalContext;
+      if (!ctx) return;
+
+      const fd = new FormData(e.target);
+      const raw = Object.fromEntries(fd.entries());
+
+      try {
+        if (ctx.type === 'user') {
+          await apiFetch(`/api/users/${ctx.id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+              name: raw.name,
+              email: raw.email,
+              department: raw.department,
+              company: raw.company,
+              role: raw.role,
+              graduationYear: raw.graduationYear
+            })
+          });
+          if (raw.createdAt) {
+            await apiFetch(`/api/admin/dates/users/${ctx.id}`, {
+              method: 'PATCH',
+              body: JSON.stringify({ createdAt: new Date(raw.createdAt).toISOString(), graduationYear: raw.graduationYear })
+            });
+          }
+        } else if (ctx.type === 'announcement_create') {
+          const created = await apiFetch('/api/announcements', {
+            method: 'POST',
+            body: JSON.stringify({
+              title: raw.title,
+              category: raw.category,
+              status: raw.status,
+              priority: raw.priority,
+              content: raw.content
+            })
+          });
+          if (raw.createdAt && created?.data?.id) {
+            await apiFetch(`/api/admin/dates/announcements/${created.data.id}`, {
+              method: 'PATCH',
+              body: JSON.stringify({ createdAt: new Date(raw.createdAt).toISOString() })
+            });
+          }
+        } else if (ctx.type === 'announcement') {
+          await apiFetch(`/api/announcements/${ctx.id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+              title: raw.title,
+              category: raw.category,
+              status: raw.status,
+              priority: raw.priority,
+              content: raw.content
+            })
+          });
+          if (raw.createdAt) {
+            await apiFetch(`/api/admin/dates/announcements/${ctx.id}`, {
+              method: 'PATCH',
+              body: JSON.stringify({ createdAt: new Date(raw.createdAt).toISOString() })
+            });
+          }
+        } else if (ctx.type === 'job') {
+          await apiFetch(`/api/jobs/${ctx.id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+              title: raw.title,
+              companyName: raw.companyName,
+              location: raw.location,
+              status: raw.status
+            })
+          });
+          await apiFetch(`/api/admin/dates/jobs/${ctx.id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+              deadline: raw.deadline || null,
+              ...(raw.createdAt ? { createdAt: new Date(raw.createdAt).toISOString() } : {})
+            })
+          });
+        } else if (ctx.type === 'application') {
+          await apiFetch(`/api/admin/dates/applications/${ctx.id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+              status: raw.status,
+              notes: raw.notes,
+              ...(raw.appliedAt ? { appliedAt: new Date(raw.appliedAt).toISOString() } : {})
+            })
+          });
+        }
+
+        closeModal();
+        showToast('Veri ve tarih güncellemeleri veritabanına kaydedildi.');
+        await loadAllData();
+      } catch (err) {
+        showToast('Güncelleme hatası: ' + err.message);
+      }
+    }
+
+    async function loadLogs() {
+      try {
+        const res = await apiFetch('/api/admin/logs');
+        const box = document.getElementById('logsContainer');
+        if (!res.entries || res.entries.length === 0) {
+          box.innerHTML = '<div style="padding:24px; color:var(--muted);">Henüz kaydedilmiş hata veya güvenlik olayı yok.</div>';
+          return;
+        }
+        box.innerHTML = res.entries.map(e => `<div class="log-entry">${escapeHtml(e)}</div>`).join('');
+      } catch (err) {
+        document.getElementById('logsContainer').innerHTML = `<div style="padding:24px; color:#B91C1C;">${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAllData);
+  </script>
+  <script src="/js/auth-nav.js"></script>
+</body>
+</html>
